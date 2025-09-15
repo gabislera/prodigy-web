@@ -3,7 +3,7 @@ import {
 	createFileRoute,
 	Link,
 	Outlet,
-	useMatchRoute,
+	useLocation,
 } from "@tanstack/react-router";
 import {
 	Calendar,
@@ -27,7 +27,6 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -49,9 +48,12 @@ const navigation = [
 ];
 
 function RouteComponent() {
-	const matchRoute = useMatchRoute();
+	const location = useLocation();
 
-	console.log(matchRoute);
+	const currentNavItem = navigation.find(
+		(item) => item.href === location.pathname,
+	);
+
 	return (
 		<SidebarProvider>
 			<div className="flex h-screen w-full">
@@ -77,10 +79,7 @@ function RouteComponent() {
 							<SidebarGroupContent>
 								<SidebarMenu>
 									{navigation.map((item) => {
-										const isActive = !!matchRoute({
-											to: item.href,
-											fuzzy: false,
-										});
+										const isActive = item.href === location.pathname;
 
 										return (
 											<SidebarMenuItem key={item.name}>
@@ -120,6 +119,7 @@ function RouteComponent() {
 						<div className="flex items-center justify-between px-6 py-4">
 							<div className="flex items-center gap-4">
 								<SidebarTrigger />
+								<h2>{currentNavItem?.name}</h2>
 							</div>
 
 							<div className="flex items-center gap-4">
@@ -173,7 +173,7 @@ function RouteComponent() {
 					</header>
 
 					{/* Page Content */}
-					<main className="flex-1 p-6">
+					<main className="flex-1">
 						<Outlet /> {/* Aqui entram Calendar, Notes, Timer, etc */}
 					</main>
 				</div>
