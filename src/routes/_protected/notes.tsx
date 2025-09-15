@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import axios from "axios";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { AINotesDialog } from "@/components/AINotesDialog";
+import { AINotesDialog } from "@/components/ai-notes-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,12 +63,12 @@ function NotesPage() {
 		setEditContent("");
 	};
 
-	const createNoteWithAI = async (instruction: string) => {
+	const createNoteWithAI = async (prompt: string) => {
 		// Criar nova nota instantaneamente
 		const newNote: Note = {
 			id: Date.now().toString(),
 			title: "Gerando com IA...",
-			content: `Aguarde, gerando conteúdo com IA...\n\nInstrução: ${instruction}`,
+			content: ``,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
@@ -78,13 +78,19 @@ function NotesPage() {
 		setEditContent(newNote.content);
 
 		try {
-			const response = await axios.get("http://localhost:3333/");
-			const aiContent = response.data.message.steps[0].content[0].text;
+			const response = await axios.post("http://localhost:3333/ai", {
+				prompt,
+			});
+			const aiContent = response.data.message.steps[0]?.content[0]?.text;
+
+			console.log(response);
+
+			console.log(aiContent);
 
 			const updatedNote = {
 				...newNote,
 				content: aiContent,
-				title: aiContent.split("\n")[0] || "Nova nota gerada por IA",
+				title: aiContent.split("\n")[0] || "Gerando...",
 				updatedAt: new Date(),
 			};
 
@@ -188,7 +194,7 @@ function NotesPage() {
 											}
 											className="px-3 py-2 cursor-pointer transition-colors hover:bg-muted/30 rounded-md data-active:bg-muted/50 text-left w-full"
 										>
-											<h4 className="font-medium text-sm text-foreground mb-1">
+											<h4 className="font-medium text-sm text-foreground mb-1 truncate">
 												{note.title}
 											</h4>
 											<span className="text-xs text-muted-foreground block">
@@ -209,7 +215,7 @@ function NotesPage() {
 							setEditContent(e.target.value);
 							updateNote(e.target.value);
 						}}
-						className="w-full flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
+						className="w-full prose prose-invert prose-zinc flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
 						placeholder="Comece a escrever..."
 					/>
 				</div>
