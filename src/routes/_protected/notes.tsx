@@ -72,8 +72,6 @@ function NotesPage() {
 				.includes(searchQuery.toLocaleLowerCase()),
 	);
 
-	console.log(notes, filteredNotes, searchQuery);
-
 	const selectNote = (note: Note) => {
 		setSelectedNote(note);
 		setEditContent(note.content);
@@ -125,7 +123,7 @@ function NotesPage() {
 
 			<div className="w-full flex flex-1 min-h-0">
 				<div className="w-72 border-r border-border/30 flex flex-col bg-background min-h-0">
-					<div className="flex-1 overflow-y-auto py-2 min-h-0">
+					<div className="flex-1 overflow-y-auto py-2 min-h-0 scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent">
 						{filteredNotes.length > 0 && (
 							<div className="px-4 mb-4">
 								<h3 className="text-sm font-medium text-muted-foreground mb-2 px-2">
@@ -163,7 +161,7 @@ function NotesPage() {
 							setEditContent(e.target.value);
 							updateNote(e.target.value);
 						}}
-						className="w-full flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto"
+						className="w-full flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
 						placeholder="Comece a escrever..."
 					/>
 				</div>
