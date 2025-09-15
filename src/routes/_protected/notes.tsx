@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import axios from "axios";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { AINotesDialog } from "@/components/AINotesDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +32,7 @@ function NotesPage() {
 	const [selectedNote, setSelectedNote] = useState<Note | null>(notes[0]);
 	const [editContent, setEditContent] = useState(selectedNote?.content || "");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
 	const updateNote = (content: string) => {
 		if (!selectedNote) return;
@@ -60,7 +63,53 @@ function NotesPage() {
 		setEditContent("");
 	};
 
-	const createNoteWithAI = () => {};
+	const createNoteWithAI = async (instruction: string) => {
+		// Criar nova nota instantaneamente
+		const newNote: Note = {
+			id: Date.now().toString(),
+			title: "Gerando com IA...",
+			content: `Aguarde, gerando conteúdo com IA...\n\nInstrução: ${instruction}`,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+
+		setNotes((prev) => [newNote, ...prev]);
+		setSelectedNote(newNote);
+		setEditContent(newNote.content);
+
+		try {
+			const response = await axios.get("http://localhost:3333/");
+			const aiContent = response.data.message.steps[0].content[0].text;
+
+			const updatedNote = {
+				...newNote,
+				content: aiContent,
+				title: aiContent.split("\n")[0] || "Nova nota gerada por IA",
+				updatedAt: new Date(),
+			};
+
+			setNotes((prev) =>
+				prev.map((note) => (note.id === newNote.id ? updatedNote : note)),
+			);
+			setSelectedNote(updatedNote);
+			setEditContent(updatedNote.content);
+		} catch (error) {
+			console.error("Erro ao conectar com a API:", error);
+
+			const errorNote = {
+				...newNote,
+				content: "Erro ao gerar conteúdo com IA. Tente novamente.",
+				title: "Erro na geração",
+				updatedAt: new Date(),
+			};
+
+			setNotes((prev) =>
+				prev.map((note) => (note.id === newNote.id ? errorNote : note)),
+			);
+			setSelectedNote(errorNote);
+			setEditContent(errorNote.content);
+		}
+	};
 
 	const filteredNotes = notes.filter(
 		(note) =>
@@ -109,11 +158,10 @@ function NotesPage() {
 						Nova Nota
 					</Button>
 					<Button
-						onClick={createNoteWithAI}
+						onClick={() => setIsAIDialogOpen(true)}
 						size="sm"
 						className="flex-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20"
 						variant="outline"
-						disabled
 					>
 						<Sparkles className="w-4 h-4 mr-2" />
 						Gerar com IA
@@ -166,6 +214,12 @@ function NotesPage() {
 					/>
 				</div>
 			</div>
+
+			<AINotesDialog
+				isOpen={isAIDialogOpen}
+				onOpenChange={setIsAIDialogOpen}
+				onCreateNote={createNoteWithAI}
+			/>
 		</div>
 	);
 }
