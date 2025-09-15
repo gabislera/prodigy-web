@@ -59,8 +59,8 @@ function RouteComponent() {
 			<div className="flex h-screen w-full">
 				<Sidebar>
 					<SidebarHeader>
-						<div className="flex items-center gap-3">
-							<div className="w-10 h-10 bg-gradient-to-br from-sidebar-primary to-accent rounded-xl flex items-center justify-center">
+						<div className="flex items-center gap-3 p-2">
+							<div className="w-8 h-8 bg-gradient-to-br from-sidebar-primary to-accent rounded-xl flex items-center justify-center">
 								<span className="text-xl font-bold text-sidebar-primary-foreground">
 									F
 								</span>
@@ -115,7 +115,7 @@ function RouteComponent() {
 				</Sidebar>
 
 				<div className="flex-1 flex flex-col">
-					<header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
+					<header className="sticky top-0 z-40 bg-sidebar backdrop-blur-sm border-b border-border">
 						<div className="flex items-center justify-between px-6 py-4">
 							<div className="flex items-center gap-4">
 								<SidebarTrigger />
@@ -177,9 +177,6 @@ function RouteComponent() {
 						<Outlet /> {/* Aqui entram Calendar, Notes, Timer, etc */}
 					</main>
 				</div>
-
-				{/* <main className="flex-1 p-4 overflow-y-auto">
-        </main> */}
 			</div>
 		</SidebarProvider>
 	);
