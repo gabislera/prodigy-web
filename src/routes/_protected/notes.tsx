@@ -1,13 +1,14 @@
+import { useChat } from "@ai-sdk/react";
 import { createFileRoute } from "@tanstack/react-router";
-import axios from "axios";
-import { Plus, Search, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { DefaultChatTransport } from "ai";
+import { Bot, Plus, Search, Send, Sparkles, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AINotesDialog } from "@/components/ai-notes-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-interface Note {
+export interface Note {
 	id: string;
 	title: string;
 	content: string;
@@ -33,22 +34,33 @@ function NotesPage() {
 	const [editContent, setEditContent] = useState(selectedNote?.content || "");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
+	const [isChatOpen, setIsChatOpen] = useState(false);
 
-	const updateNote = (content: string) => {
-		if (!selectedNote) return;
+	const containerRef = useRef<HTMLTextAreaElement>(null);
+	const aiGeneratedNoteId = useRef<string | null>(null);
 
-		const updatedNote = {
-			...selectedNote,
-			content,
-			title: content.split("\n")[0] || "Nova Nota",
-			updatedAt: new Date(),
-		};
+	const { messages, sendMessage, status } = useChat({
+		transport: new DefaultChatTransport({ api: "http://localhost:3333/ai" }),
+	});
 
-		setNotes((prev) =>
-			prev.map((note) => (note.id === selectedNote.id ? updatedNote : note)),
-		);
-		setSelectedNote(updatedNote);
-	};
+	const updateNote = useCallback(
+		(content: string) => {
+			if (!selectedNote) return;
+
+			const updatedNote = {
+				...selectedNote,
+				content,
+				title: content.split("\n")[0] || "Nova Nota",
+				updatedAt: new Date(),
+			};
+
+			setNotes((prev) =>
+				prev.map((note) => (note.id === selectedNote.id ? updatedNote : note)),
+			);
+			setSelectedNote(updatedNote);
+		},
+		[selectedNote],
+	);
 
 	const createNewNote = () => {
 		const newNote: Note = {
@@ -58,64 +70,30 @@ function NotesPage() {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
+		aiGeneratedNoteId.current = null; // Limpar referência da IA
 		setNotes((prev) => [newNote, ...prev]);
 		setSelectedNote(newNote);
 		setEditContent("");
 	};
 
 	const createNoteWithAI = async (prompt: string) => {
-		// Criar nova nota instantaneamente
 		const newNote: Note = {
 			id: Date.now().toString(),
-			title: "Gerando com IA...",
+			title: "",
 			content: ``,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
 
+		// Marcar esta nota como sendo gerada pela IA
+		aiGeneratedNoteId.current = newNote.id;
 		setNotes((prev) => [newNote, ...prev]);
 		setSelectedNote(newNote);
 		setEditContent(newNote.content);
-
-		try {
-			const response = await axios.post("http://localhost:3333/ai", {
-				prompt,
-			});
-			const aiContent = response.data.message.steps[0]?.content[0]?.text;
-
-			console.log(response);
-
-			console.log(aiContent);
-
-			const updatedNote = {
-				...newNote,
-				content: aiContent,
-				title: aiContent.split("\n")[0] || "Gerando...",
-				updatedAt: new Date(),
-			};
-
-			setNotes((prev) =>
-				prev.map((note) => (note.id === newNote.id ? updatedNote : note)),
-			);
-			setSelectedNote(updatedNote);
-			setEditContent(updatedNote.content);
-		} catch (error) {
-			console.error("Erro ao conectar com a API:", error);
-
-			const errorNote = {
-				...newNote,
-				content: "Erro ao gerar conteúdo com IA. Tente novamente.",
-				title: "Erro na geração",
-				updatedAt: new Date(),
-			};
-
-			setNotes((prev) =>
-				prev.map((note) => (note.id === newNote.id ? errorNote : note)),
-			);
-			setSelectedNote(errorNote);
-			setEditContent(errorNote.content);
-		}
+		sendMessage({ text: prompt });
 	};
+
+	// console.log(messages, status);
 
 	const filteredNotes = notes.filter(
 		(note) =>
@@ -128,6 +106,10 @@ function NotesPage() {
 	);
 
 	const selectNote = (note: Note) => {
+		// Se não é a mesma nota que está sendo gerada pela IA, limpar a referência
+		if (aiGeneratedNoteId.current !== note.id) {
+			aiGeneratedNoteId.current = null;
+		}
 		setSelectedNote(note);
 		setEditContent(note.content);
 	};
@@ -139,6 +121,69 @@ function NotesPage() {
 			year: "numeric",
 		});
 	};
+
+	// Effect para injetar conteúdo da IA na textarea APENAS para a nota sendo gerada pela IA
+	useEffect(() => {
+		if (
+			messages.length > 0 &&
+			selectedNote &&
+			aiGeneratedNoteId.current === selectedNote.id
+		) {
+			const lastAssistantMessage = messages
+				.filter((message) => message.role === "assistant")
+				.pop();
+
+			if (lastAssistantMessage) {
+				const textContent = lastAssistantMessage.parts
+					.filter((part) => part.type === "text")
+					.map((part) => part.text)
+					.join("");
+
+				// Só atualiza se há conteúdo de texto diferente do atual
+				if (textContent && textContent !== selectedNote.content) {
+					// Atualizar o editContent
+					setEditContent(textContent);
+
+					// Atualizar a nota
+					const updatedNote = {
+						...selectedNote,
+						content: textContent,
+						title: textContent.split("\n")[0] || "Nova Nota",
+						updatedAt: new Date(),
+					};
+
+					setNotes((prev) =>
+						prev.map((note) =>
+							note.id === selectedNote.id ? updatedNote : note,
+						),
+					);
+					setSelectedNote(updatedNote);
+				}
+			}
+		}
+	}, [messages, selectedNote]);
+
+	useEffect(() => {
+		if (messages.length > 0 && status === "streaming" && containerRef.current) {
+			containerRef.current.scrollTo({
+				top: containerRef.current.scrollHeight,
+				behavior: "smooth",
+			});
+		}
+	}, [messages, status]);
+
+	// Effect para limpar a referência da IA quando o streaming terminar
+	useEffect(() => {
+		if (
+			(status === "ready" || status === "error") &&
+			aiGeneratedNoteId.current
+		) {
+			// Limpar a referência depois de um breve delay para permitir edição livre
+			setTimeout(() => {
+				aiGeneratedNoteId.current = null;
+			}, 500);
+		}
+	}, [status]);
 
 	return (
 		<div className="flex flex-col h-[calc(100vh-80px)]">
@@ -153,7 +198,10 @@ function NotesPage() {
 					/>
 				</div>
 
-				<div className="flex gap-2">
+				<div className="flex items-center justify-center gap-2">
+					{status === "submitted" && (
+						<Bot className="size-6 text-zinc-400 animate-pulse mr-2" />
+					)}
 					<Button
 						onClick={createNewNote}
 						size="sm"
@@ -210,14 +258,47 @@ function NotesPage() {
 
 				<div className="flex-1 bg-background min-h-0 flex flex-col">
 					<Textarea
+						ref={containerRef}
 						value={editContent}
 						onChange={(e) => {
 							setEditContent(e.target.value);
 							updateNote(e.target.value);
 						}}
-						className="w-full prose prose-invert prose-zinc flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
+						className="min-w-full prose prose-invert prose-zinc flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
 						placeholder="Comece a escrever..."
 					/>
+					{isChatOpen && selectedNote ? (
+						<div className="p-4 border-t border-border/30">
+							<div className="flex gap-2">
+								<Input
+									// value={aiChatMessage}
+									// onChange={(e) => setAiChatMessage(e.target.value)}
+									placeholder="Digite sua mensagem..."
+									// onKeyPress={(e) => e.key === "Enter" && sendAIMessage()}
+									className="flex-1"
+								/>
+								<Button size="sm">
+									<Send className="w-4 h-4" />
+								</Button>
+								<Button
+									onClick={() => setIsChatOpen(false)}
+									size="sm"
+									variant="ghost"
+								>
+									<X className="w-4 h-4" />
+								</Button>
+							</div>
+						</div>
+					) : (
+						<Button
+							onClick={() => setIsChatOpen(true)}
+							size="lg"
+							className="bg-purple-500/10 hover:bg-purple-500/20  border-purple-500/20 fixed bottom-4 right-4 rounded-full w-12 h-12"
+							variant="outline"
+						>
+							<Bot className="size-6" />
+						</Button>
+					)}
 				</div>
 			</div>
 

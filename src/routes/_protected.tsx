@@ -60,14 +60,14 @@ function RouteComponent() {
 				<Sidebar>
 					<SidebarHeader>
 						<div className="flex items-center gap-3 p-2">
-							<div className="w-8 h-8 bg-gradient-to-br from-sidebar-primary to-accent rounded-xl flex items-center justify-center">
+							{/* <div className="w-8 h-8 bg-gradient-to-br from-sidebar-primary to-accent rounded-xl flex items-center justify-center">
 								<span className="text-xl font-bold text-sidebar-primary-foreground">
 									F
 								</span>
-							</div>
+							</div> */}
 							<div>
 								<h1 className="text-xl font-bold text-sidebar-foreground">
-									FocusFlow
+									Focus
 								</h1>
 								<p className="text-xs text-muted-foreground">Produtividade</p>
 							</div>
