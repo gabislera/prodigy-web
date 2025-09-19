@@ -1,6 +1,7 @@
 import { useChat } from "@ai-sdk/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
+import axios from "axios";
 import { Bot, Plus, Search, Send, Sparkles, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AINotesDialog } from "@/components/ai-notes-dialog";
@@ -62,7 +63,17 @@ function NotesPage() {
 		[selectedNote],
 	);
 
-	const createNewNote = () => {
+	const createNewNote = async () => {
+		try {
+			const response = await axios.post("http://localhost:3333/notes", {
+				title: "teste",
+				content: "content",
+			});
+			console.log(response.data);
+		} catch (err) {
+			console.log(err);
+		}
+
 		const newNote: Note = {
 			id: Date.now().toString(),
 			title: "Nova Nota",
@@ -114,8 +125,9 @@ function NotesPage() {
 		setEditContent(note.content);
 	};
 
-	const formatDate = (date: Date) => {
-		return date.toLocaleDateString("pt-BR", {
+	const formatDate = (date: Date | string) => {
+		const dateObj = typeof date === "string" ? new Date(date) : date;
+		return dateObj.toLocaleDateString("pt-BR", {
 			day: "2-digit",
 			month: "2-digit",
 			year: "numeric",
@@ -184,6 +196,20 @@ function NotesPage() {
 			}, 500);
 		}
 	}, [status]);
+
+	const getNotes = async () => {
+		try {
+			const result = await axios.get("http://localhost:3333/notes");
+			console.log(result.data);
+			setNotes(result.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	useEffect(() => {
+		getNotes();
+	}, []);
 
 	return (
 		<div className="flex flex-col h-[calc(100vh-80px)]">
@@ -267,7 +293,7 @@ function NotesPage() {
 						className="min-w-full prose prose-invert prose-zinc flex-1 p-4 rounded-none resize-none border-none text-base leading-relaxed focus-visible:ring-0 font-normal overflow-y-auto scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
 						placeholder="Comece a escrever..."
 					/>
-					{isChatOpen && selectedNote ? (
+					{/* {isChatOpen && selectedNote ? (
 						<div className="p-4 border-t border-border/30">
 							<div className="flex gap-2">
 								<Input
@@ -298,7 +324,7 @@ function NotesPage() {
 						>
 							<Bot className="size-6" />
 						</Button>
-					)}
+					)} */}
 				</div>
 			</div>
 
