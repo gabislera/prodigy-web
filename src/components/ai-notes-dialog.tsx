@@ -37,6 +37,13 @@ export function AINotesDialog({
 		setInstruction("");
 	};
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
+			handleSubmit();
+		}
+	};
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
@@ -53,6 +60,7 @@ export function AINotesDialog({
 					<Textarea
 						value={instruction}
 						onChange={(e) => setInstruction(e.target.value)}
+						onKeyDown={handleKeyDown}
 						placeholder="Ex: Escreva um resumo sobre inteligência artificial..."
 						className="min-h-[100px] resize-none"
 					/>

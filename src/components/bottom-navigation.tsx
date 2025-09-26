@@ -31,7 +31,7 @@ export const BottomNavigation = () => {
 							)}
 						>
 							<Icon
-								size={22}
+								size={20}
 								className={cn(
 									"transition-colors duration-300 text-muted-foreground",
 									isActive && "text-white",

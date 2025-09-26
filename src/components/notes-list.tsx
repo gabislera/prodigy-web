@@ -1,4 +1,5 @@
 import { Trash2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Note } from "@/services/notesService";
 
 interface NotesListProps {
@@ -14,6 +15,7 @@ export function NotesList({
 	onSelectNote,
 	onDeleteNote,
 }: NotesListProps) {
+	const isMobile = useIsMobile();
 	const formatDate = (date: Date | string) => {
 		const dateObj = typeof date === "string" ? new Date(date) : date;
 		return dateObj.toLocaleDateString("pt-BR", {
@@ -25,7 +27,7 @@ export function NotesList({
 
 	if (notes.length === 0) {
 		return (
-			<div className="w-72 border-r border-border/30 flex flex-col bg-background min-h-0">
+			<div className="w-full md:w-72 md:border-r border-border/30 flex flex-col bg-background min-h-0">
 				<div className="flex-1 overflow-y-auto py-2 min-h-0 flex items-center justify-center">
 					<p className="text-sm text-muted-foreground">
 						Nenhuma nota encontrada
@@ -36,7 +38,7 @@ export function NotesList({
 	}
 
 	return (
-		<div className="w-72 border-r border-border/30 flex flex-col bg-background min-h-0">
+		<div className="w-full md:w-72 md:border-r border-border/30 flex flex-col bg-background min-h-0">
 			<div className="flex-1 overflow-y-auto py-2 min-h-0 scrollbar scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent">
 				<div className="px-4 mb-4">
 					<h3 className="text-sm font-medium text-muted-foreground mb-2 px-2">
@@ -63,7 +65,7 @@ export function NotesList({
 										e.stopPropagation();
 										onDeleteNote(note.id);
 									}}
-									className="absolute top-4 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive/90 hover:transition-all"
+									className="absolute top-5 right-2 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive/90 hover:transition-all"
 									title="Deletar nota"
 								>
 									<Trash2 size={16} />

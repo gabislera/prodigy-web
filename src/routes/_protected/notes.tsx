@@ -7,6 +7,7 @@ import { AINotesDialog } from "@/components/ai-notes-dialog";
 import { NotesEditor } from "@/components/notes-editor";
 import { NotesHeader } from "@/components/notes-header";
 import { NotesList } from "@/components/notes-list";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotes } from "@/hooks/use-notes";
 import type { Note } from "@/services/notesService";
 
@@ -16,11 +17,13 @@ export const Route = createFileRoute("/_protected/notes")({
 
 function NotesPage() {
 	const { notes, createNote, debouncedUpdateNote, deleteNote } = useNotes();
+	const isMobile = useIsMobile();
 
 	const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 	const [editContent, setEditContent] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
+	const [showEditor, setShowEditor] = useState(false); // Para controlar view mobile
 
 	const containerRef = useRef<HTMLTextAreaElement>(null);
 	const aiGeneratedNoteId = useRef<string | null>(null);
@@ -77,6 +80,11 @@ function NotesPage() {
 				setSelectedNote(newNote);
 				setEditContent("");
 
+				// No mobile, mudar para a view do editor
+				if (isMobile) {
+					setShowEditor(true);
+				}
+
 				// If AI prompt provided, generate content
 				if (aiPrompt) {
 					aiGeneratedNoteId.current = newNote.id;
@@ -86,8 +94,12 @@ function NotesPage() {
 				console.error("Erro ao criar nota:", error);
 			}
 		},
-		[createNote, sendMessage],
+		[createNote, sendMessage, isMobile],
 	);
+
+	const handleBackToList = useCallback(() => {
+		setShowEditor(false);
+	}, []);
 
 	const handleSelectNote = (note: Note) => {
 		// Clear AI reference if switching to a different note
@@ -96,6 +108,11 @@ function NotesPage() {
 		}
 		setSelectedNote(note);
 		setEditContent(note.content);
+
+		// No mobile, mudar para a view do editor
+		if (isMobile) {
+			setShowEditor(true);
+		}
 	};
 
 	const handleDeleteNote = useCallback(
@@ -112,13 +129,17 @@ function NotesPage() {
 					} else {
 						setSelectedNote(null);
 						setEditContent("");
+						// No mobile, voltar para a lista se não há mais notas
+						if (isMobile) {
+							setShowEditor(false);
+						}
 					}
 				}
 			} catch (error) {
 				console.error("Erro ao deletar nota:", error);
 			}
 		},
-		[deleteNote, selectedNote, notes],
+		[deleteNote, selectedNote, notes, isMobile],
 	);
 
 	const handleContentChange = useCallback(
@@ -183,29 +204,56 @@ function NotesPage() {
 	}, [messages, status, selectedNote, debouncedUpdateNote]);
 
 	return (
-		<div className="flex flex-col h-[calc(100vh-80px)]">
+		<div className="flex flex-col h-[calc(100vh-60px)] md:h-[calc(100vh-80px)]">
+			{/* Header - sempre visível */}
 			<NotesHeader
 				searchQuery={searchQuery}
 				onSearchChange={setSearchQuery}
 				onCreateNote={() => handleCreateNote()}
 				onOpenAIDialog={() => setIsAIDialogOpen(true)}
 				isAIGenerating={status === "submitted"}
+				showBackButton={isMobile && showEditor && selectedNote !== null}
+				onBackToList={handleBackToList}
 			/>
 
 			<div className="w-full flex flex-1 min-h-0">
-				<NotesList
-					notes={filteredNotes}
-					selectedNote={selectedNote}
-					onSelectNote={handleSelectNote}
-					onDeleteNote={handleDeleteNote}
-				/>
+				{/* Layout Desktop */}
+				{!isMobile && (
+					<>
+						<NotesList
+							notes={filteredNotes}
+							selectedNote={selectedNote}
+							onSelectNote={handleSelectNote}
+							onDeleteNote={handleDeleteNote}
+						/>
 
-				<NotesEditor
-					ref={containerRef}
-					selectedNote={selectedNote}
-					editContent={editContent}
-					onContentChange={handleContentChange}
-				/>
+						<NotesEditor
+							ref={containerRef}
+							selectedNote={selectedNote}
+							editContent={editContent}
+							onContentChange={handleContentChange}
+						/>
+					</>
+				)}
+
+				{/* Layout Mobile */}
+				{isMobile && !showEditor && (
+					<NotesList
+						notes={filteredNotes}
+						selectedNote={selectedNote}
+						onSelectNote={handleSelectNote}
+						onDeleteNote={handleDeleteNote}
+					/>
+				)}
+
+				{isMobile && showEditor && (
+					<NotesEditor
+						ref={containerRef}
+						selectedNote={selectedNote}
+						editContent={editContent}
+						onContentChange={handleContentChange}
+					/>
+				)}
 			</div>
 
 			<AINotesDialog
