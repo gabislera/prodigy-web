@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
 	createFileRoute,
 	Link,
@@ -9,31 +8,26 @@ import {
 	Calendar,
 	FileText,
 	Home,
-	LogOut,
 	Settings,
 	Timer,
+	Trophy,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarHeader,
+	SidebarInset,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_protected")({
 	component: RouteComponent,
@@ -54,22 +48,31 @@ function RouteComponent() {
 		(item) => item.href === location.pathname,
 	);
 
+	const isMobile = useIsMobile();
+
+	if (isMobile) {
+		return (
+			<div className="min-h-screen bg-background text-foreground">
+				<main className="relative pb-20">
+					<Outlet /> {/* Mobile pages */}
+				</main>
+				<BottomNavigation />
+			</div>
+		);
+	}
+
 	return (
 		<SidebarProvider>
-			<div className="flex h-screen w-full">
-				<Sidebar>
-					<SidebarHeader>
-						<div className="flex items-center gap-3 p-2">
-							{/* <div className="w-8 h-8 bg-gradient-to-br from-sidebar-primary to-accent rounded-xl flex items-center justify-center">
-								<span className="text-xl font-bold text-sidebar-primary-foreground">
-									F
-								</span>
-							</div> */}
-							<div>
-								<h1 className="text-xl font-bold text-sidebar-foreground">
-									Focus
-								</h1>
-								<p className="text-xs text-muted-foreground">Produtividade</p>
+			<div className="min-h-screen flex w-full bg-background">
+				<Sidebar className="border-r border-white/10">
+					<SidebarHeader className="border-b border-white/10 p-4">
+						<div className="flex items-center gap-3">
+							<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+								<Trophy className="w-4 h-4 text-white" />
+							</div>
+							<div className="flex flex-col">
+								<h2 className="font-bold text-white">StudyFlow</h2>
+								<p className="text-xs text-gray-400">Sua jornada produtiva</p>
 							</div>
 						</div>
 					</SidebarHeader>
@@ -78,15 +81,27 @@ function RouteComponent() {
 						<SidebarGroup>
 							<SidebarGroupContent>
 								<SidebarMenu>
-									{navigation.map((item) => {
-										const isActive = item.href === location.pathname;
+									{navigation.map((tab) => {
+										const Icon = tab.icon;
+										const isActive = tab.href === location.pathname;
 
 										return (
-											<SidebarMenuItem key={item.name}>
-												<SidebarMenuButton asChild isActive={isActive}>
-													<Link to={item.href}>
-														<item.icon className="h-4 w-4" />
-														<span>{item.name}</span>
+											<SidebarMenuItem key={tab.name}>
+												<SidebarMenuButton
+													size={"sm"}
+													asChild
+													isActive={isActive}
+													className={cn(
+														"px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/5",
+														isActive && "bg-gradient-primary",
+													)}
+												>
+													<Link
+														to={tab.href}
+														className="flex items-center gap-3 "
+													>
+														<Icon className="h-4 w-4" />
+														<span className="font-medium">{tab.name}</span>
 													</Link>
 												</SidebarMenuButton>
 											</SidebarMenuItem>
@@ -96,87 +111,20 @@ function RouteComponent() {
 							</SidebarGroupContent>
 						</SidebarGroup>
 					</SidebarContent>
-
-					<SidebarFooter className="border-t border-sidebar-border p-4">
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									onClick={() => {
-										// TODO: Implement logout logic
-										console.log("Logout clicked");
-									}}
-								>
-									<LogOut className="h-4 w-4" />
-									<span>Sair</span>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						</SidebarMenu>
-					</SidebarFooter>
 				</Sidebar>
-
-				<div className="flex-1 flex flex-col">
-					<header className="sticky top-0 z-40 bg-sidebar backdrop-blur-sm border-b border-border">
-						<div className="flex items-center justify-between px-6 py-4">
-							<div className="flex items-center gap-4">
-								<SidebarTrigger />
-								<h2>{currentNavItem?.name}</h2>
-							</div>
-
-							<div className="flex items-center gap-4">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											variant="ghost"
-											className="relative h-10 w-10 rounded-full"
-										>
-											<Avatar className="w-10">
-												<AvatarImage
-													src="/diverse-user-avatars.png"
-													alt="Avatar"
-												/>
-												<AvatarFallback className="bg-primary text-primary-foreground">
-													U
-												</AvatarFallback>
-											</Avatar>
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										className="w-56 bg-popover/95 backdrop-blur-sm"
-										align="end"
-										forceMount
-									>
-										<div className="flex items-center justify-start gap-2 p-2">
-											<div className="flex flex-col space-y-1 leading-none">
-												<p className="font-medium text-popover-foreground">
-													Usuário
-												</p>
-												<p className="w-[200px] truncate text-sm text-muted-foreground">
-													usuario@email.com
-												</p>
-											</div>
-										</div>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem className="text-popover-foreground hover:bg-accent/50">
-											Perfil
-										</DropdownMenuItem>
-										<DropdownMenuItem className="text-popover-foreground hover:bg-accent/50">
-											Configurações
-										</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem className="text-destructive hover:bg-destructive/10">
-											Sair
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
+				<SidebarInset>
+					<header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
+						<SidebarTrigger className="-ml-1" />
+						<div className="flex items-center gap-2">
+							<h1 className="text-xl font-bold text-white">
+								{currentNavItem?.name}
+							</h1>
 						</div>
 					</header>
-
-					{/* Page Content */}
-					<main className="flex-1">
-						<Outlet /> {/* Aqui entram Calendar, Notes, Timer, etc */}
+					<main className="flex-1 overflow-auto">
+						<Outlet /> {/* Desktop pages */}
 					</main>
-				</div>
+				</SidebarInset>
 			</div>
 		</SidebarProvider>
 	);
