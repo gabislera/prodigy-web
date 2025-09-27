@@ -49,7 +49,39 @@ function DashboardHome() {
 
 	return (
 		<div className="p-3 pb-24 space-y-4">
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			{/* Header */}
+			<div className="text-center space-y-1">
+				<h1 className="text-xl font-bold text-foreground">
+					Olá, Estudante! 👋
+				</h1>
+				<p className="text-sm text-muted-foreground capitalize">
+					{dayName}, {date}
+				</p>
+			</div>
+
+			{/* Mobile Streak Card */}
+			<div className="lg:hidden">
+				<Card className="bg-gradient-streak border-0 p-4 shadow-success">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<div className="p-2 rounded-full bg-white/20">
+								<Flame className="h-4 w-4 text-white" />
+							</div>
+							<div>
+								<h3 className="text-sm font-semibold text-white">Sequência</h3>
+								<p className="text-xs text-white/80">Dias consecutivos</p>
+							</div>
+						</div>
+						<div className="text-right">
+							<div className="text-2xl font-bold text-white">7</div>
+							<p className="text-xs text-white/80">dias</p>
+						</div>
+					</div>
+				</Card>
+			</div>
+
+			{/* Desktop Layout - Side by Side */}
+			<div className="hidden lg:grid lg:grid-cols-2 lg:gap-6">
 				{/* Today's Tasks */}
 				<Card className="bg-gradient-card border-border/50 p-4">
 					<div className="flex items-center justify-between mb-3">
@@ -62,7 +94,7 @@ function DashboardHome() {
 					</div>
 
 					<div className="space-y-2">
-						{todayTasks.map((task) => (
+						{todayTasks.map((task, index) => (
 							<div key={task.name} className="flex items-center gap-2 py-1">
 								<Circle
 									className={`h-2 w-2 ${getPriorityColor(task.priority)} ${task.completed ? "fill-current" : ""}`}
@@ -84,7 +116,96 @@ function DashboardHome() {
 					</Button>
 				</Card>
 
-				{/* Daily Goals - Compact */}
+				{/* Daily Goals */}
+				<Card className="bg-gradient-card border-border/50 p-4">
+					<h2 className="text-sm font-semibold flex items-center gap-2 mb-3">
+						<Target className="h-4 w-4 text-primary" />
+						Metas de Hoje
+					</h2>
+
+					<div className="space-y-2">
+						{[
+							{
+								name: "Estudar 2 horas",
+								progress: 75,
+								icon: BookOpen,
+								completed: false,
+							},
+							{
+								name: "3 Pomodoros",
+								progress: 100,
+								icon: Clock,
+								completed: true,
+							},
+							{
+								name: "Revisar notas",
+								progress: 50,
+								icon: Zap,
+								completed: false,
+							},
+						].map((goal, index) => (
+							<div key={goal.name} className="p-3 bg-background/50 rounded-lg">
+								<div className="flex items-center gap-2 mb-2">
+									<goal.icon className="h-3 w-3 text-primary" />
+									<span className="flex-1 text-xs font-medium">
+										{goal.name}
+									</span>
+									{goal.completed && (
+										<Badge
+											variant="secondary"
+											className="bg-success text-success-foreground text-xs px-1 py-0"
+										>
+											✓
+										</Badge>
+									)}
+								</div>
+								<Progress value={goal.progress} className="h-1.5" />
+								<p className="text-xs text-muted-foreground mt-1">
+									{goal.progress}% concluído
+								</p>
+							</div>
+						))}
+					</div>
+				</Card>
+			</div>
+
+			{/* Mobile Layout - Stacked */}
+			<div className="lg:hidden space-y-4">
+				{/* Today's Tasks */}
+				<Card className="bg-gradient-card border-border/50 p-4">
+					<div className="flex items-center justify-between mb-3">
+						<h2 className="text-sm font-semibold text-foreground">
+							Tarefas de Hoje
+						</h2>
+						<p className="text-xs text-muted-foreground">
+							Suas prioridades para hoje
+						</p>
+					</div>
+
+					<div className="space-y-2">
+						{todayTasks.map((task, index) => (
+							<div key={task.name} className="flex items-center gap-2 py-1">
+								<Circle
+									className={`h-2 w-2 ${getPriorityColor(task.priority)} ${task.completed ? "fill-current" : ""}`}
+								/>
+								<span
+									className={`flex-1 text-xs ${task.completed ? "line-through text-muted-foreground" : ""}`}
+								>
+									{task.name}
+								</span>
+							</div>
+						))}
+					</div>
+
+					<Button
+						variant="outline"
+						className="w-full mt-3 h-8 text-xs bg-gradient-primary border-0 text-white hover:opacity-90"
+					>
+						Ver todas as tarefas
+					</Button>
+				</Card>
+
+				{/* Daily Goals */}
 				<div className="space-y-3">
 					<h2 className="text-sm font-semibold flex items-center gap-2">
 						<Target className="h-4 w-4 text-primary" />
@@ -111,7 +232,7 @@ function DashboardHome() {
 								icon: Zap,
 								completed: false,
 							},
-						].map((goal) => (
+						].map((goal, index) => (
 							<Card
 								key={goal.name}
 								className="p-3 bg-gradient-card border-border/50"

@@ -1,5 +1,4 @@
 import { Trash2 } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import type { Note } from "@/services/notesService";
 
 interface NotesListProps {
@@ -15,7 +14,6 @@ export function NotesList({
 	onSelectNote,
 	onDeleteNote,
 }: NotesListProps) {
-	const isMobile = useIsMobile();
 	const formatDate = (date: Date | string) => {
 		const dateObj = typeof date === "string" ? new Date(date) : date;
 		return dateObj.toLocaleDateString("pt-BR", {
