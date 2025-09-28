@@ -83,10 +83,8 @@ function CalendarPage() {
 	};
 
 	const handleDateClick = (date: Date) => {
-		if (!mockEvents.find((e) => e.date === date.getDate())) {
-			setSelectedDate(date);
-			setTaskDialogOpen(true);
-		}
+		setSelectedDate(date);
+		setTaskDialogOpen(true);
 	};
 
 	const handleTimeSlotClick = (date: Date, hour: number) => {
