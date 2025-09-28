@@ -60,7 +60,7 @@ export const WeekView = ({
 							<button
 								key={`timeslot-${day.toISOString()}-${hour}`}
 								type="button"
-								className="min-h-[50px] border-r border-border last:border-r-0 relative cursor-pointer hover:bg-muted/10 w-full bg-transparent outline-none focus:ring-2 focus:ring-primary/20"
+								className="min-h-[50px] truncate border-r border-border last:border-r-0 relative cursor-pointer hover:bg-muted/10 w-full bg-transparent outline-none focus:ring-2 focus:ring-primary/20"
 								onClick={() => onTimeSlotClick(day, hour)}
 								onKeyDown={(e) => {
 									if (e.key === "Enter" || e.key === " ") {
@@ -73,7 +73,7 @@ export const WeekView = ({
 								{hour === 13 && dayIndex === 3 && (
 									<button
 										type="button"
-										className="absolute inset-1 bg-accent rounded text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30"
+										className="absolute bg-accent rounded text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30 truncate"
 										onClick={(e) =>
 											onTaskClick(e, {
 												id: 2,
@@ -96,37 +96,9 @@ export const WeekView = ({
 											}
 										}}
 									>
-										<div className="font-medium">CSG Video Interview</div>
-										<div className="opacity-80">
-											1pm, Microsoft Teams Meeting
+										<div className="font-medium truncate">
+											CSG Video Interview
 										</div>
-									</button>
-								)}
-								{hour === 1 && dayIndex === 4 && (
-									<button
-										type="button"
-										className="absolute inset-1 bg-success rounded text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30"
-										onClick={(e) =>
-											onTaskClick(e, {
-												id: 3,
-												title: "Parabéns!",
-												date: day,
-												type: "birthday",
-											})
-										}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												onTaskClick(e, {
-													id: 3,
-													title: "Parabéns!",
-													date: day,
-													type: "birthday",
-												});
-											}
-										}}
-									>
-										Parabéns!
 									</button>
 								)}
 							</button>

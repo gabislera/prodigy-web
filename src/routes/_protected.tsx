@@ -7,6 +7,7 @@ import {
 import {
 	Calendar,
 	FileText,
+	Flame,
 	Home,
 	Settings,
 	Timer,
@@ -115,10 +116,14 @@ function RouteComponent() {
 				<SidebarInset>
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
 						<SidebarTrigger className="-ml-1" />
-						<div className="flex items-center gap-2">
+						<div className="flex items-center justify-between w-full">
 							<h1 className="text-xl font-bold text-white">
 								{currentNavItem?.name}
 							</h1>
+							<div className="flex items-center gap-2 bg-gradient-streak rounded-full px-3 py-1">
+								<Flame className="size-4 text-white" />
+								<span className="text-sm font-bold text-white">7</span>
+							</div>
 						</div>
 					</header>
 					<main className="flex-1 overflow-auto">

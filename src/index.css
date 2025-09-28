@@ -73,6 +73,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.646 0.222 142);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -125,7 +126,6 @@
   --border: hsl(220 13% 18%);
   --input: hsl(220 13% 15%);
   --ring: hsl(245 75% 65%);
-
 
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -183,4 +183,6 @@
   .shadow-success {
     box-shadow: var(--shadow-success);
   }
+
+
 }

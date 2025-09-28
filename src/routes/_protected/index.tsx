@@ -49,18 +49,8 @@ function DashboardHome() {
 
 	return (
 		<div className="p-3 pb-24 space-y-4">
-			{/* Header */}
-			<div className="text-center space-y-1">
-				<h1 className="text-xl font-bold text-foreground">
-					Olá, Estudante! 👋
-				</h1>
-				<p className="text-sm text-muted-foreground capitalize">
-					{dayName}, {date}
-				</p>
-			</div>
-
 			{/* Mobile Streak Card */}
-			<div className="lg:hidden">
+			<div className="md:hidden">
 				<Card className="bg-gradient-streak border-0 p-4 shadow-success">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
