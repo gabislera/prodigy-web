@@ -1,4 +1,4 @@
-import { Clock, MapPin, User, X } from "lucide-react";
+import { Clock, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -30,7 +30,9 @@ export const TaskDetailsDialog = ({
 			<div className="space-y-4 py-4">
 				<div className="flex items-center gap-2 text-sm text-muted-foreground">
 					<Clock className="h-4 w-4" />
-					{selectedTask?.time || "Dia todo"}
+					{selectedTask?.startDate && selectedTask?.endDate
+						? `${selectedTask.startDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} - ${selectedTask.endDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+						: "Dia todo"}
 				</div>
 				{selectedTask?.type === "meeting" && (
 					<div className="flex items-center gap-2 text-sm text-muted-foreground">

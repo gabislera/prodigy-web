@@ -1,5 +1,5 @@
-import { calendarUtils, dayNames } from "@/services/calendarService";
 import type { Event } from "@/types/calendar";
+import { calendarUtils, dayNames } from "@/utils/calendarUtils";
 
 interface MonthViewProps {
 	currentDate: Date;
@@ -38,7 +38,6 @@ export const MonthView = ({
 					);
 					const isToday =
 						calendarUtils.isToday(
-							new Date(),
 							dayObj.day,
 							currentDate.getMonth(),
 							currentDate.getFullYear(),

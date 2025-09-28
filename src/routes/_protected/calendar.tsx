@@ -9,12 +9,8 @@ import {
 	TaskDialog,
 	WeekView,
 } from "@/components/calendar";
-import {
-	calendarUtils,
-	mockEvents,
-	monthNames,
-} from "@/services/calendarService";
 import type { Event, ViewType } from "@/types/calendar";
+import { calendarUtils, mockEvents, monthNames } from "@/utils/calendarUtils";
 
 export const Route = createFileRoute("/_protected/calendar")({
 	component: CalendarPage,

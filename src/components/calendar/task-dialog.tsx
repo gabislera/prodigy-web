@@ -32,59 +32,111 @@ export const TaskDialog = ({
 	onOpenChange,
 	selectedDate,
 }: TaskDialogProps) => {
+	// Função para gerar horários de 15 em 15 minutos
+	const generateTimeOptions = () => {
+		const times: string[] = [];
+		for (let hour = 0; hour < 24; hour++) {
+			for (let minute = 0; minute < 60; minute += 15) {
+				const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+				times.push(timeString);
+			}
+		}
+		return times;
+	};
+
+	const timeOptions = generateTimeOptions();
+
 	const {
 		register,
 		handleSubmit,
 		control,
 		reset,
+		watch,
 		formState: { errors, isSubmitting },
 	} = useForm<TaskFormData>({
 		resolver: zodResolver(taskSchema),
 		defaultValues: {
 			title: "",
 			description: "",
-			hour: selectedDate
-				? selectedDate.getHours().toString().padStart(2, "0")
-				: "09",
-			minute: selectedDate
-				? selectedDate.getMinutes().toString().padStart(2, "0")
-				: "00",
-			duration: "",
+			startTime: "09:00",
+			endTime: "10:00",
 			type: "",
 		},
 	});
 
-	// Reset do formulário quando o diálogo abrir/fechar
+	const watchedStartTime = watch("startTime");
+
+	// Form reset when the dialog opens
 	useEffect(() => {
 		if (open) {
+			// Function to calculate the default start time
+			const getDefaultStartTime = () => {
+				// Use the current time as the base for any selected date
+				// selectedDate is used only for context, not for the time calculation
+				const now = new Date();
+				const currentHour = now.getHours();
+				const currentMinute = now.getMinutes();
+
+				// Log for debug (can be removed in production)
+				if (selectedDate) {
+					console.log(
+						`Criando tarefa para ${selectedDate.toDateString()} com horário baseado em ${now.toTimeString()}`,
+					);
+				}
+
+				// Calculate the next 15 minute slot
+				// If it's exactly in the slot (ex: 15:00), keep the same
+				// If it's not (ex: 15:05), round to the next (15:15)
+				const nextSlotMinute = Math.ceil(currentMinute / 15) * 15;
+
+				// If the rounding passed 60 minutes, adjust the hour
+				if (nextSlotMinute >= 60) {
+					const nextHour = (currentHour + 1) % 24;
+					return `${nextHour.toString().padStart(2, "0")}:00`;
+				}
+
+				return `${currentHour.toString().padStart(2, "0")}:${nextSlotMinute.toString().padStart(2, "0")}`;
+			};
+
+			// Function to calculate the default end time (1 hour after the start)
+			const getDefaultEndTime = (startTime: string) => {
+				const [hour, minute] = startTime.split(":").map(Number);
+				const totalMinutes = hour * 60 + minute + 60; // Add 1 hour
+				const endHour = Math.floor(totalMinutes / 60) % 24;
+				const endMinute = totalMinutes % 60;
+				return `${endHour.toString().padStart(2, "0")}:${endMinute.toString().padStart(2, "0")}`;
+			};
+
+			const newStartTime = getDefaultStartTime();
+			const newEndTime = getDefaultEndTime(newStartTime);
 			reset({
 				title: "",
 				description: "",
-				hour: selectedDate
-					? selectedDate.getHours().toString().padStart(2, "0")
-					: "09",
-				minute: selectedDate
-					? selectedDate.getMinutes().toString().padStart(2, "0")
-					: "00",
-				duration: "",
+				startTime: newStartTime,
+				endTime: newEndTime,
 				type: "",
 			});
 		}
 	}, [open, selectedDate, reset]);
 
 	const onSubmit = (data: TaskFormData) => {
-		// Criar a data completa com hora e minuto
-		const taskDate = selectedDate ? new Date(selectedDate) : new Date();
-		taskDate.setHours(parseInt(data.hour));
-		taskDate.setMinutes(parseInt(data.minute));
-		taskDate.setSeconds(0);
-		taskDate.setMilliseconds(0);
+		// Create the full start and end dates
+		const baseDate = selectedDate ? new Date(selectedDate) : new Date();
 
-		// Aqui você pode adicionar a lógica para criar a tarefa
-		console.log("Criando tarefa válida:", {
+		const [startHour, startMinute] = data.startTime.split(":").map(Number);
+		const startDate = new Date(baseDate);
+		startDate.setHours(startHour, startMinute, 0, 0);
+
+		const [endHour, endMinute] = data.endTime.split(":").map(Number);
+		const endDate = new Date(baseDate);
+		endDate.setHours(endHour, endMinute, 0, 0);
+
+		// TODO: Add the logic to create the task
+		console.log("Creating valid task:", {
 			...data,
 			date: selectedDate,
-			time: taskDate,
+			startDate,
+			endDate,
 		});
 
 		reset();
@@ -134,103 +186,76 @@ export const TaskDialog = ({
 					</div>
 					<div className="space-y-2">
 						<div className="text-sm font-medium">Horário</div>
-						<div className="grid grid-cols-2 gap-2">
-							<div className="flex items-center gap-2">
-								<div className="space-y-1">
-									<div className="text-xs text-muted-foreground">Hora</div>
-									<Controller
-										name="hour"
-										control={control}
-										render={({ field }) => (
-											<Select
-												value={field.value}
-												onValueChange={field.onChange}
-											>
-												<SelectTrigger
-													className={errors.hour ? "border-red-500" : ""}
-												>
-													<SelectValue placeholder="00" />
-												</SelectTrigger>
-												<SelectContent className="h-48">
-													{Array.from({ length: 24 }, (_, i) =>
-														i.toString().padStart(2, "0"),
-													).map((hour) => (
-														<SelectItem key={hour} value={hour}>
-															{hour}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										)}
-									/>
-									{errors.hour && (
-										<p className="text-xs text-red-500">
-											{errors.hour.message}
-										</p>
-									)}
-								</div>
-								<div className="space-y-1">
-									<div className="text-xs text-muted-foreground">Minuto</div>
-									<Controller
-										name="minute"
-										control={control}
-										render={({ field }) => (
-											<Select
-												value={field.value}
-												onValueChange={field.onChange}
-											>
-												<SelectTrigger
-													className={errors.minute ? "border-red-500" : ""}
-												>
-													<SelectValue placeholder="00" />
-												</SelectTrigger>
-												<SelectContent className="h-48">
-													{Array.from({ length: 60 }, (_, i) =>
-														i.toString().padStart(2, "0"),
-													)
-														.filter((_, i) => i % 5 === 0)
-														.map((minute) => (
-															<SelectItem key={minute} value={minute}>
-																{minute}
-															</SelectItem>
-														))}
-												</SelectContent>
-											</Select>
-										)}
-									/>
-									{errors.minute && (
-										<p className="text-xs text-red-500">
-											{errors.minute.message}
-										</p>
-									)}
-								</div>
-							</div>
-							<div className="space-y-2 w-full">
-								<label htmlFor="duration" className="text-sm font-medium block">
-									Duração
-								</label>
+						<div className="flex items-center gap-3">
+							<div className="space-y-1 flex-1">
+								<div className="text-xs text-muted-foreground">Início</div>
 								<Controller
-									name="duration"
+									name="startTime"
 									control={control}
 									render={({ field }) => (
 										<Select value={field.value} onValueChange={field.onChange}>
 											<SelectTrigger
-												className={errors.duration ? "border-red-500" : ""}
+												className={errors.startTime ? "border-red-500" : ""}
 											>
-												<SelectValue placeholder="Duração" />
+												<SelectValue placeholder="00:00" />
 											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="30min">30 minutos</SelectItem>
-												<SelectItem value="1h">1 hora</SelectItem>
-												<SelectItem value="2h">2 horas</SelectItem>
-												<SelectItem value="custom">Personalizado</SelectItem>
+											<SelectContent className="h-48">
+												{timeOptions.map((time) => (
+													<SelectItem key={time} value={time}>
+														{time}
+													</SelectItem>
+												))}
 											</SelectContent>
 										</Select>
 									)}
 								/>
-								{errors.duration && (
-									<p className="text-sm text-red-500">
-										{errors.duration.message}
+								{errors.startTime && (
+									<p className="text-xs text-red-500">
+										{errors.startTime.message}
+									</p>
+								)}
+							</div>
+							<div className="text-sm text-muted-foreground mt-6">até</div>
+							<div className="space-y-1 flex-1">
+								<div className="text-xs text-muted-foreground">Fim</div>
+								<Controller
+									name="endTime"
+									control={control}
+									render={({ field }) => (
+										<Select value={field.value} onValueChange={field.onChange}>
+											<SelectTrigger
+												className={errors.endTime ? "border-red-500" : ""}
+											>
+												<SelectValue placeholder="00:00" />
+											</SelectTrigger>
+											<SelectContent className="h-48">
+												{timeOptions
+													.filter((time) => {
+														// Filter only times after the start time
+														if (!watchedStartTime) return true;
+														const [startHour, startMinute] = watchedStartTime
+															.split(":")
+															.map(Number);
+														const [timeHour, timeMinute] = time
+															.split(":")
+															.map(Number);
+														const startTotalMinutes =
+															startHour * 60 + startMinute;
+														const timeTotalMinutes = timeHour * 60 + timeMinute;
+														return timeTotalMinutes > startTotalMinutes;
+													})
+													.map((time) => (
+														<SelectItem key={time} value={time}>
+															{time}
+														</SelectItem>
+													))}
+											</SelectContent>
+										</Select>
+									)}
+								/>
+								{errors.endTime && (
+									<p className="text-xs text-red-500">
+										{errors.endTime.message}
 									</p>
 								)}
 							</div>
