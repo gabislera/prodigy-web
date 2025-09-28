@@ -1,5 +1,5 @@
-import { calendarUtils } from "@/services/calendarService";
 import type { Event } from "@/types/calendar";
+import { calendarUtils } from "@/utils/calendarUtils";
 
 interface DayViewProps {
 	currentDate: Date;
@@ -38,30 +38,42 @@ export const DayView = ({
 								<button
 									type="button"
 									className="absolute inset-2 bg-accent rounded text-sm text-white p-2 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30"
-									onClick={(e) =>
+									onClick={(e) => {
+										const startDate = new Date(currentDate);
+										startDate.setHours(13, 0, 0, 0);
+										const endDate = new Date(currentDate);
+										endDate.setHours(14, 0, 0, 0);
 										onTaskClick(e, {
 											id: 2,
 											title: "CSG Video Interview",
 											date: currentDate,
-											time: "1pm",
+											startDate: startDate,
+											endDate: endDate,
 											type: "meeting",
-										})
-									}
+										});
+									}}
 									onKeyDown={(e) => {
 										if (e.key === "Enter" || e.key === " ") {
 											e.preventDefault();
+											const startDate = new Date(currentDate);
+											startDate.setHours(13, 0, 0, 0);
+											const endDate = new Date(currentDate);
+											endDate.setHours(14, 0, 0, 0);
 											onTaskClick(e, {
 												id: 2,
 												title: "CSG Video Interview",
 												date: currentDate,
-												time: "1pm",
+												startDate: startDate,
+												endDate: endDate,
 												type: "meeting",
 											});
 										}
 									}}
 								>
 									<div className="font-medium">CSG Video Interview</div>
-									<div className="opacity-80">1pm, Microsoft Teams Meeting</div>
+									<div className="opacity-80">
+										13:00 - 14:00, Microsoft Teams Meeting
+									</div>
 								</button>
 							)}
 						</button>

@@ -1,5 +1,5 @@
-import { calendarUtils, weekDayNames } from "@/services/calendarService";
 import type { Event } from "@/types/calendar";
+import { calendarUtils, weekDayNames } from "@/utils/calendarUtils";
 
 interface WeekViewProps {
 	currentDate: Date;
@@ -74,23 +74,33 @@ export const WeekView = ({
 									<button
 										type="button"
 										className="absolute bg-accent rounded text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30 truncate"
-										onClick={(e) =>
+										onClick={(e) => {
+											const startDate = new Date(day);
+											startDate.setHours(13, 0, 0, 0);
+											const endDate = new Date(day);
+											endDate.setHours(14, 0, 0, 0);
 											onTaskClick(e, {
 												id: 2,
 												title: "CSG Video Interview",
 												date: day,
-												time: "1pm",
+												startDate: startDate,
+												endDate: endDate,
 												type: "meeting",
-											})
-										}
+											});
+										}}
 										onKeyDown={(e) => {
 											if (e.key === "Enter" || e.key === " ") {
 												e.preventDefault();
+												const startDate = new Date(day);
+												startDate.setHours(13, 0, 0, 0);
+												const endDate = new Date(day);
+												endDate.setHours(14, 0, 0, 0);
 												onTaskClick(e, {
 													id: 2,
 													title: "CSG Video Interview",
 													date: day,
-													time: "1pm",
+													startDate: startDate,
+													endDate: endDate,
 													type: "meeting",
 												});
 											}
