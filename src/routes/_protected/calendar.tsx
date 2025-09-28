@@ -4,9 +4,9 @@ import {
 	AIDialog,
 	CalendarHeader,
 	DayView,
+	EventDetailsDialog,
+	EventDialog,
 	MonthView,
-	TaskDetailsDialog,
-	TaskDialog,
 	WeekView,
 } from "@/components/calendar";
 import type { Event, ViewType } from "@/types/calendar";
@@ -20,10 +20,10 @@ function CalendarPage() {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [viewType, setViewType] = useState<ViewType>("month");
 	const [aiDialogOpen, setAiDialogOpen] = useState(false);
-	const [taskDialogOpen, setTaskDialogOpen] = useState(false);
-	const [taskDetailsDialogOpen, setTaskDetailsDialogOpen] = useState(false);
+	const [eventDialogOpen, setEventDialogOpen] = useState(false);
+	const [eventDetailsDialogOpen, setEventDetailsDialogOpen] = useState(false);
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-	const [selectedTask, setSelectedTask] = useState<Event | null>(null);
+	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
 	const navigateMonth = (direction: "prev" | "next") => {
 		const newDate = new Date(currentDate);
@@ -80,23 +80,23 @@ function CalendarPage() {
 
 	const handleDateClick = (date: Date) => {
 		setSelectedDate(date);
-		setTaskDialogOpen(true);
+		setEventDialogOpen(true);
 	};
 
 	const handleTimeSlotClick = (date: Date, hour: number) => {
 		setSelectedDate(
 			new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour),
 		);
-		setTaskDialogOpen(true);
+		setEventDialogOpen(true);
 	};
 
-	const handleTaskClick = (
+	const handleEventClick = (
 		e: React.MouseEvent | React.KeyboardEvent,
-		task: Event,
+		event: Event,
 	) => {
 		e.stopPropagation();
-		setSelectedTask(task);
-		setTaskDetailsDialogOpen(true);
+		setSelectedEvent(event);
+		setEventDetailsDialogOpen(true);
 	};
 
 	return (
@@ -107,9 +107,9 @@ function CalendarPage() {
 				onNavigate={handleNavigate}
 				onViewTypeChange={setViewType}
 				onAIDialogOpen={() => setAiDialogOpen(true)}
-				onTaskDialogOpen={() => {
+				onEventDialogOpen={() => {
 					setSelectedDate(new Date());
-					setTaskDialogOpen(true);
+					setEventDialogOpen(true);
 				}}
 			/>
 
@@ -119,35 +119,35 @@ function CalendarPage() {
 					currentDate={currentDate}
 					events={mockEvents}
 					onDateClick={handleDateClick}
-					onTaskClick={handleTaskClick}
+					onEventClick={handleEventClick}
 				/>
 			)}
 			{viewType === "week" && (
 				<WeekView
 					currentDate={currentDate}
 					onTimeSlotClick={handleTimeSlotClick}
-					onTaskClick={handleTaskClick}
+					onEventClick={handleEventClick}
 				/>
 			)}
 			{viewType === "day" && (
 				<DayView
 					currentDate={currentDate}
 					onTimeSlotClick={handleTimeSlotClick}
-					onTaskClick={handleTaskClick}
+					onEventClick={handleEventClick}
 				/>
 			)}
 
 			<AIDialog open={aiDialogOpen} onOpenChange={setAiDialogOpen} />
 
-			<TaskDialog
-				open={taskDialogOpen}
-				onOpenChange={setTaskDialogOpen}
+			<EventDialog
+				open={eventDialogOpen}
+				onOpenChange={setEventDialogOpen}
 				selectedDate={selectedDate}
 			/>
-			<TaskDetailsDialog
-				open={taskDetailsDialogOpen}
-				onOpenChange={setTaskDetailsDialogOpen}
-				selectedTask={selectedTask}
+			<EventDetailsDialog
+				open={eventDetailsDialogOpen}
+				onOpenChange={setEventDetailsDialogOpen}
+				selectedEvent={selectedEvent}
 			/>
 		</div>
 	);

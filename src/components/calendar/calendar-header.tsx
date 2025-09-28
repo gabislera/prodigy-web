@@ -10,7 +10,7 @@ interface CalendarHeaderProps {
 	onNavigate: (direction: "prev" | "next") => void;
 	onViewTypeChange: (view: ViewType) => void;
 	onAIDialogOpen: () => void;
-	onTaskDialogOpen: () => void;
+	onEventDialogOpen: () => void;
 }
 
 export const CalendarHeader = ({
@@ -19,7 +19,7 @@ export const CalendarHeader = ({
 	onNavigate,
 	onViewTypeChange,
 	onAIDialogOpen,
-	onTaskDialogOpen,
+	onEventDialogOpen,
 }: CalendarHeaderProps) => {
 	const isMobile = useIsMobile();
 	const buttonVariant = isMobile ? "ghost" : "outline";
@@ -66,7 +66,7 @@ export const CalendarHeader = ({
 							variant={buttonVariant}
 							size="sm"
 							className="text-xs"
-							onClick={onTaskDialogOpen}
+							onClick={onEventDialogOpen}
 						>
 							<Plus className="h-3 w-3 mr-1" />
 							<span className="sr-only md:not-sr-only md:ml-2">Adicionar</span>

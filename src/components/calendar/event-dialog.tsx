@@ -19,19 +19,19 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { type TaskFormData, taskSchema } from "@/schemas/taskSchema";
+import { type EventFormData, eventSchema } from "@/schemas/eventSchema";
 
-interface TaskDialogProps {
+interface EventDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	selectedDate: Date | null;
 }
 
-export const TaskDialog = ({
+export const EventDialog = ({
 	open,
 	onOpenChange,
 	selectedDate,
-}: TaskDialogProps) => {
+}: EventDialogProps) => {
 	// Função para gerar horários de 15 em 15 minutos
 	const generateTimeOptions = () => {
 		const times: string[] = [];
@@ -53,8 +53,8 @@ export const TaskDialog = ({
 		reset,
 		watch,
 		formState: { errors, isSubmitting },
-	} = useForm<TaskFormData>({
-		resolver: zodResolver(taskSchema),
+	} = useForm<EventFormData>({
+		resolver: zodResolver(eventSchema),
 		defaultValues: {
 			title: "",
 			description: "",
@@ -119,7 +119,7 @@ export const TaskDialog = ({
 		}
 	}, [open, selectedDate, reset]);
 
-	const onSubmit = (data: TaskFormData) => {
+	const onSubmit = (data: EventFormData) => {
 		// Create the full start and end dates
 		const baseDate = selectedDate ? new Date(selectedDate) : new Date();
 
@@ -131,8 +131,8 @@ export const TaskDialog = ({
 		const endDate = new Date(baseDate);
 		endDate.setHours(endHour, endMinute, 0, 0);
 
-		// TODO: Add the logic to create the task
-		console.log("Creating valid task:", {
+		// TODO: Add the logic to create the event
+		console.log("Creating valid event:", {
 			...data,
 			date: selectedDate,
 			startDate,

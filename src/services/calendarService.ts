@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export interface Task {
+export interface Event {
 	id: string;
 	title: string;
 	content: string;
@@ -11,7 +11,7 @@ export interface Task {
 	updatedAt: Date;
 }
 
-export interface CreateTaskData {
+export interface CreateEventData {
 	title: string;
 	content: string;
 	startDate: Date;
@@ -22,22 +22,25 @@ export interface CreateTaskData {
 const API_BASE_URL = "http://localhost:3333";
 
 export const calendarService = {
-	async getAllTasks(): Promise<Task[]> {
-		const response = await axios.get(`${API_BASE_URL}/tasks`);
+	async getAllEvents(): Promise<Event[]> {
+		const response = await axios.get(`${API_BASE_URL}/events`);
 		return response.data;
 	},
 
-	async createTask(data: CreateTaskData): Promise<Task> {
-		const response = await axios.post(`${API_BASE_URL}/tasks`, data);
+	async createEvent(data: CreateEventData): Promise<Event> {
+		const response = await axios.post(`${API_BASE_URL}/events`, data);
 		return response.data;
 	},
 
-	async updateTask(id: string, data: Partial<CreateTaskData>): Promise<Task> {
-		const response = await axios.put(`${API_BASE_URL}/tasks/${id}`, data);
+	async updateEvent(
+		id: string,
+		data: Partial<CreateEventData>,
+	): Promise<Event> {
+		const response = await axios.put(`${API_BASE_URL}/events/${id}`, data);
 		return response.data;
 	},
 
-	async deleteTask(id: string): Promise<void> {
-		await axios.delete(`${API_BASE_URL}/tasks/${id}`);
+	async deleteEvent(id: string): Promise<void> {
+		await axios.delete(`${API_BASE_URL}/events/${id}`);
 	},
 };

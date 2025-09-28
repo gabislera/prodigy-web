@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const taskSchema = z
+export const eventSchema = z
 	.object({
 		title: z
 			.string()
@@ -29,4 +29,4 @@ export const taskSchema = z
 		},
 	);
 
-export type TaskFormData = z.infer<typeof taskSchema>;
+export type EventFormData = z.infer<typeof eventSchema>;

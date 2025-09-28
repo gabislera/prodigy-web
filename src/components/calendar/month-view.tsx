@@ -5,14 +5,17 @@ interface MonthViewProps {
 	currentDate: Date;
 	events: Event[];
 	onDateClick: (date: Date) => void;
-	onTaskClick: (e: React.MouseEvent | React.KeyboardEvent, task: Event) => void;
+	onEventClick: (
+		e: React.MouseEvent | React.KeyboardEvent,
+		event: Event,
+	) => void;
 }
 
 export const MonthView = ({
 	currentDate,
 	events,
 	onDateClick,
-	onTaskClick,
+	onEventClick,
 }: MonthViewProps) => {
 	const days = calendarUtils.getDaysInMonth(currentDate);
 
@@ -93,11 +96,11 @@ export const MonthView = ({
 												? "bg-accent"
 												: "bg-primary"
 									}`}
-									onClick={(e) => onTaskClick(e, event)}
+									onClick={(e) => onEventClick(e, event)}
 									onKeyDown={(e) => {
 										if (e.key === "Enter" || e.key === " ") {
 											e.preventDefault();
-											onTaskClick(e, event);
+											onEventClick(e, event);
 										}
 									}}
 								>

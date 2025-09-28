@@ -4,13 +4,16 @@ import { calendarUtils, weekDayNames } from "@/utils/calendarUtils";
 interface WeekViewProps {
 	currentDate: Date;
 	onTimeSlotClick: (date: Date, hour: number) => void;
-	onTaskClick: (e: React.MouseEvent | React.KeyboardEvent, task: Event) => void;
+	onEventClick: (
+		e: React.MouseEvent | React.KeyboardEvent,
+		event: Event,
+	) => void;
 }
 
 export const WeekView = ({
 	currentDate,
 	onTimeSlotClick,
-	onTaskClick,
+	onEventClick,
 }: WeekViewProps) => {
 	const weekDays = calendarUtils.getWeekDays(currentDate);
 	const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -79,7 +82,7 @@ export const WeekView = ({
 											startDate.setHours(13, 0, 0, 0);
 											const endDate = new Date(day);
 											endDate.setHours(14, 0, 0, 0);
-											onTaskClick(e, {
+											onEventClick(e, {
 												id: 2,
 												title: "CSG Video Interview",
 												date: day,
@@ -95,7 +98,7 @@ export const WeekView = ({
 												startDate.setHours(13, 0, 0, 0);
 												const endDate = new Date(day);
 												endDate.setHours(14, 0, 0, 0);
-												onTaskClick(e, {
+												onEventClick(e, {
 													id: 2,
 													title: "CSG Video Interview",
 													date: day,
