@@ -3,6 +3,7 @@ import { calendarUtils, weekDayNames } from "@/utils/calendarUtils";
 
 interface WeekViewProps {
 	currentDate: Date;
+	events: Event[];
 	onTimeSlotClick: (date: Date, hour: number) => void;
 	onEventClick: (
 		e: React.MouseEvent | React.KeyboardEvent,
@@ -12,6 +13,7 @@ interface WeekViewProps {
 
 export const WeekView = ({
 	currentDate,
+	events,
 	onTimeSlotClick,
 	onEventClick,
 }: WeekViewProps) => {
@@ -19,10 +21,10 @@ export const WeekView = ({
 	const hours = Array.from({ length: 24 }, (_, i) => i);
 
 	return (
-		<div className="bg-card rounded-lg border border-border">
+		<div className="bg-card rounded-lg border border-border h-full flex flex-col overflow-hidden">
 			{/* Week Header */}
 			<div
-				className="grid border-b border-border"
+				className="grid border-b border-border flex-shrink-0"
 				style={{ gridTemplateColumns: "4rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr" }}
 			>
 				<div className="p-2 text-xs font-medium text-muted-foreground border-r border-border"></div>
@@ -49,7 +51,7 @@ export const WeekView = ({
 			</div>
 
 			{/* Time Grid */}
-			<div className=" overflow-y-auto">
+			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent">
 				{hours.map((hour) => (
 					<div
 						key={hour}
@@ -59,11 +61,11 @@ export const WeekView = ({
 						<div className="p-2 text-xs text-muted-foreground border-r border-border">
 							{calendarUtils.formatHour(hour)}
 						</div>
-						{weekDays.map((day, dayIndex) => (
+						{weekDays.map((day) => (
 							<button
 								key={`timeslot-${day.toISOString()}-${hour}`}
 								type="button"
-								className="min-h-[50px] truncate border-r border-border last:border-r-0 relative cursor-pointer hover:bg-muted/10 w-full bg-transparent outline-none focus:ring-2 focus:ring-primary/20"
+								className="h-12 pb-2 flex flex-col gap-1 items-start justify-start truncate border-r border-border last:border-r-0 cursor-pointer hover:bg-muted/10 w-full bg-transparent outline-none focus:ring-2 focus:ring-primary/20"
 								onClick={() => onTimeSlotClick(day, hour)}
 								onKeyDown={(e) => {
 									if (e.key === "Enter" || e.key === " ") {
@@ -72,48 +74,40 @@ export const WeekView = ({
 									}
 								}}
 							>
-								{/* Mock events */}
-								{hour === 13 && dayIndex === 3 && (
-									<button
-										type="button"
-										className="absolute bg-accent rounded text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30 truncate"
-										onClick={(e) => {
-											const startDate = new Date(day);
-											startDate.setHours(13, 0, 0, 0);
-											const endDate = new Date(day);
-											endDate.setHours(14, 0, 0, 0);
-											onEventClick(e, {
-												id: 2,
-												title: "CSG Video Interview",
-												date: day,
-												startDate: startDate,
-												endDate: endDate,
-												type: "meeting",
-											});
-										}}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												const startDate = new Date(day);
-												startDate.setHours(13, 0, 0, 0);
-												const endDate = new Date(day);
-												endDate.setHours(14, 0, 0, 0);
-												onEventClick(e, {
-													id: 2,
-													title: "CSG Video Interview",
-													date: day,
-													startDate: startDate,
-													endDate: endDate,
-													type: "meeting",
-												});
-											}
-										}}
-									>
-										<div className="font-medium truncate">
-											CSG Video Interview
-										</div>
-									</button>
-								)}
+								{/* Events for this day and hour */}
+								{/* TODO: check this */}
+								{events
+									.filter((event) => {
+										const eventDate = new Date(event.startDate);
+										return (
+											eventDate.getDate() === day.getDate() &&
+											eventDate.getMonth() === day.getMonth() &&
+											eventDate.getFullYear() === day.getFullYear() &&
+											eventDate.getHours() === hour
+										);
+									})
+									.map((event) => (
+										<button
+											key={event.id}
+											type="button"
+											className={`bg-accent text-start rounded w-full text-xs text-white p-1 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30 truncate ${
+												event.type === "holiday"
+													? "bg-success"
+													: event.type === "meeting"
+														? "bg-accent"
+														: "bg-primary"
+											}`}
+											onClick={(e) => onEventClick(e, event)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													e.preventDefault();
+													onEventClick(e, event);
+												}
+											}}
+										>
+											<div className="font-medium truncate">{event.title}</div>
+										</button>
+									))}
 							</button>
 						))}
 					</div>
