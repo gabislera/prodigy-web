@@ -1,11 +1,12 @@
 export interface Event {
-	id: number;
+	id: string;
 	title: string;
-	date: number | Date;
+	content: string;
 	startDate: Date;
 	endDate: Date;
 	type: string;
-	description?: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export type ViewType = "month" | "week" | "day";
