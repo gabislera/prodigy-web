@@ -11,6 +11,17 @@ export interface Event {
 	updatedAt: Date;
 }
 
+interface EventApiResponse {
+	id: string;
+	title: string;
+	content: string;
+	startDate: string;
+	endDate: string;
+	type: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface CreateEventData {
 	title: string;
 	content: string;
@@ -24,12 +35,27 @@ const API_BASE_URL = "http://localhost:3333";
 export const calendarService = {
 	async getAllEvents(): Promise<Event[]> {
 		const response = await axios.get(`${API_BASE_URL}/events`);
-		return response.data;
+		// Convert date strings to Date objects
+		return response.data.map((event: EventApiResponse) => ({
+			...event,
+			startDate: new Date(event.startDate),
+			endDate: new Date(event.endDate),
+			createdAt: new Date(event.createdAt),
+			updatedAt: new Date(event.updatedAt),
+		}));
 	},
 
 	async createEvent(data: CreateEventData): Promise<Event> {
 		const response = await axios.post(`${API_BASE_URL}/events`, data);
-		return response.data;
+		// Convert date strings to Date objects
+		const event: EventApiResponse = response.data;
+		return {
+			...event,
+			startDate: new Date(event.startDate),
+			endDate: new Date(event.endDate),
+			createdAt: new Date(event.createdAt),
+			updatedAt: new Date(event.updatedAt),
+		};
 	},
 
 	async updateEvent(
@@ -37,7 +63,15 @@ export const calendarService = {
 		data: Partial<CreateEventData>,
 	): Promise<Event> {
 		const response = await axios.put(`${API_BASE_URL}/events/${id}`, data);
-		return response.data;
+		// Convert date strings to Date objects
+		const event: EventApiResponse = response.data;
+		return {
+			...event,
+			startDate: new Date(event.startDate),
+			endDate: new Date(event.endDate),
+			createdAt: new Date(event.createdAt),
+			updatedAt: new Date(event.updatedAt),
+		};
 	},
 
 	async deleteEvent(id: string): Promise<void> {
