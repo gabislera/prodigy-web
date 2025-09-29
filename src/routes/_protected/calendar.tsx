@@ -9,8 +9,9 @@ import {
 	MonthView,
 	WeekView,
 } from "@/components/calendar";
+import { useCalendar } from "@/hooks/use-calendar";
 import type { Event, ViewType } from "@/types/calendar";
-import { calendarUtils, mockEvents, monthNames } from "@/utils/calendarUtils";
+import { calendarUtils, monthNames } from "@/utils/calendarUtils";
 
 export const Route = createFileRoute("/_protected/calendar")({
 	component: CalendarPage,
@@ -24,6 +25,8 @@ function CalendarPage() {
 	const [eventDetailsDialogOpen, setEventDetailsDialogOpen] = useState(false);
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+	const { events } = useCalendar();
 
 	const navigateMonth = (direction: "prev" | "next") => {
 		const newDate = new Date(currentDate);
@@ -100,42 +103,50 @@ function CalendarPage() {
 	};
 
 	return (
-		<div className="p-4 pb-24 space-y-4">
-			<CalendarHeader
-				viewType={viewType}
-				dateTitle={getDateTitle()}
-				onNavigate={handleNavigate}
-				onViewTypeChange={setViewType}
-				onAIDialogOpen={() => setAiDialogOpen(true)}
-				onEventDialogOpen={() => {
-					setSelectedDate(new Date());
-					setEventDialogOpen(true);
-				}}
-			/>
+		<div
+			className={`flex flex-col h-[calc(100vh-80px)] pb-20 md:h-[calc(100vh-80px)] md:p-4`}
+		>
+			<div className="flex-shrink-0 mb-4">
+				<CalendarHeader
+					viewType={viewType}
+					dateTitle={getDateTitle()}
+					onNavigate={handleNavigate}
+					onViewTypeChange={setViewType}
+					onAIDialogOpen={() => setAiDialogOpen(true)}
+					onEventDialogOpen={() => {
+						setSelectedDate(new Date());
+						setEventDialogOpen(true);
+					}}
+				/>
+			</div>
 
 			{/* Calendar Views */}
-			{viewType === "month" && (
-				<MonthView
-					currentDate={currentDate}
-					events={mockEvents}
-					onDateClick={handleDateClick}
-					onEventClick={handleEventClick}
-				/>
-			)}
-			{viewType === "week" && (
-				<WeekView
-					currentDate={currentDate}
-					onTimeSlotClick={handleTimeSlotClick}
-					onEventClick={handleEventClick}
-				/>
-			)}
-			{viewType === "day" && (
-				<DayView
-					currentDate={currentDate}
-					onTimeSlotClick={handleTimeSlotClick}
-					onEventClick={handleEventClick}
-				/>
-			)}
+			<div className="flex-1 min-h-0 overflow-hidden">
+				{viewType === "month" && (
+					<MonthView
+						currentDate={currentDate}
+						events={events}
+						onDateClick={handleDateClick}
+						onEventClick={handleEventClick}
+					/>
+				)}
+				{viewType === "week" && (
+					<WeekView
+						currentDate={currentDate}
+						onTimeSlotClick={handleTimeSlotClick}
+						onEventClick={handleEventClick}
+						events={events}
+					/>
+				)}
+				{viewType === "day" && (
+					<DayView
+						currentDate={currentDate}
+						events={events}
+						onTimeSlotClick={handleTimeSlotClick}
+						onEventClick={handleEventClick}
+					/>
+				)}
+			</div>
 
 			<AIDialog open={aiDialogOpen} onOpenChange={setAiDialogOpen} />
 

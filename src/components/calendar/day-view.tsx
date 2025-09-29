@@ -3,6 +3,7 @@ import { calendarUtils } from "@/utils/calendarUtils";
 
 interface DayViewProps {
 	currentDate: Date;
+	events: Event[];
 	onTimeSlotClick: (date: Date, hour: number) => void;
 	onEventClick: (
 		e: React.MouseEvent | React.KeyboardEvent,
@@ -12,16 +13,17 @@ interface DayViewProps {
 
 export const DayView = ({
 	currentDate,
+	events,
 	onTimeSlotClick,
 	onEventClick,
 }: DayViewProps) => {
 	const hours = Array.from({ length: 24 }, (_, i) => i);
 
 	return (
-		<div className="bg-card rounded-lg border border-border">
-			<div className="overflow-y-auto">
+		<div className="bg-card rounded-lg border border-border h-full flex flex-col overflow-hidden ">
+			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent">
 				{hours.map((hour) => (
-					<div key={hour} className="flex border-b border-border min-h-[60px]">
+					<div key={hour} className="flex border-b border-border h-12">
 						<div className="p-3 text-sm text-muted-foreground border-r border-border w-20">
 							{calendarUtils.formatHour(hour)}
 						</div>
@@ -36,49 +38,64 @@ export const DayView = ({
 								}
 							}}
 						>
-							{/* Mock events for today */}
-							{hour === 13 && (
-								<button
-									type="button"
-									className="absolute inset-2 bg-accent rounded text-sm text-white p-2 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30"
-									onClick={(e) => {
-										const startDate = new Date(currentDate);
-										startDate.setHours(13, 0, 0, 0);
-										const endDate = new Date(currentDate);
-										endDate.setHours(14, 0, 0, 0);
-										onEventClick(e, {
-											id: 2,
-											title: "CSG Video Interview",
-											date: currentDate,
-											startDate: startDate,
-											endDate: endDate,
-											type: "meeting",
-										});
-									}}
-									onKeyDown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
-											e.preventDefault();
-											const startDate = new Date(currentDate);
-											startDate.setHours(13, 0, 0, 0);
-											const endDate = new Date(currentDate);
-											endDate.setHours(14, 0, 0, 0);
-											onEventClick(e, {
-												id: 2,
-												title: "CSG Video Interview",
-												date: currentDate,
-												startDate: startDate,
-												endDate: endDate,
-												type: "meeting",
-											});
-										}
-									}}
-								>
-									<div className="font-medium">CSG Video Interview</div>
-									<div className="opacity-80">
-										13:00 - 14:00, Microsoft Teams Meeting
-									</div>
-								</button>
-							)}
+							{/* Events for this hour */}
+							{/* TODO: check this */}
+							{events
+								.filter((event) => {
+									const eventDate = new Date(event.startDate);
+									return (
+										eventDate.getDate() === currentDate.getDate() &&
+										eventDate.getMonth() === currentDate.getMonth() &&
+										eventDate.getFullYear() === currentDate.getFullYear() &&
+										eventDate.getHours() === hour
+									);
+								})
+								.map((event) => {
+									const startTime = new Date(event.startDate);
+									const endTime = new Date(event.endDate);
+									const startHour = startTime
+										.getHours()
+										.toString()
+										.padStart(2, "0");
+									const startMinute = startTime
+										.getMinutes()
+										.toString()
+										.padStart(2, "0");
+									const endHour = endTime
+										.getHours()
+										.toString()
+										.padStart(2, "0");
+									const endMinute = endTime
+										.getMinutes()
+										.toString()
+										.padStart(2, "0");
+
+									return (
+										<button
+											key={event.id}
+											type="button"
+											className={`flex items-start justify-start inset-2 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent rounded text-sm text-white p-2 cursor-pointer hover:opacity-80 outline-none focus:ring-2 focus:ring-white/30 ${
+												event.type === "holiday"
+													? "bg-success"
+													: event.type === "meeting"
+														? "bg-accent"
+														: "bg-primary"
+											}`}
+											onClick={(e) => onEventClick(e, event)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													e.preventDefault();
+													onEventClick(e, event);
+												}
+											}}
+										>
+											<div className="font-medium">{event.title}</div>
+											<div className="opacity-80">
+												{startHour}:{startMinute} - {endHour}:{endMinute}
+											</div>
+										</button>
+									);
+								})}
 						</button>
 					</div>
 				))}

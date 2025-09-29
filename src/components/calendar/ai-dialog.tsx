@@ -61,7 +61,11 @@ export const AIDialog = ({ open, onOpenChange }: AIDialogProps) => {
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+			aria-describedby="ai dialog"
+		>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">

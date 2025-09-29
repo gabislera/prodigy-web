@@ -19,6 +19,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCalendar } from "@/hooks/use-calendar";
 import { type EventFormData, eventSchema } from "@/schemas/eventSchema";
 
 interface EventDialogProps {
@@ -32,7 +33,7 @@ export const EventDialog = ({
 	onOpenChange,
 	selectedDate,
 }: EventDialogProps) => {
-	// Função para gerar horários de 15 em 15 minutos
+	const { createEvent } = useCalendar();
 	const generateTimeOptions = () => {
 		const times: string[] = [];
 		for (let hour = 0; hour < 24; hour++) {
@@ -131,12 +132,13 @@ export const EventDialog = ({
 		const endDate = new Date(baseDate);
 		endDate.setHours(endHour, endMinute, 0, 0);
 
-		// TODO: Add the logic to create the event
-		console.log("Creating valid event:", {
+		createEvent({
 			...data,
-			date: selectedDate,
 			startDate,
 			endDate,
+			title: data.title,
+			type: data.type,
+			content: data.description || "",
 		});
 
 		reset();
@@ -144,7 +146,11 @@ export const EventDialog = ({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+			aria-describedby="event dialog"
+		>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Nova Tarefa</DialogTitle>
