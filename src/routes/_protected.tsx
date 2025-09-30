@@ -9,6 +9,7 @@ import {
 	FileText,
 	Flame,
 	Home,
+	Kanban,
 	Settings,
 	Timer,
 	Trophy,
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/_protected")({
 const navigation = [
 	{ name: "Dashboard", href: "/", icon: Home },
 	{ name: "Calendário", href: "/calendar", icon: Calendar },
+	{ name: "Tarefas", href: "/tasks", icon: Kanban },
 	{ name: "Pomodoro", href: "/timer", icon: Timer },
 	{ name: "Notas", href: "/notes", icon: FileText },
 	{ name: "Configurações", href: "/settings", icon: Settings },
