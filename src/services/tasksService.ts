@@ -57,6 +57,7 @@ export interface CreateTaskData {
 	priority: "high" | "medium" | "low";
 	columnId: string;
 	position: number;
+	completed?: boolean;
 }
 
 export interface UpdateTaskData {

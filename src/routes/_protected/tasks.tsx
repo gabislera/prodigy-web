@@ -114,6 +114,7 @@ function TasksPage() {
 						priority: taskData.priority as "high" | "medium" | "low",
 						columnId: taskData.columnId,
 						position: 0,
+						completed: taskData.completed,
 					});
 
 					setIsCreateDialogOpen(false);
