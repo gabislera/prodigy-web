@@ -69,6 +69,13 @@ export interface UpdateTaskData {
 	completed?: boolean;
 }
 
+export interface UpdateGroupData {
+	name?: string;
+	icon?: string;
+	color?: string;
+	bgColor?: string;
+}
+
 const API_BASE_URL = "http://localhost:3333";
 
 export const tasksService = {
@@ -115,5 +122,20 @@ export const tasksService = {
 		await axios.put(`${API_BASE_URL}/task_groups/${groupId}/columns/order`, {
 			columnOrders,
 		});
+	},
+
+	async updateTaskGroup(
+		groupId: string,
+		data: UpdateGroupData,
+	): Promise<ApiTaskGroup> {
+		const response = await axios.put(
+			`${API_BASE_URL}/task_group/${groupId}`,
+			data,
+		);
+		return response.data;
+	},
+
+	async deleteTaskGroup(groupId: string): Promise<void> {
+		await axios.delete(`${API_BASE_URL}/task_group/${groupId}`);
 	},
 };

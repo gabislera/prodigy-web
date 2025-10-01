@@ -4,6 +4,7 @@ import {
 	type ApiTaskColumn,
 	type ApiTaskGroup,
 	tasksService,
+	type UpdateGroupData,
 	type UpdateTaskData,
 } from "@/services/tasksService";
 import type { TaskGroup } from "@/types/tasks";
@@ -92,6 +93,26 @@ export function useTasks(selectedGroupId?: string | null) {
 		},
 	});
 
+	const updateTaskGroupMutation = useMutation({
+		mutationFn: ({
+			groupId,
+			data,
+		}: {
+			groupId: string;
+			data: UpdateGroupData;
+		}) => tasksService.updateTaskGroup(groupId, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+		},
+	});
+
+	const deleteTaskGroupMutation = useMutation({
+		mutationFn: (groupId: string) => tasksService.deleteTaskGroup(groupId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+		},
+	});
+
 	return {
 		taskGroups,
 		taskColumns,
@@ -100,5 +121,7 @@ export function useTasks(selectedGroupId?: string | null) {
 		updateTask: updateTaskMutation.mutateAsync,
 		deleteTask: deleteTaskMutation.mutateAsync,
 		updateColumnOrder: updateColumnOrderMutation.mutateAsync,
+		updateTaskGroup: updateTaskGroupMutation.mutateAsync,
+		deleteTaskGroup: deleteTaskGroupMutation.mutateAsync,
 	};
 }

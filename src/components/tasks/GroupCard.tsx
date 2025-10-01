@@ -1,18 +1,31 @@
-import { Folder } from "lucide-react";
+import { Folder, MoreHorizontal, Trash2 } from "lucide-react";
 import React from "react";
 import { Card } from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { TaskGroup } from "@/types/tasks";
 import { iconOptions } from "@/utils/taskUtils";
 
 interface GroupCardProps {
 	group: TaskGroup;
 	onGroupClick: (groupId: string) => void;
+	onEditGroup: (group: TaskGroup) => void;
+	onDeleteGroup: (groupId: string) => void;
 }
 
-export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
+export const GroupCard = ({
+	group,
+	onGroupClick,
+	onEditGroup,
+	onDeleteGroup,
+}: GroupCardProps) => {
 	return (
 		<Card
-			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all`}
+			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all group`}
 			onClick={() => onGroupClick(group.id)}
 		>
 			<div className="flex items-center gap-3">
@@ -31,6 +44,41 @@ export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
 						{group.completedCount} de {group.taskCount} concluídas
 					</p> */}
 				</div>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<button
+							type="button"
+							className="p-1 rounded-sm hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+							onClick={(e) => e.stopPropagation()}
+						>
+							<MoreHorizontal className="h-4 w-4" />
+						</button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						align="end"
+						className="w-48"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<DropdownMenuItem
+							onClick={(e) => {
+								e.stopPropagation();
+								onEditGroup(group);
+							}}
+						>
+							Editar
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							variant="destructive"
+							onClick={(e) => {
+								e.stopPropagation();
+								onDeleteGroup(group.id);
+							}}
+						>
+							<Trash2 className="mr-2 h-4 w-4" />
+							Excluir
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</div>
 
 			{/* <div className="w-full bg-background/30 rounded-full h-2 mb-2">

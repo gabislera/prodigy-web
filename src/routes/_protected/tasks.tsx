@@ -8,7 +8,7 @@ import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/use-tasks";
-import type { Task, TaskColumn } from "@/types/tasks";
+import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 import {
 	CreateGroupDialog,
 	GroupCard,
@@ -29,6 +29,7 @@ function TasksPage() {
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+	const [editingGroup, setEditingGroup] = useState<TaskGroup | null>(null);
 
 	const {
 		taskGroups,
@@ -37,6 +38,7 @@ function TasksPage() {
 		updateTask,
 		deleteTask,
 		updateColumnOrder,
+		deleteTaskGroup,
 	} = useTasks(selectedGroup);
 
 	// Convert ApiTaskColumn[] to TaskColumn[]
@@ -186,6 +188,23 @@ function TasksPage() {
 			});
 		} catch (error) {
 			console.error("Erro ao atualizar status da task:", error);
+		}
+	};
+
+	const handleEditGroup = (group: TaskGroup) => {
+		setEditingGroup(group);
+		setIsCreateGroupDialogOpen(true);
+	};
+
+	const handleDeleteGroup = async (groupId: string) => {
+		try {
+			await deleteTaskGroup(groupId);
+
+			if (selectedGroup === groupId) {
+				setSelectedGroup(null);
+			}
+		} catch (error) {
+			console.error("Erro ao deletar grupo:", error);
 		}
 	};
 
@@ -446,14 +465,25 @@ function TasksPage() {
 			<div className="flex flex-wrap gap-4">
 				{taskGroups.map((group) => (
 					<div key={group.id} className="w-80 flex-shrink-0">
-						<GroupCard group={group} onGroupClick={setSelectedGroup} />
+						<GroupCard
+							group={group}
+							onGroupClick={setSelectedGroup}
+							onEditGroup={handleEditGroup}
+							onDeleteGroup={handleDeleteGroup}
+						/>
 					</div>
 				))}
 			</div>
 
 			<CreateGroupDialog
 				isOpen={isCreateGroupDialogOpen}
-				onOpenChange={setIsCreateGroupDialogOpen}
+				onOpenChange={(open) => {
+					setIsCreateGroupDialogOpen(open);
+					if (!open) {
+						setEditingGroup(null);
+					}
+				}}
+				editingGroup={editingGroup}
 				// onCreateGroup={handleCreateGroup}
 			/>
 

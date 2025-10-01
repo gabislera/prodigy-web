@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,20 +21,23 @@ import {
 	type CreateGroupFormData,
 	createGroupSchema,
 } from "@/schemas/taskSchema";
+import type { TaskGroup } from "@/types/tasks";
 import { colorOptions, iconOptions } from "@/utils/taskUtils";
 
 interface CreateGroupDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
+	editingGroup?: TaskGroup | null;
 	// onCreateGroup: (group: { name: string; icon: string; color: string }) => void;
 }
 
 export const CreateGroupDialog = ({
 	isOpen,
 	onOpenChange,
+	editingGroup,
 	// onCreateGroup,
 }: CreateGroupDialogProps) => {
-	const { createTaskGroup } = useTasks();
+	const { createTaskGroup, updateTaskGroup } = useTasks();
 
 	const {
 		register,
@@ -45,13 +49,30 @@ export const CreateGroupDialog = ({
 	} = useForm<CreateGroupFormData>({
 		resolver: zodResolver(createGroupSchema),
 		defaultValues: {
-			name: "",
-			icon: "briefcase",
-			color: "text-blue-500",
+			name: editingGroup?.name || "",
+			icon: editingGroup?.icon || "briefcase",
+			color: editingGroup?.color || "text-blue-500",
 		},
 	});
 
 	const watchedValues = watch();
+
+	// Reset form when editingGroup changes
+	useEffect(() => {
+		if (editingGroup) {
+			reset({
+				name: editingGroup.name,
+				icon: editingGroup.icon,
+				color: editingGroup.color,
+			});
+		} else {
+			reset({
+				name: "",
+				icon: "briefcase",
+				color: "text-blue-500",
+			});
+		}
+	}, [editingGroup, reset]);
 
 	const onSubmit = async (data: CreateGroupFormData) => {
 		try {
@@ -60,18 +81,32 @@ export const CreateGroupDialog = ({
 				(option) => option.value === data.color,
 			);
 
-			await createTaskGroup({
-				id: "",
-				name: data.name,
-				icon: data.icon,
-				color: data.color,
-				bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
-			});
+			if (editingGroup) {
+				// Update existing group
+				await updateTaskGroup({
+					groupId: editingGroup.id,
+					data: {
+						name: data.name,
+						icon: data.icon,
+						color: data.color,
+						bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
+					},
+				});
+			} else {
+				// Create new group
+				await createTaskGroup({
+					id: "",
+					name: data.name,
+					icon: data.icon,
+					color: data.color,
+					bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
+				});
+			}
 
 			reset();
 			onOpenChange(false);
 		} catch (error) {
-			console.error("Erro ao criar grupo:", error);
+			console.error("Erro ao salvar grupo:", error);
 		}
 	};
 
@@ -86,7 +121,9 @@ export const CreateGroupDialog = ({
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Novo Grupo de Tarefas</DialogTitle>
+					<DialogTitle>
+						{editingGroup ? "Editar Grupo de Tarefas" : "Novo Grupo de Tarefas"}
+					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -201,7 +238,13 @@ export const CreateGroupDialog = ({
 							disabled={isSubmitting}
 							className="flex-1 bg-gradient-primary border-0"
 						>
-							{isSubmitting ? "Criando..." : "Criar Grupo"}
+							{isSubmitting
+								? editingGroup
+									? "Salvando..."
+									: "Criando..."
+								: editingGroup
+									? "Salvar Alterações"
+									: "Criar Grupo"}
 						</Button>
 					</div>
 				</form>
