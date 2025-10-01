@@ -300,7 +300,6 @@ function TasksPage() {
 				<KanbanBoard
 					columns={taskColumns}
 					onTaskClick={handleTaskClick}
-					onCreateTask={() => setIsCreateDialogOpen(true)}
 					onDragStart={handleDragStart}
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}

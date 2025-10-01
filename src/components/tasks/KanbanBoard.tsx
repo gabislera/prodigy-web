@@ -13,9 +13,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { getPriorityColor } from "@/utils/taskUtils";
@@ -25,7 +23,6 @@ import { TaskCard } from "./TaskCard";
 interface KanbanBoardProps {
 	columns: TaskColumn[];
 	onTaskClick: (task: Task) => void;
-	onCreateTask: () => void;
 	onDragStart: (event: DragStartEvent) => void;
 	onDragOver: (event: DragOverEvent) => void;
 	onDragEnd: (event: DragEndEvent) => void;
@@ -35,7 +32,6 @@ interface KanbanBoardProps {
 export const KanbanBoard = ({
 	columns,
 	onTaskClick,
-	onCreateTask,
 	onDragStart,
 	onDragOver,
 	onDragEnd,
@@ -63,11 +59,7 @@ export const KanbanBoard = ({
 				{columns.map((column) => {
 					const columnTasks = column.tasks;
 					return (
-						<DroppableColumn
-							key={column.id}
-							column={column}
-							onCreateTask={onCreateTask}
-						>
+						<DroppableColumn key={column.id} column={column}>
 							<SortableContext
 								items={columnTasks.map((task) => task.id)}
 								strategy={verticalListSortingStrategy}
@@ -79,17 +71,6 @@ export const KanbanBoard = ({
 										onTaskClick={onTaskClick}
 									/>
 								))}
-
-								{columnTasks.length === 0 && (
-									<Button
-										variant="outline"
-										className="w-full h-10 border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-foreground text-xs"
-										onClick={onCreateTask}
-									>
-										<Plus className="h-3 w-3 mr-1" />
-										Adicionar tarefa
-									</Button>
-								)}
 							</SortableContext>
 						</DroppableColumn>
 					);
