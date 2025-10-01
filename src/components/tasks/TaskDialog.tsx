@@ -24,13 +24,14 @@ import {
 	type CreateTaskFormData,
 	createTaskSchema,
 } from "@/schemas/taskSchema";
-import type { Task } from "@/types/tasks";
+import type { Task, TaskColumn } from "@/types/tasks";
 
 interface TaskDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
 	task?: Task | null;
 	columnId?: string;
+	columns?: TaskColumn[];
 	onSave: (taskData: {
 		title: string;
 		description: string;
@@ -44,6 +45,7 @@ export const TaskDialog = ({
 	onOpenChange,
 	task,
 	columnId,
+	columns,
 	onSave,
 }: TaskDialogProps) => {
 	const isEditMode = !!task;
@@ -163,6 +165,35 @@ export const TaskDialog = ({
 							<p className="text-sm text-red-500">{errors.priority.message}</p>
 						)}
 					</div>
+
+					{!isEditMode && columns && columns.length > 0 && (
+						<div className="space-y-2">
+							<Label htmlFor="task-column">Coluna</Label>
+							<Select
+								value={watch("columnId")}
+								onValueChange={(value) => setValue("columnId", value)}
+							>
+								<SelectTrigger
+									id="task-column"
+									className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+								>
+									<SelectValue placeholder="Selecione uma coluna" />
+								</SelectTrigger>
+								<SelectContent>
+									{columns.map((column) => (
+										<SelectItem key={column.id} value={column.id}>
+											{column.title}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							{errors.columnId && (
+								<p className="text-sm text-red-500">
+									{errors.columnId.message}
+								</p>
+							)}
+						</div>
+					)}
 
 					<DialogFooter>
 						<Button type="button" variant="outline" onClick={handleCancel}>

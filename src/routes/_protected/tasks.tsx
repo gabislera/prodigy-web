@@ -103,21 +103,14 @@ function TasksPage() {
 			await handleUpdateTask(selectedTask.id, taskData);
 			setIsDetailDialogOpen(false);
 		} else {
-			// Modo de criação - usar columnId específica ou primeira coluna do grupo
-			let targetColumnId = taskData.columnId;
-
-			if (!targetColumnId && selectedGroup && taskColumns.length > 0) {
-				// Usar a primeira coluna disponível do grupo selecionado
-				targetColumnId = taskColumns[0].id;
-			}
-
-			if (targetColumnId) {
+			// Modo de criação - usar columnId selecionada pelo usuário
+			if (taskData.columnId) {
 				try {
 					await createTask({
 						title: taskData.title,
 						description: taskData.description,
 						priority: taskData.priority as "high" | "medium" | "low",
-						columnId: targetColumnId,
+						columnId: taskData.columnId,
 						position: 0,
 					});
 
@@ -127,7 +120,7 @@ function TasksPage() {
 					// TODO: Mostrar notificação de erro para o usuário
 				}
 			} else {
-				console.error("Nenhuma coluna disponível para criar a tarefa");
+				console.error("Coluna é obrigatória para criar a tarefa");
 				// TODO: Mostrar notificação de erro para o usuário
 			}
 		}
@@ -392,6 +385,7 @@ function TasksPage() {
 				<TaskDialog
 					isOpen={isCreateDialogOpen}
 					onOpenChange={setIsCreateDialogOpen}
+					columns={taskColumns}
 					onSave={handleSaveTask}
 				/>
 
