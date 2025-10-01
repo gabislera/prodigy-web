@@ -1,7 +1,8 @@
 import { Folder } from "lucide-react";
+import React from "react";
 import { Card } from "@/components/ui/card";
 import type { TaskGroup } from "@/types/tasks";
-import { getProgressBarColor } from "@/utils/taskUtils";
+import { iconOptions } from "@/utils/taskUtils";
 
 interface GroupCardProps {
 	group: TaskGroup;
@@ -9,7 +10,6 @@ interface GroupCardProps {
 }
 
 export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
-	// console.log(group);
 	return (
 		<Card
 			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all`}
@@ -17,8 +17,13 @@ export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
 		>
 			<div className="flex items-center gap-3">
 				<div className={`p-2 rounded-lg `}>
-					{/* <group.icon className={`h-5 w-5 ${group.color}`} /> */}
-					<Folder size={16} />
+					{React.createElement(
+						iconOptions.find((option) => option.value === group.icon)?.icon ||
+							Folder,
+						{
+							className: `h-5 w-5 ${group.color}`,
+						},
+					)}
 				</div>
 				<div className="flex-1">
 					<h3 className="font-semibold text-sm">{group.name}</h3>

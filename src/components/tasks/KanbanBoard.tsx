@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { getPriorityColor } from "@/utils/taskUtils";
 import { DroppableColumn } from "./DroppableColumn";
@@ -90,9 +91,21 @@ export const KanbanBoard = ({
 				{activeTask ? (
 					<Card className="p-2 bg-gradient-card border-border/50 cursor-grabbing shadow-xl rotate-3">
 						<div className="flex items-center justify-between">
-							<h4 className="font-medium text-sm flex-1 pr-2">
-								{activeTask.title}
-							</h4>
+							<div className="flex items-center gap-2 flex-1 pr-2">
+								<Checkbox
+									checked={activeTask.completed}
+									className="opacity-100 transition-opacity rounded-full border-2"
+								/>
+								<h4
+									className={`font-medium text-sm transition-all ${
+										activeTask.completed
+											? "line-through text-muted-foreground opacity-70"
+											: ""
+									}`}
+								>
+									{activeTask.title}
+								</h4>
+							</div>
 							<Badge
 								variant="outline"
 								className={`text-xs px-2 py-0 w-12 text-center ${getPriorityColor(activeTask.priority)}`}

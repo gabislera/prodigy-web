@@ -15,6 +15,7 @@ export interface TaskGroup {
 	name: string;
 	color: string;
 	bgColor: string;
+	icon: string;
 	columns: TaskColumn[];
 	taskCount?: number;
 	completedCount?: number;
