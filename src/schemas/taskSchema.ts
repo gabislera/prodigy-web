@@ -16,6 +16,7 @@ export const createTaskSchema = z.object({
 		message: "Prioridade deve ser baixa, média ou alta",
 	}),
 	columnId: z.string().min(1, "Coluna é obrigatória"),
+	completed: z.boolean().default(false),
 });
 
 export const updateTaskSchema = createTaskSchema.partial().extend({
@@ -43,6 +44,21 @@ export const createGroupSchema = z.object({
 		}),
 });
 
+export const taskFormSchema = z.object({
+	title: z
+		.string()
+		.min(1, "Título é obrigatório")
+		.max(100, "Título deve ter no máximo 100 caracteres")
+		.trim(),
+	description: z.string(),
+	priority: z.enum(["low", "medium", "high"], {
+		message: "Prioridade deve ser baixa, média ou alta",
+	}),
+	columnId: z.string().min(1, "Coluna é obrigatória"),
+	completed: z.boolean(),
+});
+
+export type TaskFormData = z.infer<typeof taskFormSchema>;
 export type CreateTaskFormData = z.infer<typeof createTaskSchema>;
 export type UpdateTaskFormData = z.infer<typeof updateTaskSchema>;
 export type CreateGroupFormData = z.infer<typeof createGroupSchema>;

@@ -3,6 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,6 +22,7 @@ interface TaskCardProps {
 	onTaskClick: (task: Task) => void;
 	onDeleteTask: (taskId: string) => void;
 	onMoveTask: (taskId: string, columnId: string) => void;
+	onToggleComplete: (taskId: string, completed: boolean) => void;
 }
 
 export const TaskCard = ({
@@ -29,6 +31,7 @@ export const TaskCard = ({
 	onTaskClick,
 	onDeleteTask,
 	onMoveTask,
+	onToggleComplete,
 }: TaskCardProps) => {
 	const {
 		attributes,
@@ -45,10 +48,15 @@ export const TaskCard = ({
 		opacity: isDragging ? 0.5 : 1,
 	};
 
+	const handleToggleComplete = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		onToggleComplete(task.id, !task.completed);
+	};
+
 	return (
 		<div ref={setNodeRef} style={style} {...attributes} {...listeners}>
 			<Card
-				className="p-2 mb-2 bg-gradient-card border-border/50 cursor-grab active:cursor-grabbing hover:shadow-card transition-all"
+				className="p-2 mb-2 bg-gradient-card border border-border/50 cursor-grab active:cursor-grabbing hover:shadow-card transition-all group"
 				onClick={() => {
 					if (!isDragging) {
 						onTaskClick(task);
@@ -56,7 +64,22 @@ export const TaskCard = ({
 				}}
 			>
 				<div className="flex items-center justify-between">
-					<h4 className="font-medium text-sm flex-1 pr-2">{task.title}</h4>
+					<div className="flex items-center gap-2 flex-1 pr-2">
+						<Checkbox
+							checked={task.completed}
+							onClick={handleToggleComplete}
+							className="opacity-100 transition-opacity rounded-full border-2"
+						/>
+						<h4
+							className={`font-medium text-sm transition-all ${
+								task.completed
+									? "line-through text-muted-foreground opacity-70"
+									: ""
+							}`}
+						>
+							{task.title}
+						</h4>
+					</div>
 					<div className="flex items-center gap-2">
 						<Badge
 							variant="outline"

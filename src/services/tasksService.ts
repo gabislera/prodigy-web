@@ -32,6 +32,7 @@ export interface ApiTask {
 	priority: "high" | "medium" | "low";
 	columnId: string;
 	position: number;
+	completed: boolean;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -64,6 +65,7 @@ export interface UpdateTaskData {
 	priority?: "high" | "medium" | "low";
 	columnId?: string;
 	position?: number;
+	completed?: boolean;
 }
 
 const API_BASE_URL = "http://localhost:3333";

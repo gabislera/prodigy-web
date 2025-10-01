@@ -52,6 +52,7 @@ function TasksPage() {
 			priority: apiTask.priority,
 			columnId: apiTask.columnId,
 			position: apiTask.position,
+			completed: apiTask.completed,
 			createdAt: apiTask.createdAt,
 			updatedAt: apiTask.updatedAt,
 		})),
@@ -97,6 +98,7 @@ function TasksPage() {
 		description: string;
 		priority: string;
 		columnId?: string;
+		completed: boolean;
 	}) => {
 		if (selectedTask) {
 			// Modo de edição
@@ -128,7 +130,12 @@ function TasksPage() {
 
 	const handleUpdateTask = async (
 		taskId: string,
-		updatedTask: { title: string; description: string; priority: string },
+		updatedTask: {
+			title: string;
+			description: string;
+			priority: string;
+			completed: boolean;
+		},
 	) => {
 		try {
 			await updateTask({
@@ -137,6 +144,7 @@ function TasksPage() {
 					title: updatedTask.title,
 					description: updatedTask.description,
 					priority: updatedTask.priority as "high" | "medium" | "low",
+					completed: updatedTask.completed,
 				},
 			});
 		} catch (error) {
@@ -166,6 +174,17 @@ function TasksPage() {
 			});
 		} catch (error) {
 			console.error("Erro ao mover task:", error);
+		}
+	};
+
+	const handleToggleComplete = async (taskId: string, completed: boolean) => {
+		try {
+			await updateTask({
+				taskId,
+				data: { completed },
+			});
+		} catch (error) {
+			console.error("Erro ao atualizar status da task:", error);
 		}
 	};
 
@@ -375,6 +394,7 @@ function TasksPage() {
 					onTaskClick={handleTaskClick}
 					onDeleteTask={handleDeleteTask}
 					onMoveTask={handleMoveTask}
+					onToggleComplete={handleToggleComplete}
 					onDragStart={handleDragStart}
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}

@@ -25,6 +25,7 @@ interface KanbanBoardProps {
 	onTaskClick: (task: Task) => void;
 	onDeleteTask: (taskId: string) => void;
 	onMoveTask: (taskId: string, columnId: string) => void;
+	onToggleComplete: (taskId: string, completed: boolean) => void;
 	onDragStart: (event: DragStartEvent) => void;
 	onDragOver: (event: DragOverEvent) => void;
 	onDragEnd: (event: DragEndEvent) => void;
@@ -36,6 +37,7 @@ export const KanbanBoard = ({
 	onTaskClick,
 	onDeleteTask,
 	onMoveTask,
+	onToggleComplete,
 	onDragStart,
 	onDragOver,
 	onDragEnd,
@@ -76,6 +78,7 @@ export const KanbanBoard = ({
 										onTaskClick={onTaskClick}
 										onDeleteTask={onDeleteTask}
 										onMoveTask={onMoveTask}
+										onToggleComplete={onToggleComplete}
 									/>
 								))}
 							</SortableContext>

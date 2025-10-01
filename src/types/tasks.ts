@@ -5,6 +5,7 @@ export interface Task {
 	priority: "high" | "medium" | "low";
 	columnId: string;
 	position: number;
+	completed: boolean;
 	createdAt?: string;
 	updatedAt?: string;
 }

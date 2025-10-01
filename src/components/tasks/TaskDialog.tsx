@@ -20,10 +20,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-	type CreateTaskFormData,
-	createTaskSchema,
-} from "@/schemas/taskSchema";
+import { type TaskFormData, taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
 
 interface TaskDialogProps {
@@ -37,6 +34,7 @@ interface TaskDialogProps {
 		description: string;
 		priority: string;
 		columnId?: string;
+		completed: boolean;
 	}) => void;
 }
 
@@ -57,13 +55,15 @@ export const TaskDialog = ({
 		reset,
 		setValue,
 		watch,
-	} = useForm<CreateTaskFormData>({
-		resolver: zodResolver(createTaskSchema),
+	} = useForm<TaskFormData>({
+		resolver: zodResolver(taskFormSchema),
 		defaultValues: {
 			title: "",
 			description: "",
-			priority: "medium",
-			columnId: columnId,
+			priority: "low",
+			columnId:
+				columnId || (columns && columns.length > 0 ? columns[0].id : ""),
+			completed: false,
 		},
 	});
 
@@ -72,22 +72,29 @@ export const TaskDialog = ({
 			setValue("title", task.title);
 			setValue("description", task.description);
 			setValue("priority", task.priority);
+			setValue("completed", task.completed);
 		} else {
+			// Se não há columnId passado, usar a primeira coluna disponível
+			const defaultColumnId =
+				columnId || (columns && columns.length > 0 ? columns[0].id : "");
+
 			reset({
 				title: "",
 				description: "",
-				priority: "medium",
-				columnId: columnId,
+				priority: "low",
+				columnId: defaultColumnId,
+				completed: false,
 			});
 		}
-	}, [task, columnId, setValue, reset]);
+	}, [task, columnId, columns, setValue, reset]);
 
-	const onSubmit = (data: CreateTaskFormData) => {
+	const onSubmit = (data: TaskFormData) => {
 		onSave({
 			title: data.title,
 			description: data.description,
 			priority: data.priority,
 			columnId: data.columnId || columnId,
+			completed: data.completed,
 		});
 		onOpenChange(false);
 	};
@@ -141,59 +148,89 @@ export const TaskDialog = ({
 						)}
 					</div>
 
-					<div className="space-y-2">
-						<Label htmlFor="task-priority">Prioridade</Label>
-						<Select
-							value={watch("priority")}
-							onValueChange={(value) =>
-								setValue("priority", value as "low" | "medium" | "high")
-							}
-						>
-							<SelectTrigger
-								id="task-priority"
-								className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-							>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="low">Baixa</SelectItem>
-								<SelectItem value="medium">Média</SelectItem>
-								<SelectItem value="high">Alta</SelectItem>
-							</SelectContent>
-						</Select>
-						{errors.priority && (
-							<p className="text-sm text-red-500">{errors.priority.message}</p>
-						)}
-					</div>
-
-					{!isEditMode && columns && columns.length > 0 && (
-						<div className="space-y-2">
-							<Label htmlFor="task-column">Coluna</Label>
+					<div className="flex items-center gap-4">
+						<div className="space-y-2 ">
+							<Label htmlFor="task-priority">Prioridade</Label>
 							<Select
-								value={watch("columnId")}
-								onValueChange={(value) => setValue("columnId", value)}
+								value={watch("priority")}
+								onValueChange={(value) =>
+									setValue("priority", value as "low" | "medium" | "high")
+								}
 							>
 								<SelectTrigger
-									id="task-column"
+									id="task-priority"
 									className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
 								>
-									<SelectValue placeholder="Selecione uma coluna" />
+									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{columns.map((column) => (
-										<SelectItem key={column.id} value={column.id}>
-											{column.title}
-										</SelectItem>
-									))}
+									<SelectItem value="low">Baixa</SelectItem>
+									<SelectItem value="medium">Média</SelectItem>
+									<SelectItem value="high">Alta</SelectItem>
 								</SelectContent>
 							</Select>
-							{errors.columnId && (
+							{errors.priority && (
 								<p className="text-sm text-red-500">
-									{errors.columnId.message}
+									{errors.priority.message}
 								</p>
 							)}
 						</div>
-					)}
+
+						<div className="space-y-2">
+							<Label htmlFor="task-status">Status</Label>
+							<Select
+								value={watch("completed") ? "completed" : "incomplete"}
+								onValueChange={(value) =>
+									setValue("completed", value === "completed")
+								}
+							>
+								<SelectTrigger
+									id="task-status"
+									className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+								>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="incomplete">Incompleta</SelectItem>
+									<SelectItem value="completed">Completa</SelectItem>
+								</SelectContent>
+							</Select>
+							{errors.completed && (
+								<p className="text-sm text-red-500">
+									{errors.completed.message}
+								</p>
+							)}
+						</div>
+
+						{columns && columns.length > 0 && (
+							<div className="space-y-2">
+								<Label htmlFor="task-column">Coluna</Label>
+								<Select
+									value={watch("columnId")}
+									onValueChange={(value) => setValue("columnId", value)}
+								>
+									<SelectTrigger
+										id="task-column"
+										className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+									>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{columns.map((column) => (
+											<SelectItem key={column.id} value={column.id}>
+												{column.title}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								{errors.columnId && (
+									<p className="text-sm text-red-500">
+										{errors.columnId.message}
+									</p>
+								)}
+							</div>
+						)}
+					</div>
 
 					<DialogFooter>
 						<Button type="button" variant="outline" onClick={handleCancel}>
