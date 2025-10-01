@@ -1,3 +1,4 @@
+import { Folder } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { TaskGroup } from "@/types/tasks";
 import { getProgressBarColor } from "@/utils/taskUtils";
@@ -14,33 +15,34 @@ export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
 			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all`}
 			onClick={() => onGroupClick(group.id)}
 		>
-			<div className="flex items-center gap-3 mb-3">
-				<div className={`p-2 rounded-lg bg-background/50`}>
+			<div className="flex items-center gap-3">
+				<div className={`p-2 rounded-lg `}>
 					{/* <group.icon className={`h-5 w-5 ${group.color}`} /> */}
+					<Folder size={16} />
 				</div>
 				<div className="flex-1">
 					<h3 className="font-semibold text-sm">{group.name}</h3>
-					<p className="text-xs text-muted-foreground">
+					{/* <p className="text-xs text-muted-foreground">
 						{group.completedCount} de {group.taskCount} concluídas
-					</p>
+					</p> */}
 				</div>
 			</div>
 
-			<div className="w-full bg-background/30 rounded-full h-2 mb-2">
+			{/* <div className="w-full bg-background/30 rounded-full h-2 mb-2">
 				<div
 					className={`h-2 rounded-full ${getProgressBarColor(group.color)}`}
-					// style={{
-					// 	width: `${(group.completedCount / group.taskCount) * 100}%`,
-					// }}
+					style={{
+						width: `${(group.completedCount / group.taskCount) * 100}%`,
+					}}
 				/>
-			</div>
+			</div> */}
 
-			<div className="flex items-center justify-between text-xs">
+			{/* <div className="flex items-center justify-between text-xs">
 				<span className="text-muted-foreground">Progresso</span>
-				{/* <span className="font-medium">
+				<span className="font-medium">
 					{Math.round((group.completedCount / group.taskCount) * 100)}%
-				</span> */}
-			</div>
+				</span>
+			</div> */}
 		</Card>
 	);
 };
