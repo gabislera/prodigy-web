@@ -62,11 +62,24 @@ export function useTasks(selectedGroupId?: string | null) {
 		},
 	});
 
+	const deleteTaskMutation = useMutation({
+		mutationFn: (taskId: string) => tasksService.deleteTask(taskId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+			if (selectedGroupId) {
+				queryClient.invalidateQueries({
+					queryKey: [TASKS_QUERY_KEY, "columns", selectedGroupId],
+				});
+			}
+		},
+	});
+
 	return {
 		taskGroups,
 		taskColumns,
 		createTaskGroup: createTaskGroupMutation.mutateAsync,
 		createTask: createTaskMutation.mutateAsync,
 		updateTask: updateTaskMutation.mutateAsync,
+		deleteTask: deleteTaskMutation.mutateAsync,
 	};
 }

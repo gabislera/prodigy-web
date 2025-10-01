@@ -29,7 +29,7 @@ function TasksPage() {
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-	const { taskGroups, taskColumns, createTask, updateTask } =
+	const { taskGroups, taskColumns, createTask, updateTask, deleteTask } =
 		useTasks(selectedGroup);
 
 	// Helper function to calculate new positions when reordering within the same column
@@ -119,6 +119,25 @@ function TasksPage() {
 	const handleTaskClick = (task: Task) => {
 		setSelectedTask(task);
 		setIsDetailDialogOpen(true);
+	};
+
+	const handleDeleteTask = async (taskId: string) => {
+		try {
+			await deleteTask(taskId);
+		} catch (error) {
+			console.error("Erro ao deletar task:", error);
+		}
+	};
+
+	const handleMoveTask = async (taskId: string, columnId: string) => {
+		try {
+			await updateTask({
+				taskId,
+				data: { columnId },
+			});
+		} catch (error) {
+			console.error("Erro ao mover task:", error);
+		}
 	};
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -300,6 +319,8 @@ function TasksPage() {
 				<KanbanBoard
 					columns={taskColumns}
 					onTaskClick={handleTaskClick}
+					onDeleteTask={handleDeleteTask}
+					onMoveTask={handleMoveTask}
 					onDragStart={handleDragStart}
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}

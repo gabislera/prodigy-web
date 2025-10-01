@@ -23,6 +23,8 @@ import { TaskCard } from "./TaskCard";
 interface KanbanBoardProps {
 	columns: TaskColumn[];
 	onTaskClick: (task: Task) => void;
+	onDeleteTask: (taskId: string) => void;
+	onMoveTask: (taskId: string, columnId: string) => void;
 	onDragStart: (event: DragStartEvent) => void;
 	onDragOver: (event: DragOverEvent) => void;
 	onDragEnd: (event: DragEndEvent) => void;
@@ -32,6 +34,8 @@ interface KanbanBoardProps {
 export const KanbanBoard = ({
 	columns,
 	onTaskClick,
+	onDeleteTask,
+	onMoveTask,
 	onDragStart,
 	onDragOver,
 	onDragEnd,
@@ -68,7 +72,10 @@ export const KanbanBoard = ({
 									<TaskCard
 										key={task.id}
 										task={task}
+										columns={columns}
 										onTaskClick={onTaskClick}
+										onDeleteTask={onDeleteTask}
+										onMoveTask={onMoveTask}
 									/>
 								))}
 							</SortableContext>
