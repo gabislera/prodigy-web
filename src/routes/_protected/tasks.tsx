@@ -7,7 +7,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn } from "@/types/tasks";
 import {
@@ -100,8 +99,8 @@ function TasksPage() {
 		columnId?: string;
 	}) => {
 		if (selectedTask) {
-			// Modo de edição - TODO: implementar atualização de tarefa
-			handleUpdateTask(selectedTask.id, taskData);
+			// Modo de edição
+			await handleUpdateTask(selectedTask.id, taskData);
 			setIsDetailDialogOpen(false);
 		} else {
 			// Modo de criação - usar columnId específica ou primeira coluna do grupo
@@ -134,12 +133,23 @@ function TasksPage() {
 		}
 	};
 
-	const handleUpdateTask = (
+	const handleUpdateTask = async (
 		taskId: string,
 		updatedTask: { title: string; description: string; priority: string },
 	) => {
-		// TODO: Implementar atualização de tarefa no backend
-		console.log("Atualizar tarefa:", taskId, updatedTask);
+		try {
+			await updateTask({
+				taskId,
+				data: {
+					title: updatedTask.title,
+					description: updatedTask.description,
+					priority: updatedTask.priority as "high" | "medium" | "low",
+				},
+			});
+		} catch (error) {
+			console.error("Erro ao atualizar tarefa:", error);
+			// TODO: Mostrar notificação de erro para o usuário
+		}
 	};
 
 	const handleTaskClick = (task: Task) => {
@@ -425,24 +435,6 @@ function TasksPage() {
 					</div>
 				))}
 			</div>
-
-			{/* Quick Stats */}
-			<Card className="p-4 bg-gradient-card border-border/50">
-				<div className="grid grid-cols-2 gap-4 text-center">
-					<div>
-						<div className="text-xl font-bold text-primary">
-							{/* {taskGroups.reduce((acc, group) => acc + group.taskCount, 0)} */}
-						</div>
-						<p className="text-xs text-muted-foreground">Total de Tarefas</p>
-					</div>
-					<div>
-						<div className="text-xl font-bold text-success">
-							{/* {taskGroups.reduce((acc, group) => acc + group.completedCount, 0)} */}
-						</div>
-						<p className="text-xs text-muted-foreground">Concluídas</p>
-					</div>
-				</div>
-			</Card>
 
 			<CreateGroupDialog
 				isOpen={isCreateGroupDialogOpen}

@@ -85,23 +85,22 @@ export const KanbanBoard = ({
 			</div>
 			<DragOverlay>
 				{activeTask ? (
-					<Card className="p-3 bg-gradient-card border-border/50 cursor-grabbing shadow-xl rotate-3">
-						<div className="flex items-start justify-between mb-2">
-							<h4 className="font-medium text-sm">{activeTask.title}</h4>
+					<Card className="p-2 bg-gradient-card border-border/50 cursor-grabbing shadow-xl rotate-3">
+						<div className="flex items-center justify-between">
+							<h4 className="font-medium text-sm flex-1 pr-2">
+								{activeTask.title}
+							</h4>
+							<Badge
+								variant="outline"
+								className={`text-xs px-2 py-0 w-12 text-center ${getPriorityColor(activeTask.priority)}`}
+							>
+								{activeTask.priority === "high"
+									? "Alta"
+									: activeTask.priority === "medium"
+										? "Média"
+										: "Baixa"}
+							</Badge>
 						</div>
-						<p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-							{activeTask.description}
-						</p>
-						<Badge
-							variant="outline"
-							className={`text-xs px-2 py-0 ${getPriorityColor(activeTask.priority)}`}
-						>
-							{activeTask.priority === "high"
-								? "Alta"
-								: activeTask.priority === "medium"
-									? "Média"
-									: "Baixa"}
-						</Badge>
 					</Card>
 				) : null}
 			</DragOverlay>
