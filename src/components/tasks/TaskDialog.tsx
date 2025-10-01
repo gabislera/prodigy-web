@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -18,6 +20,10 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	type CreateTaskFormData,
+	createTaskSchema,
+} from "@/schemas/taskSchema";
 import type { Task } from "@/types/tasks";
 
 interface TaskDialogProps {
@@ -40,58 +46,54 @@ export const TaskDialog = ({
 	columnId,
 	onSave,
 }: TaskDialogProps) => {
-	const [taskData, setTaskData] = useState({
-		title: "",
-		description: "",
-		priority: "medium",
-	});
-
 	const isEditMode = !!task;
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		reset,
+		setValue,
+		watch,
+	} = useForm<CreateTaskFormData>({
+		resolver: zodResolver(createTaskSchema),
+		defaultValues: {
+			title: "",
+			description: "",
+			priority: "medium",
+			columnId: columnId,
+		},
+	});
 
 	useEffect(() => {
 		if (task) {
-			setTaskData({
-				title: task.title,
-				description: task.description,
-				priority: task.priority,
-			});
+			setValue("title", task.title);
+			setValue("description", task.description);
+			setValue("priority", task.priority);
 		} else {
-			setTaskData({
+			reset({
 				title: "",
 				description: "",
 				priority: "medium",
-			});
-		}
-	}, [task]);
-
-	const handleSave = () => {
-		if (taskData.title.trim()) {
-			onSave({
-				...taskData,
 				columnId: columnId,
 			});
-			onOpenChange(false);
 		}
-	};
+	}, [task, columnId, setValue, reset]);
 
-	const handleCancel = () => {
-		if (task) {
-			setTaskData({
-				title: task.title,
-				description: task.description,
-				priority: task.priority,
-			});
-		} else {
-			setTaskData({
-				title: "",
-				description: "",
-				priority: "medium",
-			});
-		}
+	const onSubmit = (data: CreateTaskFormData) => {
+		onSave({
+			title: data.title,
+			description: data.description,
+			priority: data.priority,
+			columnId: data.columnId || columnId,
+		});
 		onOpenChange(false);
 	};
 
-	const isFormValid = taskData.title.trim();
+	const handleCancel = () => {
+		reset();
+		onOpenChange(false);
+	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleCancel}>
@@ -107,18 +109,18 @@ export const TaskDialog = ({
 					)}
 				</DialogHeader>
 
-				<div className="space-y-4 py-4">
+				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
 					<div className="space-y-2">
 						<Label htmlFor="task-title">Título</Label>
 						<Input
 							id="task-title"
 							placeholder="Digite o título da tarefa"
-							value={taskData.title}
-							onChange={(e) =>
-								setTaskData({ ...taskData, title: e.target.value })
-							}
+							{...register("title")}
 							className="font-medium focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
+						{errors.title && (
+							<p className="text-sm text-red-500">{errors.title.message}</p>
+						)}
 					</div>
 
 					<div className="space-y-2">
@@ -126,21 +128,23 @@ export const TaskDialog = ({
 						<Textarea
 							id="task-description"
 							placeholder="Descreva os detalhes da tarefa"
-							value={taskData.description}
-							onChange={(e) =>
-								setTaskData({ ...taskData, description: e.target.value })
-							}
+							{...register("description")}
 							rows={isEditMode ? 6 : 4}
 							className="resize-none focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
+						{errors.description && (
+							<p className="text-sm text-red-500">
+								{errors.description.message}
+							</p>
+						)}
 					</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="task-priority">Prioridade</Label>
 						<Select
-							value={taskData.priority}
+							value={watch("priority")}
 							onValueChange={(value) =>
-								setTaskData({ ...taskData, priority: value })
+								setValue("priority", value as "low" | "medium" | "high")
 							}
 						>
 							<SelectTrigger
@@ -155,21 +159,30 @@ export const TaskDialog = ({
 								<SelectItem value="high">Alta</SelectItem>
 							</SelectContent>
 						</Select>
+						{errors.priority && (
+							<p className="text-sm text-red-500">{errors.priority.message}</p>
+						)}
 					</div>
-				</div>
 
-				<DialogFooter>
-					<Button variant="outline" onClick={handleCancel}>
-						Cancelar
-					</Button>
-					<Button
-						onClick={handleSave}
-						disabled={!isFormValid}
-						className={isEditMode ? "bg-gradient-primary border-0" : ""}
-					>
-						{isEditMode ? "Salvar" : "Criar Tarefa"}
-					</Button>
-				</DialogFooter>
+					<DialogFooter>
+						<Button type="button" variant="outline" onClick={handleCancel}>
+							Cancelar
+						</Button>
+						<Button
+							type="submit"
+							disabled={isSubmitting}
+							className={isEditMode ? "bg-gradient-primary border-0" : ""}
+						>
+							{isSubmitting
+								? isEditMode
+									? "Salvando..."
+									: "Criando..."
+								: isEditMode
+									? "Salvar"
+									: "Criar Tarefa"}
+						</Button>
+					</DialogFooter>
+				</form>
 			</DialogContent>
 		</Dialog>
 	);

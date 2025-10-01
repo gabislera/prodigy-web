@@ -19,7 +19,7 @@ import { useTasks } from "@/hooks/use-tasks";
 import {
 	type CreateGroupFormData,
 	createGroupSchema,
-} from "@/schemas/groupSchema";
+} from "@/schemas/taskSchema";
 import { colorOptions, iconOptions } from "@/utils/taskUtils";
 
 interface CreateGroupDialogProps {
