@@ -20,7 +20,7 @@ export const DroppableColumn = ({ column, children }: DroppableColumnProps) => {
 				</div>
 			</div>
 
-			<div className="space-y-2 min-h-[200px] p-2 rounded-lg bg-muted/5 border-2 border-dashed border-transparent hover:border-border/50 transition-colors">
+			<div className="space-y-2 min-h-[60px] p-2 rounded-lg bg-muted/5 border-2 border-dashed border-transparent hover:border-border/50 transition-colors">
 				{children}
 			</div>
 		</div>
