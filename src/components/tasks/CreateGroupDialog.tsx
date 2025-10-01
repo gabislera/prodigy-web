@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -14,43 +15,71 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { useTasks } from "@/hooks/use-tasks";
+import {
+	type CreateGroupFormData,
+	createGroupSchema,
+} from "@/schemas/groupSchema";
 import { colorOptions, iconOptions } from "@/utils/taskUtils";
 
 interface CreateGroupDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	onCreateGroup: (group: { name: string; icon: string; color: string }) => void;
+	// onCreateGroup: (group: { name: string; icon: string; color: string }) => void;
 }
 
 export const CreateGroupDialog = ({
 	isOpen,
 	onOpenChange,
-	onCreateGroup,
+	// onCreateGroup,
 }: CreateGroupDialogProps) => {
-	const [groupName, setGroupName] = useState("");
-	const [selectedIcon, setSelectedIcon] = useState("briefcase");
-	const [selectedColor, setSelectedColor] = useState("text-blue-500");
+	const { createTaskGroup } = useTasks();
 
-	const handleCreate = () => {
-		if (!groupName.trim()) return;
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		watch,
+		setValue,
+		reset,
+	} = useForm<CreateGroupFormData>({
+		resolver: zodResolver(createGroupSchema),
+		defaultValues: {
+			name: "",
+			icon: "briefcase",
+			color: "text-blue-500",
+		},
+	});
 
-		onCreateGroup({
-			name: groupName.trim(),
-			icon: selectedIcon,
-			color: selectedColor,
-		});
+	const watchedValues = watch();
 
-		setGroupName("");
-		setSelectedIcon("briefcase");
-		setSelectedColor("text-blue-500");
-		onOpenChange(false);
+	const onSubmit = async (data: CreateGroupFormData) => {
+		try {
+			// Get the background color for the selected color
+			const selectedColorOption = colorOptions.find(
+				(option) => option.value === data.color,
+			);
+
+			await createTaskGroup({
+				id: "",
+				name: data.name,
+				icon: data.icon,
+				color: data.color,
+				bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
+			});
+
+			reset();
+			onOpenChange(false);
+		} catch (error) {
+			console.error("Erro ao criar grupo:", error);
+		}
 	};
 
 	const selectedIconOption = iconOptions.find(
-		(option) => option.value === selectedIcon,
+		(option) => option.value === watchedValues.icon,
 	);
 	const selectedColorOption = colorOptions.find(
-		(option) => option.value === selectedColor,
+		(option) => option.value === watchedValues.color,
 	);
 
 	return (
@@ -60,19 +89,24 @@ export const CreateGroupDialog = ({
 					<DialogTitle>Novo Grupo de Tarefas</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4">
+				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 					<div className="space-y-2">
 						<Input
+							{...register("name")}
 							id="group-name"
 							placeholder="Ex: Projetos Pessoais"
-							value={groupName}
-							onChange={(e) => setGroupName(e.target.value)}
 						/>
+						{errors.name && (
+							<p className="text-sm text-red-500">{errors.name.message}</p>
+						)}
 					</div>
 
 					<div className="flex items-center gap-4">
 						<div className="space-y-2">
-							<Select value={selectedIcon} onValueChange={setSelectedIcon}>
+							<Select
+								value={watchedValues.icon}
+								onValueChange={(value) => setValue("icon", value)}
+							>
 								<SelectTrigger>
 									<SelectValue>
 										<div className="flex items-center gap-2">
@@ -94,10 +128,16 @@ export const CreateGroupDialog = ({
 									))}
 								</SelectContent>
 							</Select>
+							{errors.icon && (
+								<p className="text-sm text-red-500">{errors.icon.message}</p>
+							)}
 						</div>
 
 						<div className="space-y-2">
-							<Select value={selectedColor} onValueChange={setSelectedColor}>
+							<Select
+								value={watchedValues.color}
+								onValueChange={(value) => setValue("color", value)}
+							>
 								<SelectTrigger>
 									<SelectValue>
 										<div className="flex items-center gap-2">
@@ -125,6 +165,9 @@ export const CreateGroupDialog = ({
 									))}
 								</SelectContent>
 							</Select>
+							{errors.color && (
+								<p className="text-sm text-red-500">{errors.color.message}</p>
+							)}
 						</div>
 					</div>
 
@@ -134,11 +177,11 @@ export const CreateGroupDialog = ({
 						<div className="flex items-center gap-2 mb-2">
 							{selectedIconOption && (
 								<selectedIconOption.icon
-									className={`h-4 w-4 ${selectedColor}`}
+									className={`h-4 w-4 ${watchedValues.color}`}
 								/>
 							)}
 							<span className="text-sm font-medium">
-								{groupName || "Nome do Grupo"}
+								{watchedValues.name || "Nome do Grupo"}
 							</span>
 						</div>
 						<p className="text-xs text-muted-foreground">Preview do grupo</p>
@@ -146,6 +189,7 @@ export const CreateGroupDialog = ({
 
 					<div className="flex gap-2 pt-2">
 						<Button
+							type="button"
 							variant="outline"
 							onClick={() => onOpenChange(false)}
 							className="flex-1"
@@ -153,14 +197,14 @@ export const CreateGroupDialog = ({
 							Cancelar
 						</Button>
 						<Button
-							onClick={handleCreate}
-							disabled={!groupName.trim()}
+							type="submit"
+							disabled={isSubmitting}
 							className="flex-1 bg-gradient-primary border-0"
 						>
-							Criar Grupo
+							{isSubmitting ? "Criando..." : "Criar Grupo"}
 						</Button>
 					</div>
-				</div>
+				</form>
 			</DialogContent>
 		</Dialog>
 	);

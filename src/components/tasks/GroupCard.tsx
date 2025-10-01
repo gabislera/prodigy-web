@@ -8,7 +8,7 @@ interface GroupCardProps {
 }
 
 export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
-	console.log(group);
+	// console.log(group);
 	return (
 		<Card
 			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all`}
@@ -29,17 +29,17 @@ export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
 			<div className="w-full bg-background/30 rounded-full h-2 mb-2">
 				<div
 					className={`h-2 rounded-full ${getProgressBarColor(group.color)}`}
-					style={{
-						width: `${(group.completedCount / group.taskCount) * 100}%`,
-					}}
+					// style={{
+					// 	width: `${(group.completedCount / group.taskCount) * 100}%`,
+					// }}
 				/>
 			</div>
 
 			<div className="flex items-center justify-between text-xs">
 				<span className="text-muted-foreground">Progresso</span>
-				<span className="font-medium">
+				{/* <span className="font-medium">
 					{Math.round((group.completedCount / group.taskCount) * 100)}%
-				</span>
+				</span> */}
 			</div>
 		</Card>
 	);

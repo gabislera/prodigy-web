@@ -3,6 +3,10 @@ export interface Task {
 	title: string;
 	description: string;
 	priority: "high" | "medium" | "low";
+	columnId: string;
+	position: number;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface TaskGroup {
@@ -11,16 +15,17 @@ export interface TaskGroup {
 	icon: React.ComponentType<{ className?: string }>;
 	color: string;
 	bgColor: string;
-	taskCount: number;
-	completedCount: number;
+	columns: TaskColumn[];
+	taskCount?: number;
+	completedCount?: number;
 }
 
-export interface Column {
+export interface TaskColumn {
 	id: string;
 	title: string;
-	icon: React.ComponentType<{ className?: string }>;
-	color: string;
-	bgColor: string;
+	groupId: string;
+	order: number;
+	tasks?: Task[];
 }
 
 export interface TasksState {
@@ -28,3 +33,5 @@ export interface TasksState {
 	inProgress: Task[];
 	done: Task[];
 }
+
+export type TasksByColumn = Record<string, Task[]>;

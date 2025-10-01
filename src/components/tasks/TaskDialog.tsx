@@ -24,10 +24,12 @@ interface TaskDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
 	task?: Task | null;
+	columnId?: string;
 	onSave: (taskData: {
 		title: string;
 		description: string;
 		priority: string;
+		columnId?: string;
 	}) => void;
 }
 
@@ -35,6 +37,7 @@ export const TaskDialog = ({
 	isOpen,
 	onOpenChange,
 	task,
+	columnId,
 	onSave,
 }: TaskDialogProps) => {
 	const [taskData, setTaskData] = useState({
@@ -63,7 +66,10 @@ export const TaskDialog = ({
 
 	const handleSave = () => {
 		if (taskData.title.trim() && taskData.description.trim()) {
-			onSave(taskData);
+			onSave({
+				...taskData,
+				columnId: columnId,
+			});
 			onOpenChange(false);
 		}
 	};

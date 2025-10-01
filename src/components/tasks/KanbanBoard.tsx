@@ -17,14 +17,14 @@ import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { Column, Task, TasksState } from "@/types/tasks";
+import type { Task, TaskColumn, TasksByColumn } from "@/types/tasks";
 import { getPriorityColor } from "@/utils/taskUtils";
 import { DroppableColumn } from "./DroppableColumn";
 import { TaskCard } from "./TaskCard";
 
 interface KanbanBoardProps {
-	tasks: TasksState;
-	columns: Column[];
+	tasks: TasksByColumn;
+	columns: TaskColumn[];
 	onTaskClick: (task: Task) => void;
 	onCreateTask: () => void;
 	onDragStart: (event: DragStartEvent) => void;
@@ -64,35 +64,40 @@ export const KanbanBoard = ({
 			onDragEnd={onDragEnd}
 		>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{columns.map((column) => (
-					<DroppableColumn
-						key={column.id}
-						column={column}
-						onCreateTask={onCreateTask}
-					>
-						<SortableContext
-							items={tasks[column.id as keyof typeof tasks].map(
-								(task) => task.id,
-							)}
-							strategy={verticalListSortingStrategy}
+				{columns.map((column) => {
+					const columnTasks = tasks[column.id] || [];
+					return (
+						<DroppableColumn
+							key={column.id}
+							column={column}
+							onCreateTask={onCreateTask}
 						>
-							{tasks[column.id as keyof typeof tasks].map((task) => (
-								<TaskCard key={task.id} task={task} onTaskClick={onTaskClick} />
-							))}
+							<SortableContext
+								items={columnTasks.map((task) => task.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								{columnTasks.map((task) => (
+									<TaskCard
+										key={task.id}
+										task={task}
+										onTaskClick={onTaskClick}
+									/>
+								))}
 
-							{column.id === "todo" && tasks.todo.length === 0 && (
-								<Button
-									variant="outline"
-									className="w-full h-10 border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-foreground text-xs"
-									onClick={onCreateTask}
-								>
-									<Plus className="h-3 w-3 mr-1" />
-									Adicionar tarefa
-								</Button>
-							)}
-						</SortableContext>
-					</DroppableColumn>
-				))}
+								{columnTasks.length === 0 && (
+									<Button
+										variant="outline"
+										className="w-full h-10 border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-foreground text-xs"
+										onClick={onCreateTask}
+									>
+										<Plus className="h-3 w-3 mr-1" />
+										Adicionar tarefa
+									</Button>
+								)}
+							</SortableContext>
+						</DroppableColumn>
+					);
+				})}
 			</div>
 			<DragOverlay>
 				{activeTask ? (

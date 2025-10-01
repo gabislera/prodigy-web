@@ -1,10 +1,10 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Column } from "@/types/tasks";
+import type { TaskColumn } from "@/types/tasks";
 
 interface DroppableColumnProps {
-	column: Column;
+	column: TaskColumn;
 	children: React.ReactNode;
 	onCreateTask?: () => void;
 }
@@ -22,7 +22,7 @@ export const DroppableColumn = ({
 		<div ref={setNodeRef} className="space-y-3">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<column.icon className={`h-4 w-4 ${column.color}`} />
+					{/* <column.icon className={`h-4 w-4 ${column.color}`} /> */}
 					<h3 className="font-semibold text-sm">{column.title}</h3>
 				</div>
 				{column.id === "todo" && onCreateTask && (
