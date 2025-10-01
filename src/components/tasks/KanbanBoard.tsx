@@ -17,13 +17,12 @@ import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { Task, TaskColumn, TasksByColumn } from "@/types/tasks";
+import type { Task, TaskColumn } from "@/types/tasks";
 import { getPriorityColor } from "@/utils/taskUtils";
 import { DroppableColumn } from "./DroppableColumn";
 import { TaskCard } from "./TaskCard";
 
 interface KanbanBoardProps {
-	tasks: TasksByColumn;
 	columns: TaskColumn[];
 	onTaskClick: (task: Task) => void;
 	onCreateTask: () => void;
@@ -34,7 +33,6 @@ interface KanbanBoardProps {
 }
 
 export const KanbanBoard = ({
-	tasks,
 	columns,
 	onTaskClick,
 	onCreateTask,
@@ -44,9 +42,7 @@ export const KanbanBoard = ({
 	activeId,
 }: KanbanBoardProps) => {
 	const activeTask = activeId
-		? Object.values(tasks)
-				.flat()
-				.find((task) => task.id === activeId)
+		? columns.flatMap((col) => col.tasks).find((task) => task.id === activeId)
 		: null;
 
 	return (
@@ -65,7 +61,7 @@ export const KanbanBoard = ({
 		>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{columns.map((column) => {
-					const columnTasks = tasks[column.id] || [];
+					const columnTasks = column.tasks;
 					return (
 						<DroppableColumn
 							key={column.id}

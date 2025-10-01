@@ -16,7 +16,7 @@ export const GroupCard = ({ group, onGroupClick }: GroupCardProps) => {
 		>
 			<div className="flex items-center gap-3 mb-3">
 				<div className={`p-2 rounded-lg bg-background/50`}>
-					<group.icon className={`h-5 w-5 ${group.color}`} />
+					{/* <group.icon className={`h-5 w-5 ${group.color}`} /> */}
 				</div>
 				<div className="flex-1">
 					<h3 className="font-semibold text-sm">{group.name}</h3>

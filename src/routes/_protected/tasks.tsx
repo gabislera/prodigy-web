@@ -4,23 +4,12 @@ import type {
 	DragStartEvent,
 } from "@dnd-kit/core";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-	ArrowLeft,
-	BookOpen,
-	Briefcase,
-	Flag,
-	Heart,
-	Home,
-	Plus,
-	Star,
-	Target,
-	Users,
-	Zap,
-} from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { Task, TaskGroup, TasksState } from "@/types/tasks";
+import { useTasks } from "@/hooks/use-tasks";
+import type { Task } from "@/types/tasks";
 import {
 	CreateGroupDialog,
 	GroupCard,
@@ -34,172 +23,97 @@ export const Route = createFileRoute("/_protected/tasks")({
 
 function TasksPage() {
 	const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-	const [tasks, setTasks] = useState<TasksState>({
-		todo: [
-			{
-				id: "1",
-				title: "Estudar React Hooks",
-				description: "Revisar useState, useEffect e custom hooks",
-				priority: "high",
-			},
-			{
-				id: "2",
-				title: "Preparar apresentação",
-				description: "Slides para reunião com cliente",
-				priority: "medium",
-			},
-		],
-		inProgress: [
-			{
-				id: "3",
-				title: "Implementar autenticação",
-				description: "Sistema de login com JWT",
-				priority: "high",
-			},
-		],
-		done: [
-			{
-				id: "4",
-				title: "Setup do projeto",
-				description: "Configurar Vite + React + TypeScript",
-				priority: "low",
-			},
-		],
-	});
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-	const [taskGroups, setTaskGroups] = useState<TaskGroup[]>([
-		{
-			id: "work",
-			name: "Trabalho",
-			icon: Briefcase,
-			color: "text-primary",
-			bgColor: "bg-primary/10",
-			taskCount: 5,
-			completedCount: 2,
-		},
-		{
-			id: "study",
-			name: "Estudo",
-			icon: BookOpen,
-			color: "text-accent",
-			bgColor: "bg-accent/10",
-			taskCount: 8,
-			completedCount: 3,
-		},
-	]);
+	const { taskGroups, taskColumns, createTask, updateTask } =
+		useTasks(selectedGroup);
 
-	const columns = [
-		{
-			id: "todo",
-			title: "A Fazer",
-			icon: Target,
-			color: "text-muted-foreground",
-			bgColor: "bg-muted/10",
-		},
-		{
-			id: "inProgress",
-			title: "Em Progresso",
-			icon: Target,
-			color: "text-warning",
-			bgColor: "bg-warning/10",
-		},
-		{
-			id: "done",
-			title: "Concluído",
-			icon: Flag,
-			color: "text-success",
-			bgColor: "bg-success/10",
-		},
-	];
+	// Helper function to calculate new positions when reordering within the same column
+	const calculateNewPositions = (
+		columns: typeof taskColumns,
+		activeId: string,
+		overId: string,
+		targetColumnId: string,
+	) => {
+		const targetColumn = columns.find((col) => col.id === targetColumnId);
+		if (!targetColumn) return [];
 
-	const handleSaveTask = (taskData: {
+		const columnTasks = targetColumn.tasks;
+		const activeTaskIndex = columnTasks.findIndex(
+			(task) => task.id === activeId,
+		);
+		const overTaskIndex = columnTasks.findIndex((task) => task.id === overId);
+
+		if (activeTaskIndex === -1 || overTaskIndex === -1) return [];
+
+		const newTasks = [...columnTasks];
+		const [movedTask] = newTasks.splice(activeTaskIndex, 1);
+
+		// Insert at the new position
+		if (activeTaskIndex < overTaskIndex) {
+			newTasks.splice(overTaskIndex - 1, 0, movedTask);
+		} else {
+			newTasks.splice(overTaskIndex, 0, movedTask);
+		}
+
+		// Return updates for all affected tasks
+		return newTasks.map((task, index) => ({
+			taskId: task.id,
+			position: index,
+		}));
+	};
+
+	const handleSaveTask = async (taskData: {
 		title: string;
 		description: string;
 		priority: string;
+		columnId?: string;
 	}) => {
 		if (selectedTask) {
-			// Modo de edição
+			// Modo de edição - TODO: implementar atualização de tarefa
 			handleUpdateTask(selectedTask.id, taskData);
 			setIsDetailDialogOpen(false);
 		} else {
-			// Modo de criação
-			const task: Task = {
-				id: Date.now().toString(),
-				title: taskData.title,
-				description: taskData.description,
-				priority: taskData.priority as "high" | "medium" | "low",
-			};
+			// Modo de criação - usar columnId específica ou primeira coluna do grupo
+			let targetColumnId = taskData.columnId;
 
-			setTasks((prev) => ({
-				...prev,
-				todo: [...prev.todo, task],
-			}));
-			setIsCreateDialogOpen(false);
+			if (!targetColumnId && selectedGroup && taskColumns.length > 0) {
+				// Usar a primeira coluna disponível do grupo selecionado
+				targetColumnId = taskColumns[0].id;
+			}
+
+			if (targetColumnId) {
+				try {
+					await createTask({
+						title: taskData.title,
+						description: taskData.description,
+						priority: taskData.priority as "high" | "medium" | "low",
+						columnId: targetColumnId,
+						position: 0,
+					});
+
+					setIsCreateDialogOpen(false);
+				} catch (error) {
+					console.error("Erro ao criar tarefa:", error);
+					// TODO: Mostrar notificação de erro para o usuário
+				}
+			} else {
+				console.error("Nenhuma coluna disponível para criar a tarefa");
+				// TODO: Mostrar notificação de erro para o usuário
+			}
 		}
-	};
-
-	const handleCreateGroup = (groupData: {
-		name: string;
-		icon: string;
-		color: string;
-	}) => {
-		const iconMap: Record<
-			string,
-			React.ComponentType<{ className?: string }>
-		> = {
-			briefcase: Briefcase,
-			book: BookOpen,
-			home: Home,
-			users: Users,
-			target: Target,
-			heart: Heart,
-			zap: Zap,
-			star: Star,
-		};
-
-		const newGroup: TaskGroup = {
-			id: Date.now().toString(),
-			name: groupData.name,
-			icon: iconMap[groupData.icon] || Briefcase,
-			color: groupData.color,
-			bgColor: groupData.color.replace("text-", "bg-") + "/10",
-			taskCount: 0,
-			completedCount: 0,
-		};
-
-		setTaskGroups((prev) => [...prev, newGroup]);
 	};
 
 	const handleUpdateTask = (
 		taskId: string,
 		updatedTask: { title: string; description: string; priority: string },
 	) => {
-		setTasks((prev) => {
-			const newTasks = { ...prev };
-
-			// Find and update the task in any column
-			Object.keys(newTasks).forEach((columnKey) => {
-				const column = columnKey as keyof typeof newTasks;
-				const taskIndex = newTasks[column].findIndex(
-					(task) => task.id === taskId,
-				);
-				if (taskIndex !== -1) {
-					newTasks[column][taskIndex] = {
-						...newTasks[column][taskIndex],
-						title: updatedTask.title,
-						description: updatedTask.description,
-						priority: updatedTask.priority as "high" | "medium" | "low",
-					};
-				}
-			});
-
-			return newTasks;
-		});
+		// TODO: Implementar atualização de tarefa no backend
+		console.log("Atualizar tarefa:", taskId, updatedTask);
 	};
 
 	const handleTaskClick = (task: Task) => {
@@ -213,44 +127,49 @@ function TasksPage() {
 
 	const handleDragOver = (event: DragOverEvent) => {
 		const { active, over } = event;
+
 		if (!over) return;
 
 		const activeId = active.id as string;
 		const overId = over.id as string;
 
-		const activeColumn = Object.keys(tasks).find((key) =>
-			tasks[key as keyof typeof tasks].some((task) => task.id === activeId),
-		) as keyof typeof tasks | undefined;
+		// Find the active task
+		const activeTask = taskColumns
+			.flatMap((col) => col.tasks)
+			.find((task) => task.id === activeId);
 
-		let overColumn = Object.keys(tasks).find((key) =>
-			tasks[key as keyof typeof tasks].some((task) => task.id === overId),
-		) as keyof typeof tasks | undefined;
+		if (!activeTask) return;
 
-		if (["todo", "inProgress", "done"].includes(overId)) {
-			overColumn = overId as keyof typeof tasks;
-		}
+		// If dropping on a column or another task
+		if (overId !== activeId) {
+			// Check if dropping on a different column
+			const activeColumn = taskColumns.find((column) =>
+				column.tasks?.some((task) => task.id === activeId),
+			);
 
-		if (!activeColumn || !overColumn) return;
+			// Determine target column
+			let targetColumn = overId;
 
-		if (activeColumn !== overColumn) {
-			setTasks((prev) => {
-				const activeTask = prev[activeColumn].find(
-					(task) => task.id === activeId,
-				);
-				if (!activeTask) return prev;
+			// If dropping on a task, get its column
+			const overTask = taskColumns
+				.flatMap((col) => col.tasks || [])
+				.find((task) => task.id === overId);
 
-				return {
-					...prev,
-					[activeColumn]: prev[activeColumn].filter(
-						(task) => task.id !== activeId,
-					),
-					[overColumn]: [...prev[overColumn], activeTask],
-				};
-			});
+			if (overTask) {
+				targetColumn =
+					taskColumns.find((column) =>
+						column.tasks?.some((task) => task.id === overId),
+					)?.id || overId;
+			}
+
+			if (activeColumn?.id !== targetColumn) {
+				// Task is being moved to a different column
+				// We'll handle this in handleDragEnd
+			}
 		}
 	};
 
-	const handleDragEnd = (event: DragEndEvent) => {
+	const handleDragEnd = async (event: DragEndEvent) => {
 		const { active, over } = event;
 		setActiveId(null);
 
@@ -259,30 +178,89 @@ function TasksPage() {
 		const activeId = active.id as string;
 		const overId = over.id as string;
 
-		const activeColumn = Object.keys(tasks).find((key) =>
-			tasks[key as keyof typeof tasks].some((task) => task.id === activeId),
-		) as keyof typeof tasks | undefined;
+		// Find the active task
+		const activeTask = taskColumns
+			.flatMap((col) => col.tasks)
+			.find((task) => task.id === activeId);
 
-		if (!activeColumn) return;
+		if (!activeTask) return;
 
-		const activeIndex = tasks[activeColumn].findIndex(
-			(task) => task.id === activeId,
+		// Find current column of the task
+		const currentColumn = taskColumns.find((column) =>
+			column.tasks?.some((task) => task.id === activeId),
 		);
-		const overIndex = tasks[activeColumn].findIndex(
-			(task) => task.id === overId,
-		);
 
-		if (activeIndex !== overIndex && overIndex !== -1) {
-			setTasks((prev) => {
-				const newTasks = [...prev[activeColumn]];
-				const [movedTask] = newTasks.splice(activeIndex, 1);
-				newTasks.splice(overIndex, 0, movedTask);
+		// Determine target column and position
+		let targetColumn = overId;
+		let targetPosition = 0;
 
-				return {
-					...prev,
-					[activeColumn]: newTasks,
-				};
-			});
+		// If dropping on a task, get its column and calculate position
+		const overTask = taskColumns
+			.flatMap((col) => col.tasks)
+			.find((task) => task.id === overId);
+
+		if (overTask) {
+			// Dropping on another task
+			const overColumn = taskColumns.find((column) =>
+				column.tasks.some((task) => task.id === overId),
+			);
+			targetColumn = overColumn?.id || overId;
+
+			// Get all tasks in the target column
+			const targetColumnTasks = overColumn?.tasks || [];
+			const overTaskIndex = targetColumnTasks.findIndex(
+				(task) => task.id === overId,
+			);
+
+			if (overTaskIndex !== -1) {
+				// Position after the task we're dropping on
+				targetPosition = overTaskIndex + 1;
+			}
+		} else {
+			// Dropping on a column
+			targetColumn = overId;
+			// Position at the end of the column
+			const targetColumnData = taskColumns.find((col) => col.id === overId);
+			targetPosition = (targetColumnData?.tasks || []).length;
+		}
+
+		// Only update if there's a change
+		if (
+			currentColumn?.id !== targetColumn ||
+			targetPosition !== activeTask.position
+		) {
+			try {
+				// If moving within the same column, update all affected tasks
+				if (currentColumn?.id === targetColumn && overTask) {
+					const positionUpdates = calculateNewPositions(
+						taskColumns,
+						activeId,
+						overId,
+						targetColumn,
+					);
+
+					// Update all affected tasks
+					await Promise.all(
+						positionUpdates.map(({ taskId, position }) =>
+							updateTask({
+								taskId,
+								data: { position },
+							}),
+						),
+					);
+				} else {
+					// Moving to a different column or to empty space
+					await updateTask({
+						taskId: activeId,
+						data: {
+							columnId: targetColumn,
+							position: targetPosition,
+						},
+					});
+				}
+			} catch (error) {
+				console.error("Erro ao mover task:", error);
+			}
 		}
 	};
 
@@ -303,7 +281,7 @@ function TasksPage() {
 							<ArrowLeft className="h-4 w-4" />
 						</Button>
 						<div className="flex items-center gap-2">
-							{group && <group.icon className={`h-5 w-5 ${group.color}`} />}
+							{/* {group && <group.icon className={`h-5 w-5 ${group.color}`} />} */}
 							<h1 className="text-xl font-bold text-foreground">
 								{group?.name || "Tarefas"}
 							</h1>
@@ -320,8 +298,7 @@ function TasksPage() {
 
 				{/* Kanban Board */}
 				<KanbanBoard
-					tasks={tasks}
-					columns={columns}
+					columns={taskColumns}
 					onTaskClick={handleTaskClick}
 					onCreateTask={() => setIsCreateDialogOpen(true)}
 					onDragStart={handleDragStart}
@@ -376,13 +353,13 @@ function TasksPage() {
 				<div className="grid grid-cols-2 gap-4 text-center">
 					<div>
 						<div className="text-xl font-bold text-primary">
-							{taskGroups.reduce((acc, group) => acc + group.taskCount, 0)}
+							{/* {taskGroups.reduce((acc, group) => acc + group.taskCount, 0)} */}
 						</div>
 						<p className="text-xs text-muted-foreground">Total de Tarefas</p>
 					</div>
 					<div>
 						<div className="text-xl font-bold text-success">
-							{taskGroups.reduce((acc, group) => acc + group.completedCount, 0)}
+							{/* {taskGroups.reduce((acc, group) => acc + group.completedCount, 0)} */}
 						</div>
 						<p className="text-xs text-muted-foreground">Concluídas</p>
 					</div>
@@ -392,19 +369,12 @@ function TasksPage() {
 			<CreateGroupDialog
 				isOpen={isCreateGroupDialogOpen}
 				onOpenChange={setIsCreateGroupDialogOpen}
-				onCreateGroup={handleCreateGroup}
+				// onCreateGroup={handleCreateGroup}
 			/>
 
 			<TaskDialog
 				isOpen={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
-				onSave={handleSaveTask}
-			/>
-
-			<TaskDialog
-				isOpen={isDetailDialogOpen}
-				onOpenChange={setIsDetailDialogOpen}
-				task={selectedTask}
 				onSave={handleSaveTask}
 			/>
 		</div>

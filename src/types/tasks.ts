@@ -12,7 +12,6 @@ export interface Task {
 export interface TaskGroup {
 	id: string;
 	name: string;
-	icon: React.ComponentType<{ className?: string }>;
 	color: string;
 	bgColor: string;
 	columns: TaskColumn[];
@@ -25,7 +24,7 @@ export interface TaskColumn {
 	title: string;
 	groupId: string;
 	order: number;
-	tasks?: Task[];
+	tasks: Task[];
 }
 
 export interface TasksState {

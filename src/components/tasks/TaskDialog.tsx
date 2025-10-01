@@ -65,7 +65,7 @@ export const TaskDialog = ({
 	}, [task]);
 
 	const handleSave = () => {
-		if (taskData.title.trim() && taskData.description.trim()) {
+		if (taskData.title.trim()) {
 			onSave({
 				...taskData,
 				columnId: columnId,
@@ -91,7 +91,7 @@ export const TaskDialog = ({
 		onOpenChange(false);
 	};
 
-	const isFormValid = taskData.title.trim() && taskData.description.trim();
+	const isFormValid = taskData.title.trim();
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleCancel}>
