@@ -104,4 +104,13 @@ export const tasksService = {
 	async deleteTask(taskId: string): Promise<void> {
 		await axios.delete(`${API_BASE_URL}/task/${taskId}`);
 	},
+
+	async updateColumnOrder(
+		groupId: string,
+		columnOrders: { columnId: string; order: number }[],
+	): Promise<void> {
+		await axios.put(`${API_BASE_URL}/task_groups/${groupId}/columns/order`, {
+			columnOrders,
+		});
+	},
 };

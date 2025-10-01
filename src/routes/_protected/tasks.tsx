@@ -4,16 +4,17 @@ import type {
 	DragStartEvent,
 } from "@dnd-kit/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTasks } from "@/hooks/use-tasks";
-import type { Task } from "@/types/tasks";
+import type { Task, TaskColumn } from "@/types/tasks";
 import {
 	CreateGroupDialog,
 	GroupCard,
 	KanbanBoard,
+	SettingsDialog,
 	TaskDialog,
 } from "../../components/tasks";
 
@@ -27,10 +28,35 @@ function TasksPage() {
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-	const { taskGroups, taskColumns, createTask, updateTask, deleteTask } =
-		useTasks(selectedGroup);
+	const {
+		taskGroups,
+		taskColumns: apiTaskColumns,
+		createTask,
+		updateTask,
+		deleteTask,
+		updateColumnOrder,
+	} = useTasks(selectedGroup);
+
+	// Convert ApiTaskColumn[] to TaskColumn[]
+	const taskColumns: TaskColumn[] = apiTaskColumns.map((apiColumn) => ({
+		id: apiColumn.id,
+		title: apiColumn.title,
+		groupId: apiColumn.groupId,
+		order: apiColumn.order,
+		tasks: apiColumn.tasks.map((apiTask) => ({
+			id: apiTask.id,
+			title: apiTask.title,
+			description: apiTask.description,
+			priority: apiTask.priority,
+			columnId: apiTask.columnId,
+			position: apiTask.position,
+			createdAt: apiTask.createdAt,
+			updatedAt: apiTask.updatedAt,
+		})),
+	}));
 
 	// Helper function to calculate new positions when reordering within the same column
 	const calculateNewPositions = (
@@ -283,6 +309,21 @@ function TasksPage() {
 		}
 	};
 
+	const handleSaveColumnOrder = async (newColumns: TaskColumn[]) => {
+		if (!selectedGroup) return;
+
+		try {
+			const columnOrders = newColumns.map((column, index) => ({
+				columnId: column.id,
+				order: index,
+			}));
+
+			await updateColumnOrder({ groupId: selectedGroup, columnOrders });
+		} catch (error) {
+			console.error("Erro ao salvar ordem das colunas:", error);
+		}
+	};
+
 	if (selectedGroup) {
 		const group = taskGroups.find((g) => g.id === selectedGroup);
 
@@ -306,13 +347,23 @@ function TasksPage() {
 							</h1>
 						</div>
 					</div>
-					<Button
-						className="bg-gradient-primary border-0 shadow-glow text-xs"
-						onClick={() => setIsCreateDialogOpen(true)}
-					>
-						<Plus className="h-3 w-3 mr-1" />
-						Nova Tarefa
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="icon"
+							onClick={() => setIsSettingsDialogOpen(true)}
+							className="h-8 w-8"
+						>
+							<Settings className="h-4 w-4" />
+						</Button>
+						<Button
+							className="bg-gradient-primary border-0 shadow-glow text-xs"
+							onClick={() => setIsCreateDialogOpen(true)}
+						>
+							<Plus className="h-3 w-3 mr-1" />
+							Nova Tarefa
+						</Button>
+					</div>
 				</div>
 
 				{/* Kanban Board */}
@@ -339,6 +390,13 @@ function TasksPage() {
 					onOpenChange={setIsDetailDialogOpen}
 					task={selectedTask}
 					onSave={handleSaveTask}
+				/>
+
+				<SettingsDialog
+					isOpen={isSettingsDialogOpen}
+					onOpenChange={setIsSettingsDialogOpen}
+					columns={taskColumns}
+					onSaveColumnOrder={handleSaveColumnOrder}
 				/>
 			</div>
 		);

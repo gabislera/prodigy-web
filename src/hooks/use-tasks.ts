@@ -74,6 +74,24 @@ export function useTasks(selectedGroupId?: string | null) {
 		},
 	});
 
+	const updateColumnOrderMutation = useMutation({
+		mutationFn: ({
+			groupId,
+			columnOrders,
+		}: {
+			groupId: string;
+			columnOrders: { columnId: string; order: number }[];
+		}) => tasksService.updateColumnOrder(groupId, columnOrders),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+			if (selectedGroupId) {
+				queryClient.invalidateQueries({
+					queryKey: [TASKS_QUERY_KEY, "columns", selectedGroupId],
+				});
+			}
+		},
+	});
+
 	return {
 		taskGroups,
 		taskColumns,
@@ -81,5 +99,6 @@ export function useTasks(selectedGroupId?: string | null) {
 		createTask: createTaskMutation.mutateAsync,
 		updateTask: updateTaskMutation.mutateAsync,
 		deleteTask: deleteTaskMutation.mutateAsync,
+		updateColumnOrder: updateColumnOrderMutation.mutateAsync,
 	};
 }
