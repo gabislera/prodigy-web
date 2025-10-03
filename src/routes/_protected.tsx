@@ -2,6 +2,7 @@ import {
 	createFileRoute,
 	Link,
 	Outlet,
+	redirect,
 	useLocation,
 } from "@tanstack/react-router";
 import {
@@ -10,6 +11,7 @@ import {
 	Flame,
 	Home,
 	Kanban,
+	LogOut,
 	Settings,
 	Timer,
 	Trophy,
@@ -18,6 +20,7 @@ import { BottomNavigation } from "@/components/bottom-navigation";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarHeader,
@@ -28,10 +31,29 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_protected")({
+	beforeLoad: async () => {
+		// Check if user is authenticated
+		const token = localStorage.getItem("accessToken");
+		if (!token) {
+			throw redirect({ to: "/login" });
+		}
+
+		// Check if token is valid
+		try {
+			const payload = JSON.parse(atob(token.split(".")[1]));
+			const currentTime = Date.now() / 1000;
+			if (payload.exp <= currentTime) {
+				throw redirect({ to: "/login" });
+			}
+		} catch {
+			throw redirect({ to: "/login" });
+		}
+	},
 	component: RouteComponent,
 });
 
@@ -46,12 +68,17 @@ const navigation = [
 
 function RouteComponent() {
 	const location = useLocation();
+	const { user, logout, isLogoutLoading } = useAuth();
 
 	const currentNavItem = navigation.find(
 		(item) => item.href === location.pathname,
 	);
 
 	const isMobile = useIsMobile();
+
+	const handleLogout = () => {
+		logout();
+	};
 
 	if (isMobile) {
 		return (
@@ -78,6 +105,12 @@ function RouteComponent() {
 								<p className="text-xs text-gray-400">Sua jornada produtiva</p>
 							</div>
 						</div>
+						{user && (
+							<div className="mt-4 p-3 bg-white/5 rounded-lg">
+								<p className="text-sm text-white font-medium">{user.name}</p>
+								<p className="text-xs text-gray-400">{user.email}</p>
+							</div>
+						)}
 					</SidebarHeader>
 
 					<SidebarContent>
@@ -114,6 +147,24 @@ function RouteComponent() {
 							</SidebarGroupContent>
 						</SidebarGroup>
 					</SidebarContent>
+
+					<SidebarFooter>
+						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									size={"sm"}
+									onClick={handleLogout}
+									disabled={isLogoutLoading}
+									className="px-3 py-2 rounded-lg transition-all duration-200 hover:bg-red-500/20 text-red-400 hover:text-red-300"
+								>
+									<LogOut className="h-4 w-4" />
+									<span className="font-medium">
+										{isLogoutLoading ? "Saindo..." : "Sair"}
+									</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarFooter>
 				</Sidebar>
 				<SidebarInset>
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
