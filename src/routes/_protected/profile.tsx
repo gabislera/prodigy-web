@@ -76,8 +76,8 @@ function RouteComponent() {
 						</div> */}
 					</div>
 					<Button variant="secondary" size="sm" onClick={() => setIsOpen(true)}>
-						<Edit3 className="h-4 w-4 mr-2" />
-						Editar
+						<Edit3 className="h-4 w-4" />
+						<span className="hidden md:block">Editar</span>
 					</Button>
 				</div>
 			</Card>
