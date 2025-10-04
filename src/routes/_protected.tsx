@@ -61,9 +61,9 @@ const navigation = [
 	{ name: "Dashboard", href: "/", icon: Home },
 	{ name: "Calendário", href: "/calendar", icon: Calendar },
 	{ name: "Tarefas", href: "/tasks", icon: Kanban },
-	{ name: "Pomodoro", href: "/timer", icon: Timer },
+	{ name: "Timer", href: "/timer", icon: Timer },
 	{ name: "Notas", href: "/notes", icon: FileText },
-	{ name: "Configurações", href: "/settings", icon: Settings },
+	{ name: "Perfil", href: "/profile", icon: Settings },
 ];
 
 function RouteComponent() {

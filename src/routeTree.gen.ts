@@ -15,6 +15,7 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedTimerRouteImport } from './routes/_protected/timer'
 import { Route as ProtectedTasksRouteImport } from './routes/_protected/tasks'
+import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
 import { Route as ProtectedNotesRouteImport } from './routes/_protected/notes'
 import { Route as ProtectedCalendarRouteImport } from './routes/_protected/calendar'
 
@@ -47,6 +48,11 @@ const ProtectedTasksRoute = ProtectedTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedNotesRoute = ProtectedNotesRouteImport.update({
   id: '/notes',
   path: '/notes',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/calendar': typeof ProtectedCalendarRoute
   '/notes': typeof ProtectedNotesRoute
+  '/profile': typeof ProtectedProfileRoute
   '/tasks': typeof ProtectedTasksRoute
   '/timer': typeof ProtectedTimerRoute
   '/': typeof ProtectedIndexRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/calendar': typeof ProtectedCalendarRoute
   '/notes': typeof ProtectedNotesRoute
+  '/profile': typeof ProtectedProfileRoute
   '/tasks': typeof ProtectedTasksRoute
   '/timer': typeof ProtectedTimerRoute
   '/': typeof ProtectedIndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_protected/calendar': typeof ProtectedCalendarRoute
   '/_protected/notes': typeof ProtectedNotesRoute
+  '/_protected/profile': typeof ProtectedProfileRoute
   '/_protected/tasks': typeof ProtectedTasksRoute
   '/_protected/timer': typeof ProtectedTimerRoute
   '/_protected/': typeof ProtectedIndexRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/calendar'
     | '/notes'
+    | '/profile'
     | '/tasks'
     | '/timer'
     | '/'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/calendar'
     | '/notes'
+    | '/profile'
     | '/tasks'
     | '/timer'
     | '/'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_protected/calendar'
     | '/_protected/notes'
+    | '/_protected/profile'
     | '/_protected/tasks'
     | '/_protected/timer'
     | '/_protected/'
@@ -168,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedTasksRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/notes': {
       id: '/_protected/notes'
       path: '/notes'
@@ -188,6 +207,7 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteChildren {
   ProtectedCalendarRoute: typeof ProtectedCalendarRoute
   ProtectedNotesRoute: typeof ProtectedNotesRoute
+  ProtectedProfileRoute: typeof ProtectedProfileRoute
   ProtectedTasksRoute: typeof ProtectedTasksRoute
   ProtectedTimerRoute: typeof ProtectedTimerRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
@@ -196,6 +216,7 @@ interface ProtectedRouteChildren {
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedCalendarRoute: ProtectedCalendarRoute,
   ProtectedNotesRoute: ProtectedNotesRoute,
+  ProtectedProfileRoute: ProtectedProfileRoute,
   ProtectedTasksRoute: ProtectedTasksRoute,
   ProtectedTimerRoute: ProtectedTimerRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,

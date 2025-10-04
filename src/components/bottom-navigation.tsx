@@ -1,5 +1,12 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Calendar, FileText, Home, Settings, Timer } from "lucide-react";
+import {
+	Calendar,
+	FileText,
+	Home,
+	Kanban,
+	Settings,
+	Timer,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const BottomNavigation = () => {
@@ -8,9 +15,10 @@ export const BottomNavigation = () => {
 	const navigation = [
 		{ name: "Dashboard", href: "/", icon: Home },
 		{ name: "Calendário", href: "/calendar", icon: Calendar },
-		{ name: "Pomodoro", href: "/timer", icon: Timer },
+		{ name: "Tarefas", href: "/tasks", icon: Kanban },
+		{ name: "Timer", href: "/timer", icon: Timer },
 		{ name: "Notas", href: "/notes", icon: FileText },
-		{ name: "Configurações", href: "/settings", icon: Settings },
+		{ name: "Perfil", href: "/profile", icon: Settings },
 	];
 
 	return (
