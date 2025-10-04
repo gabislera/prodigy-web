@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "@/lib/apiClient";
 
 export interface Event {
 	id: string;
@@ -30,11 +30,9 @@ export interface CreateEventData {
 	type: string;
 }
 
-const API_BASE_URL = "http://localhost:3333";
-
 export const calendarService = {
 	async getAllEvents(): Promise<Event[]> {
-		const response = await axios.get(`${API_BASE_URL}/events`);
+		const response = await api.get("/events");
 		// Convert date strings to Date objects
 		return response.data.map((event: EventApiResponse) => ({
 			...event,
@@ -46,7 +44,7 @@ export const calendarService = {
 	},
 
 	async createEvent(data: CreateEventData): Promise<Event> {
-		const response = await axios.post(`${API_BASE_URL}/events`, data);
+		const response = await api.post("/events", data);
 		// Convert date strings to Date objects
 		const event: EventApiResponse = response.data;
 		return {
@@ -62,7 +60,7 @@ export const calendarService = {
 		id: string,
 		data: Partial<CreateEventData>,
 	): Promise<Event> {
-		const response = await axios.put(`${API_BASE_URL}/events/${id}`, data);
+		const response = await api.put(`/events/${id}`, data);
 		// Convert date strings to Date objects
 		const event: EventApiResponse = response.data;
 		return {
@@ -75,6 +73,6 @@ export const calendarService = {
 	},
 
 	async deleteEvent(id: string): Promise<void> {
-		await axios.delete(`${API_BASE_URL}/events/${id}`);
+		await api.delete(`/events/${id}`);
 	},
 };

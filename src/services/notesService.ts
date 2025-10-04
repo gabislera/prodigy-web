@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "@/lib/apiClient";
 
 export interface Note {
 	id: string;
@@ -13,25 +13,23 @@ export interface CreateNoteData {
 	content: string;
 }
 
-const API_BASE_URL = "http://localhost:3333";
-
 export const notesService = {
 	async getAllNotes(): Promise<Note[]> {
-		const response = await axios.get(`${API_BASE_URL}/notes`);
+		const response = await api.get("/notes");
 		return response.data;
 	},
 
 	async createNote(data: CreateNoteData): Promise<Note> {
-		const response = await axios.post(`${API_BASE_URL}/notes`, data);
+		const response = await api.post("/notes", data);
 		return response.data;
 	},
 
 	async updateNote(id: string, data: Partial<CreateNoteData>): Promise<Note> {
-		const response = await axios.put(`${API_BASE_URL}/notes/${id}`, data);
+		const response = await api.put(`/notes/${id}`, data);
 		return response.data;
 	},
 
 	async deleteNote(id: string): Promise<void> {
-		await axios.delete(`${API_BASE_URL}/notes/${id}`);
+		await api.delete(`/notes/${id}`);
 	},
 };

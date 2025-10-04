@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "@/lib/apiClient";
 
 export interface ApiTaskGroup {
 	id: string;
@@ -76,50 +76,46 @@ export interface UpdateGroupData {
 	bgColor?: string;
 }
 
-const API_BASE_URL = "http://localhost:3333";
-
 export const tasksService = {
 	async getAllTaskGroups(): Promise<ApiTaskGroup[]> {
-		const response = await axios.get(`${API_BASE_URL}/task_groups`);
+		const response = await api.get("/task_groups");
 		return response.data;
 	},
 
 	async createTaskGroup(data: CreateGroupData): Promise<ApiTaskGroup> {
-		const response = await axios.post(`${API_BASE_URL}/task_group`, data);
+		const response = await api.post("/task_group", data);
 		return response.data;
 	},
 
 	async getGroupColumns(groupId: string): Promise<ApiTaskColumn[]> {
-		const response = await axios.get(
-			`${API_BASE_URL}/task_groups/${groupId}/columns`,
-		);
+		const response = await api.get(`/task_groups/${groupId}/columns`);
 		return response.data;
 	},
 
 	async createTaskColumn(data: CreateColumnData): Promise<ApiTaskColumn> {
-		const response = await axios.post(`${API_BASE_URL}/task_column`, data);
+		const response = await api.post("/task_column", data);
 		return response.data;
 	},
 
 	async createTask(data: CreateTaskData): Promise<ApiTask> {
-		const response = await axios.post(`${API_BASE_URL}/task`, data);
+		const response = await api.post("/task", data);
 		return response.data;
 	},
 
 	async updateTask(taskId: string, data: UpdateTaskData): Promise<ApiTask> {
-		const response = await axios.put(`${API_BASE_URL}/task/${taskId}`, data);
+		const response = await api.put(`/task/${taskId}`, data);
 		return response.data;
 	},
 
 	async deleteTask(taskId: string): Promise<void> {
-		await axios.delete(`${API_BASE_URL}/task/${taskId}`);
+		await api.delete(`/task/${taskId}`);
 	},
 
 	async updateColumnOrder(
 		groupId: string,
 		columnOrders: { columnId: string; order: number }[],
 	): Promise<void> {
-		await axios.put(`${API_BASE_URL}/task_groups/${groupId}/columns/order`, {
+		await api.put(`/task_groups/${groupId}/columns/order`, {
 			columnOrders,
 		});
 	},
@@ -128,14 +124,11 @@ export const tasksService = {
 		groupId: string,
 		data: UpdateGroupData,
 	): Promise<ApiTaskGroup> {
-		const response = await axios.put(
-			`${API_BASE_URL}/task_group/${groupId}`,
-			data,
-		);
+		const response = await api.put(`/task_group/${groupId}`, data);
 		return response.data;
 	},
 
 	async deleteTaskGroup(groupId: string): Promise<void> {
-		await axios.delete(`${API_BASE_URL}/task_group/${groupId}`);
+		await api.delete(`/task_group/${groupId}`);
 	},
 };
