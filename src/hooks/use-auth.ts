@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { authService, type LoginData } from "@/services/authService";
+import type { ApiError } from "@/types/api";
 
 const AUTH_QUERY_KEY = ["auth"] as const;
 
@@ -26,8 +28,11 @@ export const useAuth = () => {
 			queryClient.setQueryData(AUTH_QUERY_KEY, data.user);
 			navigate({ to: "/" });
 		},
-		onError: (error) => {
-			console.error("Login error:", error);
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao fazer login. Tente novamente.",
+			);
 		},
 	});
 
@@ -36,6 +41,12 @@ export const useAuth = () => {
 		onSuccess: (data) => {
 			queryClient.setQueryData(AUTH_QUERY_KEY, data.user);
 			navigate({ to: "/" });
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao criar conta. Tente novamente.",
+			);
 		},
 	});
 
@@ -46,6 +57,9 @@ export const useAuth = () => {
 			queryClient.clear();
 			navigate({ to: "/login" });
 		},
+		onError: () => {
+			toast.error("Erro ao fazer logout. Tente novamente.");
+		},
 	});
 
 	const refreshTokenMutation = useMutation({
@@ -53,6 +67,9 @@ export const useAuth = () => {
 		onSuccess: () => {
 			// Refetch user data after token refresh
 			queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+		},
+		onError: () => {
+			toast.error("Sessão expirada. Faça login novamente.");
 		},
 	});
 

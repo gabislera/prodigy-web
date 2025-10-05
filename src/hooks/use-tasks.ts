@@ -1,5 +1,6 @@
 // hooks/use-tasks.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
 	type ApiTaskColumn,
 	type ApiTaskGroup,
@@ -7,6 +8,7 @@ import {
 	type UpdateGroupData,
 	type UpdateTaskData,
 } from "@/services/tasksService";
+import type { ApiError } from "@/types/api";
 import type { TaskGroup } from "@/types/tasks";
 
 const TASKS_QUERY_KEY = ["tasks"] as const;
@@ -36,6 +38,12 @@ export function useTasks(selectedGroupId?: string | null) {
 				...old,
 			]);
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao criar grupo de tarefas. Tente novamente.",
+			);
+		},
 	});
 
 	const createTaskMutation = useMutation({
@@ -47,6 +55,12 @@ export function useTasks(selectedGroupId?: string | null) {
 					queryKey: [TASKS_QUERY_KEY, "columns", selectedGroupId],
 				});
 			}
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao criar tarefa. Tente novamente.",
+			);
 		},
 	});
 
@@ -61,6 +75,12 @@ export function useTasks(selectedGroupId?: string | null) {
 				});
 			}
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar tarefa. Tente novamente.",
+			);
+		},
 	});
 
 	const deleteTaskMutation = useMutation({
@@ -72,6 +92,12 @@ export function useTasks(selectedGroupId?: string | null) {
 					queryKey: [TASKS_QUERY_KEY, "columns", selectedGroupId],
 				});
 			}
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao excluir tarefa. Tente novamente.",
+			);
 		},
 	});
 
@@ -91,6 +117,12 @@ export function useTasks(selectedGroupId?: string | null) {
 				});
 			}
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar ordem das colunas. Tente novamente.",
+			);
+		},
 	});
 
 	const updateTaskGroupMutation = useMutation({
@@ -104,12 +136,24 @@ export function useTasks(selectedGroupId?: string | null) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar grupo de tarefas. Tente novamente.",
+			);
+		},
 	});
 
 	const deleteTaskGroupMutation = useMutation({
 		mutationFn: (groupId: string) => tasksService.deleteTaskGroup(groupId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao excluir grupo de tarefas. Tente novamente.",
+			);
 		},
 	});
 

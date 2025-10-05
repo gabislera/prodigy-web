@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -107,6 +108,7 @@ export const CreateGroupDialog = ({
 			onOpenChange(false);
 		} catch (error) {
 			console.error("Erro ao salvar grupo:", error);
+			toast.error("Erro ao salvar grupo. Tente novamente.");
 		}
 	};
 

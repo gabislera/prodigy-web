@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef } from "react";
+import { toast } from "sonner";
 import type { CreateNoteData, Note } from "@/services/notesService";
 import { notesService } from "@/services/notesService";
+import type { ApiError } from "@/types/api";
 
 const NOTES_QUERY_KEY = ["notes"] as const;
 
@@ -26,6 +28,12 @@ export function useNotes() {
 				...old,
 			]);
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao criar nota. Tente novamente.",
+			);
+		},
 	});
 
 	const updateNoteMutation = useMutation({
@@ -36,6 +44,12 @@ export function useNotes() {
 				old.map((note) => (note.id === updatedNote.id ? updatedNote : note)),
 			);
 		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar nota. Tente novamente.",
+			);
+		},
 	});
 
 	const deleteNoteMutation = useMutation({
@@ -43,6 +57,12 @@ export function useNotes() {
 		onSuccess: (_, deletedId) => {
 			queryClient.setQueryData(NOTES_QUERY_KEY, (old: Note[] = []) =>
 				old.filter((note) => note.id !== deletedId),
+			);
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao excluir nota. Tente novamente.",
 			);
 		},
 	});

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -52,7 +53,6 @@ export function ProfileEditDialog({
 
 			await updateUser(updateData);
 
-			alert("Perfil atualizado com sucesso!");
 			onOpenChange(false);
 			reset();
 		} catch (error: unknown) {
@@ -61,7 +61,7 @@ export function ProfileEditDialog({
 					? (error as { response?: { data?: { message?: string } } })?.response
 							?.data?.message
 					: "Erro ao atualizar perfil";
-			alert(errorMessage);
+			toast.error(errorMessage);
 		}
 	};
 

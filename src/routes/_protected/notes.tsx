@@ -2,6 +2,7 @@ import { useChat } from "@ai-sdk/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { AINotesDialog } from "@/components/ai-notes-dialog";
 import { NotesEditor } from "@/components/notes-editor";
@@ -92,6 +93,7 @@ function NotesPage() {
 				}
 			} catch (error) {
 				console.error("Erro ao criar nota:", error);
+				toast.error("Erro ao criar nota. Tente novamente.");
 			}
 		},
 		[createNote, sendMessage, isMobile],
@@ -137,6 +139,7 @@ function NotesPage() {
 				}
 			} catch (error) {
 				console.error("Erro ao deletar nota:", error);
+				toast.error("Erro ao deletar nota. Tente novamente.");
 			}
 		},
 		[deleteNote, selectedNote, notes, isMobile],

@@ -6,6 +6,7 @@ import type {
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
@@ -122,11 +123,11 @@ function TasksPage() {
 					setIsCreateDialogOpen(false);
 				} catch (error) {
 					console.error("Erro ao criar tarefa:", error);
-					// TODO: Mostrar notificação de erro para o usuário
+					toast.error("Erro ao criar tarefa. Tente novamente.");
 				}
 			} else {
 				console.error("Coluna é obrigatória para criar a tarefa");
-				// TODO: Mostrar notificação de erro para o usuário
+				toast.error("Selecione uma coluna para criar a tarefa.");
 			}
 		}
 	};
@@ -152,7 +153,7 @@ function TasksPage() {
 			});
 		} catch (error) {
 			console.error("Erro ao atualizar tarefa:", error);
-			// TODO: Mostrar notificação de erro para o usuário
+			toast.error("Erro ao atualizar tarefa. Tente novamente.");
 		}
 	};
 

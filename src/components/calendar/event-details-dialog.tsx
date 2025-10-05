@@ -1,4 +1,5 @@
 import { Clock, MapPin, User } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -29,6 +30,7 @@ export const EventDetailsDialog = ({
 			onOpenChange(false);
 		} catch (error: unknown) {
 			console.error("Erro ao deletar evento:", error);
+			toast.error("Erro ao deletar evento. Tente novamente.");
 		}
 	};
 
