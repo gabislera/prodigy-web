@@ -1,3 +1,5 @@
+
+<img width="1511" height="827" alt="Captura de Tela 2025-10-06 às 11 49 23" src="https://github.com/user-attachments/assets/55b50780-aa39-4b4d-af14-ec72f66f5998" />
 # Prodigy
 
 Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, TypeScript e Tailwind CSS, que combina funcionalidades de calendário, gerenciamento de tarefas estilo Kanban, sistema de notas com IA e timer Pomodoro. O sistema oferece uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
@@ -55,44 +57,42 @@ pnpm dev
 
 Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 
-## Funcionalidades do Sistema
+## Preview das Funcionalidades do Sistema
 
 ### Calendário
-<img width="800" alt="Calendário Prodigy" src="docs/screens/calendar.png" />
+<img width="1512" height="826" alt="Captura de Tela 2025-10-06 às 11 49 37" src="https://github.com/user-attachments/assets/5dff6a6f-5c92-4e0f-b593-02ea79d051af" />
 
 - Visualização em múltiplas visualizações (mês, semana, dia)
 - Criação rápida de eventos com diálogos intuitivos
 
 
 ### Sistema Kanban
-<img width="800" alt="Kanban Prodigy" src="docs/screens/kanban.png" />
+<img width="1512" height="826" alt="Captura de Tela 2025-10-06 às 11 50 31" src="https://github.com/user-attachments/assets/21b107fc-dc30-4fe0-80f5-28f78f042d35" />
 
 - Drag & drop entre colunas
 - Reordenação de tarefas
 - Grupos de trabalho personalizáveis
 - Filtros e busca avançada
 
+- ### Timer Pomodoro
+<img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 43" src="https://github.com/user-attachments/assets/07766c18-abbc-43ca-ab7e-7a720742fedd" />
+
+- Ciclos de foco e pausa configuráveis
+- Estatísticas de produtividade
+
 ### Notas Inteligentes
-<img width="800" alt="Notas com IA Prodigy" src="docs/screens/notes-ai.png" />
+<img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 59" src="https://github.com/user-attachments/assets/8af9467c-8932-421e-8f0b-59bca053b9f6" />
 
 - Editor Markdown com preview
 - Geração automática com IA
 - Busca e organização
 - Salvamento automático
 
-### Timer Pomodoro
-<img width="800" alt="Timer Pomodoro Prodigy" src="docs/screens/pomodoro.png" />
-
-- Ciclos de foco e pausa configuráveis
-- Estatísticas de produtividade
-
-
-
 
 ## Implementações Futuras
 
 - [ ] Integração completa com Google Calendar
-- [ ] Sistema de conquistas avançado
+- [ ] Sistema de conquistas avançado e gamificaçao
 - [ ] Relatórios de produtividade
 - [ ] Modo offline
 - [ ] Aplicativo mobile nativo
