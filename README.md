@@ -1,6 +1,6 @@
+# Prodigy
 
 <img width="1511" height="827" alt="Captura de Tela 2025-10-06 às 11 49 23" src="https://github.com/user-attachments/assets/55b50780-aa39-4b4d-af14-ec72f66f5998" />
-# Prodigy
 
 Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, TypeScript e Tailwind CSS, que combina funcionalidades de calendário, gerenciamento de tarefas estilo Kanban, sistema de notas com IA e timer Pomodoro. O sistema oferece uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
 
@@ -12,6 +12,7 @@ Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, 
 - **Timer Pomodoro**: Técnica de produtividade com ciclos de foco e pausa
 - **Interface Responsiva**: Design adaptável para desktop e mobile
 - **Autenticação Segura**: Sistema de login com refresh token automático
+  
 
 ## Tecnologias utilizadas
 
@@ -24,11 +25,13 @@ Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, 
 ![Radix UI](https://img.shields.io/badge/Radix%20UI-161618?style=for-the-badge&logo=radixui&logoColor=white)
 ![Vercel AI](https://img.shields.io/badge/Vercel%20AI-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
+
 ## Pré-requisitos
 
 - [Node.js](https://nodejs.org/) (versão 18 ou superior)
 - [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/) ou [pnpm](https://pnpm.io/)
 - Backend Prodigy rodando em `http://localhost:3333`
+
 
 ## Instalação
 
@@ -42,6 +45,7 @@ yarn install
 # ou
 pnpm install
 ```
+
 
 ## Execução
 
@@ -57,6 +61,7 @@ pnpm dev
 
 Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 
+
 ## Preview das Funcionalidades do Sistema
 
 ### Calendário
@@ -64,6 +69,7 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 
 - Visualização em múltiplas visualizações (mês, semana, dia)
 - Criação rápida de eventos com diálogos intuitivos
+  
 
 
 ### Sistema Kanban
@@ -73,12 +79,14 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 - Reordenação de tarefas
 - Grupos de trabalho personalizáveis
 - Filtros e busca avançada
+  
 
 - ### Timer Pomodoro
 <img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 43" src="https://github.com/user-attachments/assets/07766c18-abbc-43ca-ab7e-7a720742fedd" />
 
 - Ciclos de foco e pausa configuráveis
 - Estatísticas de produtividade
+  
 
 ### Notas Inteligentes
 <img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 59" src="https://github.com/user-attachments/assets/8af9467c-8932-421e-8f0b-59bca053b9f6" />
