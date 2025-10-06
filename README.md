@@ -41,20 +41,6 @@ yarn install
 pnpm install
 ```
 
-## Configuração do Ambiente
-
-Crie um arquivo `.env.local` na raiz do projeto:
-
-```bash
-cp .env.local.example .env.local
-```
-
-Configure as variáveis de ambiente:
-
-```env
-VITE_API_URL=http://localhost:3333
-```
-
 ## Execução
 
 Para rodar o projeto em modo de desenvolvimento:
