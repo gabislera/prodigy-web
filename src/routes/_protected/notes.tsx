@@ -24,13 +24,18 @@ function NotesPage() {
 	const [editContent, setEditContent] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
-	const [showEditor, setShowEditor] = useState(false); // Para controlar view mobile
+	const [showEditor, setShowEditor] = useState(false);
 
 	const containerRef = useRef<HTMLTextAreaElement>(null);
 	const aiGeneratedNoteId = useRef<string | null>(null);
 
 	const { messages, sendMessage, status } = useChat({
-		transport: new DefaultChatTransport({ api: "http://localhost:3333/ai" }),
+		transport: new DefaultChatTransport({
+			api: "http://localhost:3333/ai",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+			},
+		}),
 	});
 
 	// Filter notes based on search query
@@ -111,7 +116,6 @@ function NotesPage() {
 		setSelectedNote(note);
 		setEditContent(note.content);
 
-		// No mobile, mudar para a view do editor
 		if (isMobile) {
 			setShowEditor(true);
 		}
@@ -131,7 +135,7 @@ function NotesPage() {
 					} else {
 						setSelectedNote(null);
 						setEditContent("");
-						// No mobile, voltar para a lista se não há mais notas
+
 						if (isMobile) {
 							setShowEditor(false);
 						}
