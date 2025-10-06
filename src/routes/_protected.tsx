@@ -101,8 +101,8 @@ function RouteComponent() {
 								<Trophy className="w-4 h-4 text-white" />
 							</div>
 							<div className="flex flex-col">
-								<h2 className="font-bold text-white">StudyFlow</h2>
-								<p className="text-xs text-gray-400">Sua jornada produtiva</p>
+								<h2 className="font-bold text-white">Prodigy</h2>
+								{/* <p className="text-xs text-gray-400">Sua jornada produtiva</p> */}
 							</div>
 						</div>
 						{user && (
