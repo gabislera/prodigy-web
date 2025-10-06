@@ -1,16 +1,13 @@
-# 🚀 StudyFlow
+# Prodigy
 
-StudyFlow é uma aplicação web moderna de produtividade desenvolvida com React, TypeScript e Tailwind CSS, que combina funcionalidades de calendário, gerenciamento de tarefas estilo Kanban, sistema de notas com IA e timer Pomodoro. O sistema oferece uma experiência completa de organização pessoal com automações inteligentes e gamificação.
+Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, TypeScript e Tailwind CSS, que combina funcionalidades de calendário, gerenciamento de tarefas estilo Kanban, sistema de notas com IA e timer Pomodoro. O sistema oferece uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
 
 ## Funcionalidades
 
-- **Calendário Inteligente**: Visualização em mês, semana e dia com criação rápida de eventos
+- **Calendário**: Visualização em mês, semana e dia com criação de eventos
 - **Sistema Kanban**: Gerenciamento de tarefas com drag & drop entre colunas
 - **Notas com IA**: Criação automática de notas usando inteligência artificial
 - **Timer Pomodoro**: Técnica de produtividade com ciclos de foco e pausa
-- **Planejamento Automático**: IA cria eventos, tarefas e notas baseado em datas e prazos
-- **Integração Google Calendar**: Sincronização automática de eventos
-- **Sistema de Gamificação**: Streaks, conquistas e pontos para manter motivação
 - **Interface Responsiva**: Design adaptável para desktop e mobile
 - **Autenticação Segura**: Sistema de login com refresh token automático
 
@@ -29,15 +26,14 @@ StudyFlow é uma aplicação web moderna de produtividade desenvolvida com React
 
 - [Node.js](https://nodejs.org/) (versão 18 ou superior)
 - [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/) ou [pnpm](https://pnpm.io/)
-- Backend StudyFlow rodando em `http://localhost:3333`
+- Backend Prodigy rodando em `http://localhost:3333`
 
 ## Instalação
 
 Clone o repositório e instale as dependências:
 
 ```bash
-git clone https://github.com/seu-usuario/studyflow.git
-cd studyflow/web
+git clone https://github.com/seu-usuario/prodigy-web.git
 npm install
 # ou
 yarn install
@@ -76,60 +72,48 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 ## Funcionalidades do Sistema
 
 ### Calendário
+<img width="800" alt="Calendário Prodigy" src="docs/screens/calendar.png" />
+
 - Visualização em múltiplas visualizações (mês, semana, dia)
 - Criação rápida de eventos com diálogos intuitivos
-- Integração com IA para planejamento automático
-- Sincronização com Google Calendar
+
 
 ### Sistema Kanban
+<img width="800" alt="Kanban Prodigy" src="docs/screens/kanban.png" />
+
 - Drag & drop entre colunas
 - Reordenação de tarefas
 - Grupos de trabalho personalizáveis
 - Filtros e busca avançada
 
 ### Notas Inteligentes
+<img width="800" alt="Notas com IA Prodigy" src="docs/screens/notes-ai.png" />
+
 - Editor Markdown com preview
 - Geração automática com IA
 - Busca e organização
 - Salvamento automático
 
 ### Timer Pomodoro
+<img width="800" alt="Timer Pomodoro Prodigy" src="docs/screens/pomodoro.png" />
+
 - Ciclos de foco e pausa configuráveis
 - Estatísticas de produtividade
-- Notificações e alertas
-- Histórico de sessões
 
-### Sistema de Gamificação
-- Streaks de produtividade
-- Conquistas e badges
-- Sistema de pontos
-- Leaderboards
 
-## Scripts Disponíveis
 
-- `npm run dev` - Inicia o servidor de desenvolvimento
-- `npm run build` - Gera build de produção
-- `npm run preview` - Visualiza build de produção
-- `npm run lint` - Executa verificação de código
-- `npm run routes:generate` - Gera rotas do TanStack Router
 
-## Variáveis de Ambiente
-
-- `VITE_API_URL`: URL do servidor da API (obrigatória para comunicação com o backend)
-
-## Roadmap
+## Implementações Futuras
 
 - [ ] Integração completa com Google Calendar
 - [ ] Sistema de conquistas avançado
 - [ ] Relatórios de produtividade
 - [ ] Modo offline
 - [ ] Aplicativo mobile nativo
+- [ ] Notificações e alertas
+- [ ] Histórico de sessões
+- [ ] Sistema de gamificação com streaks
+- [ ] Planejamento automático com IA
 
-## Contribuição
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests.
-
-## Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).
 
