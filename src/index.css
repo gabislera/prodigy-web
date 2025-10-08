@@ -112,7 +112,7 @@
   --muted: hsl(220 13% 13%);
   --muted-foreground: hsl(215 15% 65%);
 
-  --accent: hsl(160 75% 55%);
+  --accent: oklch(1 0 0 / 10%);
   --accent-foreground: hsl(220 15% 7%);
 
   --destructive: hsl(0 70% 60%);
@@ -185,5 +185,8 @@
     box-shadow: var(--shadow-success);
   }
 
+  .calendar-transparent {
+    background: transparent !important;
+  }
 
 }
