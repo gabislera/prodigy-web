@@ -6,6 +6,11 @@ export interface Task {
 	columnId: string;
 	position: number;
 	completed: boolean;
+	startDate?: string | null;
+	endDate?: string | null;
+	allDay?: boolean;
+	status?: string;
+	type?: string;
 	createdAt?: string;
 	updatedAt?: string;
 }

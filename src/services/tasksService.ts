@@ -33,6 +33,11 @@ export interface ApiTask {
 	columnId: string;
 	position: number;
 	completed: boolean;
+	startDate?: string | null;
+	endDate?: string | null;
+	allDay?: boolean;
+	status?: string;
+	type?: string;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -53,11 +58,15 @@ export interface CreateColumnData {
 
 export interface CreateTaskData {
 	title: string;
-	description: string;
+	description?: string;
 	priority: "high" | "medium" | "low";
 	columnId: string;
 	position: number;
 	completed?: boolean;
+	startDate?: string | null;
+	endDate?: string | null;
+	allDay?: boolean;
+	status?: string;
 }
 
 export interface UpdateTaskData {
@@ -67,6 +76,10 @@ export interface UpdateTaskData {
 	columnId?: string;
 	position?: number;
 	completed?: boolean;
+	startDate?: string | null;
+	endDate?: string | null;
+	allDay?: boolean;
+	status?: string;
 }
 
 export interface UpdateGroupData {
@@ -78,44 +91,60 @@ export interface UpdateGroupData {
 
 export const tasksService = {
 	async getAllTaskGroups(): Promise<ApiTaskGroup[]> {
-		const response = await api.get("/task_groups");
+		const response = await api.get("/groups");
 		return response.data;
 	},
 
 	async createTaskGroup(data: CreateGroupData): Promise<ApiTaskGroup> {
-		const response = await api.post("/task_group", data);
+		const response = await api.post("/groups", data);
 		return response.data;
 	},
 
 	async getGroupColumns(groupId: string): Promise<ApiTaskColumn[]> {
-		const response = await api.get(`/task_groups/${groupId}/columns`);
+		const response = await api.get(`/columns/${groupId}`);
 		return response.data;
 	},
 
 	async createTaskColumn(data: CreateColumnData): Promise<ApiTaskColumn> {
-		const response = await api.post("/task_column", data);
+		const response = await api.post("/columns", data);
 		return response.data;
 	},
 
 	async createTask(data: CreateTaskData): Promise<ApiTask> {
-		const response = await api.post("/task", data);
+		const formattedData = {
+			...data,
+			startDate: data.startDate ? new Date(data.startDate).toISOString() : null,
+			endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
+		};
+
+		const response = await api.post("/tasks", formattedData);
 		return response.data;
 	},
 
 	async updateTask(taskId: string, data: UpdateTaskData): Promise<ApiTask> {
-		const response = await api.put(`/task/${taskId}`, data);
+		const formattedData = {
+			...data,
+			startDate: data.startDate
+				? new Date(data.startDate).toISOString()
+				: data.startDate,
+			endDate: data.endDate
+				? new Date(data.endDate).toISOString()
+				: data.endDate,
+		};
+
+		const response = await api.put(`/tasks/${taskId}`, formattedData);
 		return response.data;
 	},
 
 	async deleteTask(taskId: string): Promise<void> {
-		await api.delete(`/task/${taskId}`);
+		await api.delete(`/tasks/${taskId}`);
 	},
 
 	async updateColumnOrder(
 		groupId: string,
 		columnOrders: { columnId: string; order: number }[],
 	): Promise<void> {
-		await api.put(`/task_groups/${groupId}/columns/order`, {
+		await api.put(`/columns${groupId}/order`, {
 			columnOrders,
 		});
 	},
@@ -124,11 +153,11 @@ export const tasksService = {
 		groupId: string,
 		data: UpdateGroupData,
 	): Promise<ApiTaskGroup> {
-		const response = await api.put(`/task_group/${groupId}`, data);
+		const response = await api.put(`/groups/${groupId}`, data);
 		return response.data;
 	},
 
 	async deleteTaskGroup(groupId: string): Promise<void> {
-		await api.delete(`/task_group/${groupId}`);
+		await api.delete(`/groups/${groupId}`);
 	},
 };

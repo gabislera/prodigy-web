@@ -56,6 +56,11 @@ function TasksPage() {
 			columnId: apiTask.columnId,
 			position: apiTask.position,
 			completed: apiTask.completed,
+			startDate: apiTask.startDate,
+			endDate: apiTask.endDate,
+			allDay: apiTask.allDay,
+			status: apiTask.status,
+			type: apiTask.type,
 			createdAt: apiTask.createdAt,
 			updatedAt: apiTask.updatedAt,
 		})),
@@ -102,6 +107,8 @@ function TasksPage() {
 		priority: string;
 		columnId?: string;
 		completed: boolean;
+		startDate?: string | null;
+		endDate?: string | null;
 	}) => {
 		if (selectedTask) {
 			// Modo de edição
@@ -111,15 +118,33 @@ function TasksPage() {
 			// Modo de criação - usar columnId selecionada pelo usuário
 			if (taskData.columnId) {
 				try {
-					await createTask({
+					const createData: {
+						title: string;
+						description: string;
+						priority: "high" | "medium" | "low";
+						columnId: string;
+						position: number;
+						completed: boolean;
+						startDate?: string | null;
+						endDate?: string | null;
+						allDay?: boolean;
+						status?: string;
+					} = {
 						title: taskData.title,
 						description: taskData.description,
 						priority: taskData.priority as "high" | "medium" | "low",
 						columnId: taskData.columnId,
 						position: 0,
 						completed: taskData.completed,
-					});
+						startDate: taskData.startDate,
+						endDate: taskData.endDate,
+						allDay: false,
+						status: "pending",
+					};
 
+					await createTask(createData);
+
+					toast.success("Tarefa criada com sucesso!");
 					setIsCreateDialogOpen(false);
 				} catch (error) {
 					console.error("Erro ao criar tarefa:", error);
@@ -139,18 +164,37 @@ function TasksPage() {
 			description: string;
 			priority: string;
 			completed: boolean;
+			startDate?: string | null;
+			endDate?: string | null;
 		},
 	) => {
 		try {
+			const updateData: {
+				title: string;
+				description: string;
+				priority: "high" | "medium" | "low";
+				completed: boolean;
+				startDate?: string | null;
+				endDate?: string | null;
+				allDay?: boolean;
+				status?: string;
+			} = {
+				title: updatedTask.title,
+				description: updatedTask.description,
+				priority: updatedTask.priority as "high" | "medium" | "low",
+				completed: updatedTask.completed,
+				startDate: updatedTask.startDate,
+				endDate: updatedTask.endDate,
+				allDay: false,
+				status: "pending",
+			};
+
 			await updateTask({
 				taskId,
-				data: {
-					title: updatedTask.title,
-					description: updatedTask.description,
-					priority: updatedTask.priority as "high" | "medium" | "low",
-					completed: updatedTask.completed,
-				},
+				data: updateData,
 			});
+
+			toast.success("Tarefa atualizada com sucesso!");
 		} catch (error) {
 			console.error("Erro ao atualizar tarefa:", error);
 			toast.error("Erro ao atualizar tarefa. Tente novamente.");

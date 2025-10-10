@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { colorOptions, iconOptions } from "@/utils/taskUtils";
 
-// Get valid icon and color values from the options
 const validIcons = iconOptions.map((option) => option.value);
 const validColors = colorOptions.map((option) => option.value);
 
@@ -11,12 +10,17 @@ export const createTaskSchema = z.object({
 		.min(1, "Título é obrigatório")
 		.max(100, "Título deve ter no máximo 100 caracteres")
 		.trim(),
-	description: z.string(),
+	description: z.string().optional().default(""),
 	priority: z.enum(["low", "medium", "high"], {
 		message: "Prioridade deve ser baixa, média ou alta",
 	}),
 	columnId: z.string().min(1, "Coluna é obrigatória"),
+	position: z.number().nonnegative().default(0),
 	completed: z.boolean().default(false),
+	startDate: z.string().optional(),
+	endDate: z.string().optional(),
+	allDay: z.boolean().default(false),
+	status: z.string().default("pending"),
 });
 
 export const updateTaskSchema = createTaskSchema.partial().extend({
@@ -50,12 +54,15 @@ export const taskFormSchema = z.object({
 		.min(1, "Título é obrigatório")
 		.max(100, "Título deve ter no máximo 100 caracteres")
 		.trim(),
-	description: z.string(),
+	description: z.string().optional().default(""),
+	startDate: z.date().nullable().optional(),
+	endDate: z.date().nullable().optional(),
 	priority: z.enum(["low", "medium", "high"], {
 		message: "Prioridade deve ser baixa, média ou alta",
 	}),
 	columnId: z.string().min(1, "Coluna é obrigatória"),
 	completed: z.boolean(),
+	allDay: z.boolean().optional().default(false),
 });
 
 export type TaskFormData = z.infer<typeof taskFormSchema>;
