@@ -1,34 +1,10 @@
 import { api } from "@/lib/apiClient";
-
-export interface Event {
-	id: string;
-	title: string;
-	content: string;
-	startDate: Date;
-	endDate: Date;
-	type: string;
-	createdAt: Date;
-	updatedAt: Date;
-}
-
-interface EventApiResponse {
-	id: string;
-	title: string;
-	content: string;
-	startDate: string;
-	endDate: string;
-	type: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface CreateEventData {
-	title: string;
-	content: string;
-	startDate: Date;
-	endDate: Date;
-	type: string;
-}
+import type {
+	CreateEventData,
+	Event,
+	EventApiResponse,
+	UpdateEventData,
+} from "@/types/calendar";
 
 export const calendarService = {
 	async getAllEvents(): Promise<Event[]> {
@@ -56,10 +32,7 @@ export const calendarService = {
 		};
 	},
 
-	async updateEvent(
-		id: string,
-		data: Partial<CreateEventData>,
-	): Promise<Event> {
+	async updateEvent(id: string, data: UpdateEventData): Promise<Event> {
 		const response = await api.put(`/events/${id}`, data);
 		// Convert date strings to Date objects
 		const event: EventApiResponse = response.data;

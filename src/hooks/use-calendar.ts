@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { calendarService, type Event } from "@/services/calendarService";
+import { calendarService } from "@/services/calendarService";
 import type { ApiError } from "@/types/api";
+import type { Event } from "@/types/calendar";
 
 const CALENDAR_QUERY_KEY = ["calendar"] as const;
 

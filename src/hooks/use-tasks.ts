@@ -1,15 +1,14 @@
-// hooks/use-tasks.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-	type ApiTaskColumn,
-	type ApiTaskGroup,
-	tasksService,
-	type UpdateGroupData,
-	type UpdateTaskData,
-} from "@/services/tasksService";
+import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
-import type { TaskGroup } from "@/types/tasks";
+import type {
+	ApiTaskColumn,
+	ApiTaskGroup,
+	TaskGroup,
+	UpdateTaskData,
+	UpdateTaskGroupData,
+} from "@/types/tasks";
 
 const TASKS_QUERY_KEY = ["tasks"] as const;
 
@@ -131,7 +130,7 @@ export function useTasks(selectedGroupId?: string | null) {
 			data,
 		}: {
 			groupId: string;
-			data: UpdateGroupData;
+			data: UpdateTaskGroupData;
 		}) => tasksService.updateTaskGroup(groupId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });

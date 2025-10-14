@@ -10,7 +10,7 @@ import { NotesHeader } from "@/components/notes-header";
 import { NotesList } from "@/components/notes-list";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotes } from "@/hooks/use-notes";
-import type { Note } from "@/services/notesService";
+import type { Note } from "@/types/notes";
 
 export const Route = createFileRoute("/_protected/notes")({
 	component: NotesPage,

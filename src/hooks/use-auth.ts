@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { authService, type LoginData } from "@/services/authService";
+import { authService } from "@/services/authService";
 import type { ApiError } from "@/types/api";
+import type { LoginData } from "@/types/auth";
 
 const AUTH_QUERY_KEY = ["auth"] as const;
 

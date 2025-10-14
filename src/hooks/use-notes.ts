@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
-import type { CreateNoteData, Note } from "@/services/notesService";
 import { notesService } from "@/services/notesService";
 import type { ApiError } from "@/types/api";
+import type { Note, UpdateNoteData } from "@/types/notes";
 
 const NOTES_QUERY_KEY = ["notes"] as const;
 
@@ -37,7 +37,7 @@ export function useNotes() {
 	});
 
 	const updateNoteMutation = useMutation({
-		mutationFn: ({ id, data }: { id: string; data: Partial<CreateNoteData> }) =>
+		mutationFn: ({ id, data }: { id: string; data: UpdateNoteData }) =>
 			notesService.updateNote(id, data),
 		onSuccess: (updatedNote) => {
 			queryClient.setQueryData(NOTES_QUERY_KEY, (old: Note[] = []) =>
@@ -69,7 +69,7 @@ export function useNotes() {
 
 	// Auto-save note with debounced API call (1 second delay)
 	const debouncedUpdateNote = useCallback(
-		(noteId: string, updates: Partial<CreateNoteData>) => {
+		(noteId: string, updates: UpdateNoteData) => {
 			// Clear existing timeout
 			if (updateTimeoutRef.current) {
 				clearTimeout(updateTimeoutRef.current);

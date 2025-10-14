@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { Note } from "@/services/notesService";
+import type { Note } from "@/types/notes";
 
 interface NotesEditorProps {
 	selectedNote: Note | null;

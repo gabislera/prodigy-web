@@ -1,15 +1,5 @@
 import { api } from "@/lib/apiClient";
-
-export interface User {
-	id: string;
-	name: string;
-	email: string;
-}
-
-export interface UpdateUserData {
-	name?: string;
-	email?: string;
-}
+import type { UpdateUserData, User } from "@/types/user";
 
 export const userService = {
 	async updateUser(data: UpdateUserData): Promise<User> {

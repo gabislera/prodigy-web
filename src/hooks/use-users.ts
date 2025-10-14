@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ApiError } from "@/types/api";
-import { type UpdateUserData, userService } from "../services/userService";
+import type { UpdateUserData } from "@/types/user";
+import { userService } from "@/services/userService";
 
 const USER_QUERY_KEY = ["user"] as const;
 

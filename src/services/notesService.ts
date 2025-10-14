@@ -1,17 +1,5 @@
 import { api } from "@/lib/apiClient";
-
-export interface Note {
-	id: string;
-	title: string;
-	content: string;
-	createdAt: Date;
-	updatedAt: Date;
-}
-
-export interface CreateNoteData {
-	title: string;
-	content: string;
-}
+import type { CreateNoteData, Note, UpdateNoteData } from "@/types/notes";
 
 export const notesService = {
 	async getAllNotes(): Promise<Note[]> {
@@ -24,7 +12,7 @@ export const notesService = {
 		return response.data;
 	},
 
-	async updateNote(id: string, data: Partial<CreateNoteData>): Promise<Note> {
+	async updateNote(id: string, data: UpdateNoteData): Promise<Note> {
 		const response = await api.put(`/notes/${id}`, data);
 		return response.data;
 	},

@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import type { Note } from "@/services/notesService";
+import type { Note } from "@/types/notes";
 
 interface NotesListProps {
 	notes: Note[];
