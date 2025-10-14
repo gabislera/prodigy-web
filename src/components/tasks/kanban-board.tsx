@@ -18,8 +18,8 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { getPriorityColor } from "@/utils/taskUtils";
-import { DroppableColumn } from "./DroppableColumn";
-import { TaskCard } from "./TaskCard";
+import { DroppableColumn } from "./droppable-column";
+import { TaskCard } from "./task-card";
 
 interface KanbanBoardProps {
 	columns: TaskColumn[];

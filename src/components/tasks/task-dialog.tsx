@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
-import { DateSelector } from "./DateSelector";
+import { DateSelector } from "./date-selector";
 
 interface TaskDialogProps {
 	isOpen: boolean;
