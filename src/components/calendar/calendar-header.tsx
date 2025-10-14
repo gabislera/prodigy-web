@@ -1,4 +1,4 @@
-import { Bot, ChevronLeft, ChevronRight, Plus, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";

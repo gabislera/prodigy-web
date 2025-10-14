@@ -17,7 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useTasks } from "@/hooks/use-tasks";
+import { useTaskGroups } from "@/hooks/use-task-groups";
 import {
 	type CreateGroupFormData,
 	createGroupSchema,
@@ -38,7 +38,7 @@ export const CreateGroupDialog = ({
 	editingGroup,
 	// onCreateGroup,
 }: CreateGroupDialogProps) => {
-	const { createTaskGroup, updateTaskGroup } = useTasks();
+	const { createTaskGroup, updateTaskGroup } = useTaskGroups();
 
 	const {
 		register,

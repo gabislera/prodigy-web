@@ -2,36 +2,44 @@ import type { Event } from "@/types/calendar";
 
 export const mockEvents: Event[] = [
 	{
-		id: 1,
+		id: "1",
 		title: "Independência",
-		date: 7,
+		content: "",
 		type: "holiday",
 		startDate: new Date(2024, 8, 7, 0, 0, 0), // 7 de setembro, dia todo
 		endDate: new Date(2024, 8, 7, 23, 59, 59),
+		createdAt: new Date(),
+		updatedAt: new Date(),
 	},
 	{
-		id: 2,
+		id: "2",
 		title: "CSG Video Interview",
-		date: 16,
+		content: "",
 		type: "meeting",
 		startDate: new Date(2024, 8, 16, 14, 0, 0), // 16 de setembro, 14:00
 		endDate: new Date(2024, 8, 16, 15, 0, 0), // 16 de setembro, 15:00
+		createdAt: new Date(),
+		updatedAt: new Date(),
 	},
 	{
-		id: 3,
+		id: "3",
 		title: "Parabéns!",
-		date: 24,
+		content: "",
 		type: "birthday",
 		startDate: new Date(2024, 8, 24, 0, 0, 0), // 24 de setembro, dia todo
 		endDate: new Date(2024, 8, 24, 23, 59, 59),
+		createdAt: new Date(),
+		updatedAt: new Date(),
 	},
 	{
-		id: 4,
+		id: "4",
 		title: "CSG Video Interview",
-		date: 23,
+		content: "",
 		type: "meeting",
 		startDate: new Date(2024, 8, 23, 13, 0, 0), // 23 de setembro, 13:00
 		endDate: new Date(2024, 8, 23, 14, 0, 0), // 23 de setembro, 14:00
+		createdAt: new Date(),
+		updatedAt: new Date(),
 	},
 ];
 

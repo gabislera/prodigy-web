@@ -16,7 +16,7 @@ import {
 	Timer,
 	Trophy,
 } from "lucide-react";
-import { BottomNavigation } from "@/components/bottom-navigation";
+import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import {
 	Sidebar,
 	SidebarContent,
