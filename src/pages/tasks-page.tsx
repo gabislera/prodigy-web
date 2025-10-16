@@ -6,16 +6,15 @@ import type {
 import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { useTaskColumns } from "@/hooks/use-task-columns";
-import { useTaskGroups } from "@/hooks/use-task-groups";
-import { useTasks } from "@/hooks/use-tasks";
-import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 import { CreateGroupDialog } from "@/components/tasks/create-group-dialog";
 import { GroupCard } from "@/components/tasks/group-card";
 import { KanbanBoard } from "@/components/tasks/kanban-board";
 import { SettingsDialog } from "@/components/tasks/settings-dialog";
 import { TaskDialog } from "@/components/tasks/task-dialog";
+import { Button } from "@/components/ui/button";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTasks } from "@/hooks/use-tasks";
+import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 
 export function TasksPage() {
 	const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -27,34 +26,39 @@ export function TasksPage() {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [editingGroup, setEditingGroup] = useState<TaskGroup | null>(null);
 
-	const { taskGroups, deleteTaskGroup } = useTaskGroups();
-	const { taskColumns: apiTaskColumns, updateColumnOrder } =
-		useTaskColumns(selectedGroup);
+	const { taskGroupsWithDetails, deleteTaskGroup, updateColumnOrder } =
+		useTaskGroupsWithDetails();
 	const { createTask, updateTask, deleteTask } = useTasks(selectedGroup);
 
+	// Get group data from cache
+	const selectedGroupData = taskGroupsWithDetails.find(
+		(g) => g.id === selectedGroup,
+	);
+
 	// Convert ApiTaskColumn[] to TaskColumn[]
-	const taskColumns: TaskColumn[] = apiTaskColumns.map((apiColumn) => ({
-		id: apiColumn.id,
-		title: apiColumn.title,
-		groupId: apiColumn.groupId,
-		order: apiColumn.order,
-		tasks: apiColumn.tasks.map((apiTask) => ({
-			id: apiTask.id,
-			title: apiTask.title,
-			description: apiTask.description,
-			priority: apiTask.priority,
-			columnId: apiTask.columnId,
-			position: apiTask.position,
-			completed: apiTask.completed,
-			startDate: apiTask.startDate,
-			endDate: apiTask.endDate,
-			allDay: apiTask.allDay,
-			status: apiTask.status,
-			type: apiTask.type,
-			createdAt: apiTask.createdAt,
-			updatedAt: apiTask.updatedAt,
-		})),
-	}));
+	const taskColumns: TaskColumn[] =
+		selectedGroupData?.columns.map((apiColumn) => ({
+			id: apiColumn.id,
+			title: apiColumn.title,
+			groupId: apiColumn.groupId,
+			order: apiColumn.order,
+			tasks: apiColumn.tasks.map((apiTask) => ({
+				id: apiTask.id,
+				title: apiTask.title,
+				description: apiTask.description,
+				priority: apiTask.priority,
+				columnId: apiTask.columnId,
+				position: apiTask.position,
+				completed: apiTask.completed,
+				startDate: apiTask.startDate,
+				endDate: apiTask.endDate,
+				allDay: apiTask.allDay,
+				status: apiTask.status,
+				type: apiTask.type,
+				createdAt: apiTask.createdAt,
+				updatedAt: apiTask.updatedAt,
+			})),
+		})) || [];
 
 	// Helper function to calculate new positions when reordering within the same column
 	const calculateNewPositions = (
@@ -402,7 +406,7 @@ export function TasksPage() {
 	};
 
 	if (selectedGroup) {
-		const group = taskGroups.find((g) => g.id === selectedGroup);
+		const group = taskGroupsWithDetails.find((g) => g.id === selectedGroup);
 
 		return (
 			<div className="p-4 pb-24 space-y-6">
@@ -480,7 +484,10 @@ export function TasksPage() {
 		);
 	}
 
-	// Groups View
+	const visibleGroups = taskGroupsWithDetails.filter(
+		(group) => group.name.toLowerCase() !== "calendar",
+	);
+
 	return (
 		<div className="p-4 pb-24 space-y-6">
 			{/* Header */}
@@ -497,7 +504,7 @@ export function TasksPage() {
 
 			{/* Groups Grid */}
 			<div className="flex flex-wrap gap-4">
-				{taskGroups.map((group) => (
+				{visibleGroups.map((group) => (
 					<div key={group.id} className="w-80 flex-shrink-0">
 						<GroupCard
 							group={group}

@@ -2,29 +2,28 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
-import type {
-	ApiTaskGroup,
-	TaskGroup,
-	UpdateTaskGroupData,
-} from "@/types/tasks";
+import type { ApiTaskGroup, UpdateTaskGroupData } from "@/types/tasks";
 
-const TASKS_QUERY_KEY = ["tasks"] as const;
+const TASK_GROUPS_WITH_DETAILS_QUERY_KEY = [
+	"task-groups-with-details",
+] as const;
 
-export function useTaskGroups() {
+export function useTaskGroupsWithDetails() {
 	const queryClient = useQueryClient();
 
-	const { data: taskGroups = [] } = useQuery<ApiTaskGroup[]>({
-		queryKey: TASKS_QUERY_KEY,
-		queryFn: tasksService.getAllTaskGroups,
+	const { data: taskGroupsWithDetails = [], isLoading } = useQuery<
+		ApiTaskGroup[]
+	>({
+		queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+		queryFn: tasksService.getAllTaskGroupsWithDetails,
 	});
 
 	const createTaskGroupMutation = useMutation({
 		mutationFn: tasksService.createTaskGroup,
-		onSuccess: (newEvent) => {
-			queryClient.setQueryData(TASKS_QUERY_KEY, (old: TaskGroup[] = []) => [
-				newEvent,
-				...old,
-			]);
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
 		},
 		onError: (error: ApiError) => {
 			toast.error(
@@ -43,7 +42,9 @@ export function useTaskGroups() {
 			data: UpdateTaskGroupData;
 		}) => tasksService.updateTaskGroup(groupId, data),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
 		},
 		onError: (error: ApiError) => {
 			toast.error(
@@ -56,7 +57,9 @@ export function useTaskGroups() {
 	const deleteTaskGroupMutation = useMutation({
 		mutationFn: (groupId: string) => tasksService.deleteTaskGroup(groupId),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
 		},
 		onError: (error: ApiError) => {
 			toast.error(
@@ -66,10 +69,33 @@ export function useTaskGroups() {
 		},
 	});
 
+	const updateColumnOrderMutation = useMutation({
+		mutationFn: ({
+			groupId,
+			columnOrders,
+		}: {
+			groupId: string;
+			columnOrders: { columnId: string; order: number }[];
+		}) => tasksService.updateColumnOrder(groupId, columnOrders),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar ordem das colunas. Tente novamente.",
+			);
+		},
+	});
+
 	return {
-		taskGroups,
+		taskGroupsWithDetails,
+		isLoading,
 		createTaskGroup: createTaskGroupMutation.mutateAsync,
 		updateTaskGroup: updateTaskGroupMutation.mutateAsync,
 		deleteTaskGroup: deleteTaskGroupMutation.mutateAsync,
+		updateColumnOrder: updateColumnOrderMutation.mutateAsync,
 	};
 }

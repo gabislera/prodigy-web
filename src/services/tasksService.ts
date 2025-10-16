@@ -11,8 +11,18 @@ import type {
 } from "@/types/tasks";
 
 export const tasksService = {
+	async getAllTasks(): Promise<ApiTask[]> {
+		const response = await api.get("/tasks");
+		return response.data;
+	},
+
 	async getAllTaskGroups(): Promise<ApiTaskGroup[]> {
 		const response = await api.get("/groups");
+		return response.data;
+	},
+
+	async getAllTaskGroupsWithDetails(): Promise<ApiTaskGroup[]> {
+		const response = await api.get("/groups/with-details");
 		return response.data;
 	},
 
