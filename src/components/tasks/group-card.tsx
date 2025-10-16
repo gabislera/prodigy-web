@@ -8,7 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TaskGroup } from "@/types/tasks";
-import { iconOptions } from "@/utils/taskUtils";
+import { getProgressBarColor, iconOptions } from "@/utils/taskUtils";
 
 interface GroupCardProps {
 	group: TaskGroup;
@@ -23,6 +23,11 @@ export const GroupCard = ({
 	onEditGroup,
 	onDeleteGroup,
 }: GroupCardProps) => {
+	const progressPercentage =
+		group.taskCount > 0
+			? Math.round((group.completedCount / group.taskCount) * 100)
+			: 0;
+
 	return (
 		<Card
 			className={`p-4 ${group.bgColor?.startsWith("bg-") ? group.bgColor : ""} border-border/50 cursor-pointer hover:shadow-card transition-all group`}
@@ -48,9 +53,9 @@ export const GroupCard = ({
 				</div>
 				<div className="flex-1">
 					<h3 className="font-semibold text-sm">{group.name}</h3>
-					{/* <p className="text-xs text-muted-foreground">
+					<p className="text-xs text-muted-foreground">
 						{group.completedCount} de {group.taskCount} concluídas
-					</p> */}
+					</p>
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -89,21 +94,20 @@ export const GroupCard = ({
 				</DropdownMenu>
 			</div>
 
-			{/* <div className="w-full bg-background/30 rounded-full h-2 mb-2">
+			<div className="w-full bg-background/30 rounded-full h-2 mb-2">
 				<div
-					className={`h-2 rounded-full ${getProgressBarColor(group.color)}`}
+					className="h-2 rounded-full transition-all"
 					style={{
-						width: `${(group.completedCount / group.taskCount) * 100}%`,
+						width: `${progressPercentage}%`,
+						backgroundColor: getProgressBarColor(group.color),
 					}}
 				/>
-			</div> */}
+			</div>
 
-			{/* <div className="flex items-center justify-between text-xs">
+			<div className="flex items-center justify-between text-xs">
 				<span className="text-muted-foreground">Progresso</span>
-				<span className="font-medium">
-					{Math.round((group.completedCount / group.taskCount) * 100)}%
-				</span>
-			</div> */}
+				<span className="font-medium">{progressPercentage}%</span>
+			</div>
 		</Card>
 	);
 };

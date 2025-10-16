@@ -30,8 +30,8 @@ export interface TaskGroup {
 	bgColor: string;
 	icon: string;
 	columns: TaskColumn[];
-	taskCount?: number;
-	completedCount?: number;
+	taskCount: number;
+	completedCount: number;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -70,6 +70,8 @@ export interface ApiTaskGroup {
 	createdAt: string;
 	updatedAt: string;
 	columns: ApiTaskColumn[];
+	taskCount: number;
+	completedCount: number;
 }
 
 export interface CreateTaskData {
