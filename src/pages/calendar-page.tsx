@@ -1,159 +1,256 @@
-import { useState } from "react";
-import {
-	AIDialog,
-	CalendarHeader,
-	DayView,
-	EventDetailsDialog,
-	EventDialog,
-	MonthView,
-	WeekView,
-} from "@/components/calendar";
-import { useCalendar } from "@/hooks/use-calendar";
-import type { Event, ViewType } from "@/types/calendar";
-import { calendarUtils, monthNames } from "@/utils/calendarUtils";
+import { useMemo, useState } from "react";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import { toast } from "sonner";
+import moment from "@/lib/moment";
+
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import "@/styles/calendar.css";
+
+import { CustomToolbar, TasksSidebar } from "@/components/calendar";
+import { TaskDialog } from "@/components/tasks/task-dialog";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTasks } from "@/hooks/use-tasks";
+import type { Task, TaskColumn } from "@/types/tasks";
+
+const localizer = momentLocalizer(moment);
+const DnDCalendar = withDragAndDrop<Task, object>(Calendar);
 
 export function CalendarPage() {
+	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
+	const { updateTask } = useTasks();
+
 	const [currentDate, setCurrentDate] = useState(new Date());
-	const [viewType, setViewType] = useState<ViewType>("month");
-	const [aiDialogOpen, setAiDialogOpen] = useState(false);
-	const [eventDialogOpen, setEventDialogOpen] = useState(false);
-	const [eventDetailsDialogOpen, setEventDetailsDialogOpen] = useState(false);
-	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+	const [isTaskSidebarOpen, setIsTaskSidebarOpen] = useState(false);
+	const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
+	const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-	const { events } = useCalendar();
+	const calendarTasks = useMemo(
+		() =>
+			taskGroupsWithDetails?.flatMap((group) =>
+				group.columns
+					.flatMap((column) => column.tasks || [])
+					.filter((task) => task.startDate || task.endDate),
+			) || [],
+		[taskGroupsWithDetails],
+	);
 
-	const navigateMonth = (direction: "prev" | "next") => {
-		const newDate = new Date(currentDate);
-		if (direction === "prev") {
-			newDate.setMonth(currentDate.getMonth() - 1);
-		} else {
-			newDate.setMonth(currentDate.getMonth() + 1);
+	const allColumns = useMemo<TaskColumn[]>(
+		() => taskGroupsWithDetails?.flatMap((group) => group.columns) || [],
+		[taskGroupsWithDetails],
+	);
+
+	const handleTaskDrop = async ({
+		event: task,
+		start,
+		end,
+	}: {
+		event: Task;
+		start: Date | string;
+		end: Date | string;
+	}) => {
+		const startDate = typeof start === "string" ? new Date(start) : start;
+		const endDate = typeof end === "string" ? new Date(end) : end;
+
+		// Validação: end deve ser maior ou igual a start
+		if (endDate < startDate) {
+			toast.error("Data final não pode ser anterior à data inicial");
+			return;
 		}
-		setCurrentDate(newDate);
-	};
 
-	const navigateWeek = (direction: "prev" | "next") => {
-		const newDate = new Date(currentDate);
-		const days = direction === "prev" ? -7 : 7;
-		newDate.setDate(currentDate.getDate() + days);
-		setCurrentDate(newDate);
-	};
-
-	const navigateDay = (direction: "prev" | "next") => {
-		const newDate = new Date(currentDate);
-		const days = direction === "prev" ? -1 : 1;
-		newDate.setDate(currentDate.getDate() + days);
-		setCurrentDate(newDate);
-	};
-
-	const handleNavigate = (direction: "prev" | "next") => {
-		switch (viewType) {
-			case "month":
-				navigateMonth(direction);
-				break;
-			case "week":
-				navigateWeek(direction);
-				break;
-			case "day":
-				navigateDay(direction);
-				break;
-		}
-	};
-
-	const getDateTitle = () => {
-		switch (viewType) {
-			case "month":
-				return `${monthNames[currentDate.getMonth()]} de ${currentDate.getFullYear()}`;
-			case "week": {
-				const weekDays = calendarUtils.getWeekDays(currentDate);
-				const start = weekDays[0];
-				const end = weekDays[6];
-				return `${start.getDate()}-${end.getDate()} ${monthNames[start.getMonth()]} ${start.getFullYear()}`;
-			}
-			case "day":
-				return `${currentDate.getDate()} ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+		try {
+			await updateTask({
+				taskId: task.id,
+				data: {
+					startDate: startDate.toISOString(),
+					endDate: endDate.toISOString(),
+				},
+			});
+			toast.success("Tarefa atualizada com sucesso!");
+		} catch (error) {
+			console.error("Erro ao mover tarefa:", error);
 		}
 	};
 
-	const handleDateClick = (date: Date) => {
-		setSelectedDate(date);
-		setEventDialogOpen(true);
+	const handleTaskResize = async ({
+		event: task,
+		start,
+		end,
+	}: {
+		event: Task;
+		start: Date | string;
+		end: Date | string;
+	}) => {
+		const startDate = typeof start === "string" ? new Date(start) : start;
+		const endDate = typeof end === "string" ? new Date(end) : end;
+
+		// Validação: end deve ser maior que start
+		if (endDate <= startDate) {
+			toast.error("Data final deve ser posterior à data inicial");
+			return;
+		}
+
+		try {
+			await updateTask({
+				taskId: task.id,
+				data: {
+					startDate: startDate.toISOString(),
+					endDate: endDate.toISOString(),
+				},
+			});
+			toast.success("Duração da tarefa atualizada!");
+		} catch (error) {
+			console.error("Erro ao redimensionar tarefa:", error);
+		}
 	};
 
-	const handleTimeSlotClick = (date: Date, hour: number) => {
-		setSelectedDate(
-			new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour),
-		);
-		setEventDialogOpen(true);
+	const handleDropFromOutside = async ({
+		start,
+		end,
+	}: {
+		start: Date | string;
+		end: Date | string;
+	}) => {
+		// Buscar o taskId armazenado no drag
+		const taskId = sessionStorage.getItem("draggingTaskId");
+		if (!taskId) {
+			console.warn("⚠️ Nenhuma task sendo arrastada");
+			return;
+		}
+
+		const startDate = typeof start === "string" ? new Date(start) : start;
+		const endDate = typeof end === "string" ? new Date(end) : end;
+
+		try {
+			await updateTask({
+				taskId,
+				data: {
+					startDate: startDate.toISOString(),
+					endDate: endDate.toISOString(),
+				},
+			});
+			toast.success("Tarefa adicionada ao calendário!");
+			sessionStorage.removeItem("draggingTaskId");
+		} catch (error) {
+			console.error("Erro ao adicionar tarefa ao calendário:", error);
+			sessionStorage.removeItem("draggingTaskId");
+		}
 	};
 
-	const handleEventClick = (
-		e: React.MouseEvent | React.KeyboardEvent,
-		event: Event,
-	) => {
-		e.stopPropagation();
-		setSelectedEvent(event);
-		setEventDetailsDialogOpen(true);
+	const handleSelectSlot = ({ start }: { start: Date; end: Date }) => {
+		console.log("Slot selecionado:", start);
+	};
+
+	const handleSelectTask = (task: Task) => {
+		console.log("📋 Tarefa selecionada:", task);
+		setSelectedTask(task);
+		setIsTaskDialogOpen(true);
+	};
+
+	const taskStyleGetter = (task: Task) => {
+		const priority = task.priority || "medium";
+		const colorMap = {
+			high: "#ef4444",
+			medium: "#f59e0b",
+			low: "#10b981",
+		};
+
+		return {
+			style: {
+				backgroundColor: colorMap[priority as keyof typeof colorMap],
+				color: "white",
+				borderRadius: "6px",
+				border: "none",
+				padding: "2px 4px",
+			},
+		};
+	};
+
+	const handleSidebarToggle = () => {
+		setIsTaskSidebarOpen((prevState) => !prevState);
+	};
+
+	const handleTaskSave = async (taskData: {
+		title: string;
+		description: string;
+		priority: "low" | "medium" | "high";
+		columnId: string;
+		completed: boolean;
+		allDay: boolean;
+		startDate?: string | null;
+		endDate?: string | null;
+	}) => {
+		if (!selectedTask) return;
+
+		try {
+			await updateTask({
+				taskId: selectedTask.id,
+				data: taskData,
+			});
+			toast.success("Tarefa atualizada com sucesso!");
+			setIsTaskDialogOpen(false);
+			setSelectedTask(null);
+		} catch (error) {
+			console.error("Erro ao salvar tarefa:", error);
+		}
 	};
 
 	return (
-		<div
-			className={`flex flex-col h-[calc(100vh-80px)] pb-20 md:h-[calc(100vh-80px)] md:p-4`}
-		>
-			<div className="flex-shrink-0 mb-4">
-				<CalendarHeader
-					viewType={viewType}
-					dateTitle={getDateTitle()}
-					onNavigate={handleNavigate}
-					onViewTypeChange={setViewType}
-					onAIDialogOpen={() => setAiDialogOpen(true)}
-					onEventDialogOpen={() => {
-						setSelectedDate(new Date());
-						setEventDialogOpen(true);
+		<div className="flex h-[calc(100vh-80px)] pb-20 md:p-4 gap-4">
+			<div className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
+				<DnDCalendar
+					localizer={localizer}
+					events={calendarTasks}
+					titleAccessor={(task) => task.title}
+					startAccessor={(task: Task) =>
+						task.startDate ? new Date(task.startDate) : new Date()
+					}
+					endAccessor={(task: Task) =>
+						task.endDate ? new Date(task.endDate) : new Date()
+					}
+					allDayAccessor={(task: Task) => Boolean(task.allDay)}
+					date={currentDate}
+					view={viewType}
+					views={[Views.MONTH, Views.WEEK, Views.DAY]}
+					onView={(v) => setViewType(v as "month" | "week" | "day")}
+					onNavigate={(date) => setCurrentDate(date)}
+					onEventDrop={handleTaskDrop}
+					onEventResize={handleTaskResize}
+					onDropFromOutside={handleDropFromOutside}
+					selectable
+					resizable
+					draggableAccessor={() => true}
+					style={{ height: "100%" }}
+					eventPropGetter={taskStyleGetter}
+					onSelectSlot={handleSelectSlot}
+					onSelectEvent={handleSelectTask}
+					popup
+					components={{
+						toolbar: (props) => (
+							<CustomToolbar {...props} onSidebarToggle={handleSidebarToggle} />
+						),
 					}}
 				/>
 			</div>
 
-			{/* Calendar Views */}
-			<div className="flex-1 min-h-0 overflow-hidden">
-				{viewType === "month" && (
-					<MonthView
-						currentDate={currentDate}
-						events={events}
-						onDateClick={handleDateClick}
-						onEventClick={handleEventClick}
-					/>
-				)}
-				{viewType === "week" && (
-					<WeekView
-						currentDate={currentDate}
-						onTimeSlotClick={handleTimeSlotClick}
-						onEventClick={handleEventClick}
-						events={events}
-					/>
-				)}
-				{viewType === "day" && (
-					<DayView
-						currentDate={currentDate}
-						events={events}
-						onTimeSlotClick={handleTimeSlotClick}
-						onEventClick={handleEventClick}
-					/>
-				)}
+			<div
+				className={`transition-all duration-300 ease-in-out overflow-hidden ${
+					isTaskSidebarOpen ? "w-80" : "w-0"
+				}`}
+			>
+				<div className="w-80">
+					<TasksSidebar taskGroupsWithDetails={taskGroupsWithDetails} />
+				</div>
 			</div>
 
-			<AIDialog open={aiDialogOpen} onOpenChange={setAiDialogOpen} />
-
-			<EventDialog
-				open={eventDialogOpen}
-				onOpenChange={setEventDialogOpen}
-				selectedDate={selectedDate}
-			/>
-			<EventDetailsDialog
-				open={eventDetailsDialogOpen}
-				onOpenChange={setEventDetailsDialogOpen}
-				selectedEvent={selectedEvent}
+			<TaskDialog
+				isOpen={isTaskDialogOpen}
+				onOpenChange={setIsTaskDialogOpen}
+				task={selectedTask}
+				columns={allColumns}
+				onSave={handleTaskSave}
 			/>
 		</div>
 	);

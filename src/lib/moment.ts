@@ -1,0 +1,86 @@
+import moment from "moment";
+
+// Centralized Moment configuration for pt-br locale
+moment.updateLocale("pt-br", {
+	months: [
+		"Janeiro",
+		"Fevereiro",
+		"Março",
+		"Abril",
+		"Maio",
+		"Junho",
+		"Julho",
+		"Agosto",
+		"Setembro",
+		"Outubro",
+		"Novembro",
+		"Dezembro",
+	],
+	monthsShort: [
+		"Jan",
+		"Fev",
+		"Mar",
+		"Abr",
+		"Mai",
+		"Jun",
+		"Jul",
+		"Ago",
+		"Set",
+		"Out",
+		"Nov",
+		"Dez",
+	],
+	weekdays: [
+		"Domingo",
+		"Segunda-feira",
+		"Terça-feira",
+		"Quarta-feira",
+		"Quinta-feira",
+		"Sexta-feira",
+		"Sábado",
+	],
+	weekdaysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+	weekdaysMin: ["Do", "Se", "Te", "Qa", "Qi", "Sx", "Sá"],
+	longDateFormat: {
+		LT: "HH:mm",
+		LTS: "HH:mm:ss",
+		L: "DD/MM/YYYY",
+		LL: "D [de] MMMM [de] YYYY",
+		LLL: "D [de] MMMM [de] YYYY [às] HH:mm",
+		LLLL: "dddd, D [de] MMMM [de] YYYY [às] HH:mm",
+	},
+	calendar: {
+		sameDay: "[Hoje às] LT",
+		nextDay: "[Amanhã às] LT",
+		nextWeek: "dddd [às] LT",
+		lastDay: "[Ontem às] LT",
+		lastWeek: "[Último] dddd [às] LT",
+		sameElse: "L",
+	},
+	relativeTime: {
+		future: "em %s",
+		past: "há %s",
+		s: "poucos segundos",
+		ss: "%d segundos",
+		m: "um minuto",
+		mm: "%d minutos",
+		h: "uma hora",
+		hh: "%d horas",
+		d: "um dia",
+		dd: "%d dias",
+		M: "um mês",
+		MM: "%d meses",
+		y: "um ano",
+		yy: "%d anos",
+	},
+	dayOfMonthOrdinalParse: /\d{1,2}º/,
+	ordinal: (n: number) => `${n}º`,
+	week: {
+		dow: 0,
+		doy: 4,
+	},
+});
+
+moment.locale("pt-br");
+
+export default moment;
