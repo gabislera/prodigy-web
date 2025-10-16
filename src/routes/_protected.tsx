@@ -94,19 +94,18 @@ function RouteComponent() {
 	return (
 		<SidebarProvider>
 			<div className="min-h-screen flex w-full bg-background">
-				<Sidebar className="border-r border-white/10">
+				<Sidebar collapsible="icon" className="border-r border-white/10">
 					<SidebarHeader className="border-b border-white/10 p-4">
 						<div className="flex items-center gap-3">
 							<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
 								<Trophy className="w-4 h-4 text-white" />
 							</div>
-							<div className="flex flex-col">
+							<div className="flex flex-col group-data-[collapsible=icon]:hidden">
 								<h2 className="font-bold text-white">Prodigy</h2>
-								{/* <p className="text-xs text-gray-400">Sua jornada produtiva</p> */}
 							</div>
 						</div>
 						{user && (
-							<div className="mt-4 p-3 bg-white/5 rounded-lg">
+							<div className="mt-4 p-3 bg-white/5 rounded-lg group-data-[collapsible=icon]:hidden">
 								<p className="text-sm text-white font-medium">{user.name}</p>
 								<p className="text-xs text-gray-400">{user.email}</p>
 							</div>
@@ -127,17 +126,22 @@ function RouteComponent() {
 													size={"sm"}
 													asChild
 													isActive={isActive}
+													tooltip={tab.name}
 													className={cn(
 														"px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/5",
+														"group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:mx-auto",
+														"group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:p-0",
 														isActive && "bg-gradient-primary",
 													)}
 												>
 													<Link
 														to={tab.href}
-														className="flex items-center gap-3 "
+														className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10"
 													>
-														<Icon className="h-4 w-4" />
-														<span className="font-medium">{tab.name}</span>
+														<Icon className="h-5 w-5 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5" />
+														<span className="font-medium group-data-[collapsible=icon]:hidden">
+															{tab.name}
+														</span>
 													</Link>
 												</SidebarMenuButton>
 											</SidebarMenuItem>
@@ -155,10 +159,11 @@ function RouteComponent() {
 									size={"sm"}
 									onClick={handleLogout}
 									disabled={isLogoutLoading}
+									tooltip={"Sair"}
 									className="px-3 py-2 rounded-lg transition-all duration-200 hover:bg-red-500/20 text-red-400 hover:text-red-300"
 								>
-									<LogOut className="h-4 w-4" />
-									<span className="font-medium">
+									<LogOut className="h-5 w-5 group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6" />
+									<span className="font-medium group-data-[collapsible=icon]:hidden">
 										{isLogoutLoading ? "Saindo..." : "Sair"}
 									</span>
 								</SidebarMenuButton>
