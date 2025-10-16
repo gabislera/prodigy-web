@@ -20,9 +20,25 @@ const DnDCalendar = withDragAndDrop<Task, object>(Calendar);
 export function CalendarPage() {
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
 	const { updateTask } = useTasks();
+	const getInitialCalendarSidebar = () => {
+		if (typeof window === "undefined") return false;
+		const stored = localStorage.getItem("calendar_sidebar_state");
+		return stored ? JSON.parse(stored) : false;
+	};
+
+	const [isTaskSidebarOpen, setIsTaskSidebarOpen] = useState<boolean>(
+		getInitialCalendarSidebar,
+	);
+
+	const toggleCalendarSidebar = () => {
+		setIsTaskSidebarOpen((prev) => {
+			const next = !prev;
+			localStorage.setItem("calendar_sidebar_state", JSON.stringify(next));
+			return next;
+		});
+	};
 
 	const [currentDate, setCurrentDate] = useState(new Date());
-	const [isTaskSidebarOpen, setIsTaskSidebarOpen] = useState(false);
 	const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
 	const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -168,10 +184,6 @@ export function CalendarPage() {
 		};
 	};
 
-	const handleSidebarToggle = () => {
-		setIsTaskSidebarOpen((prevState) => !prevState);
-	};
-
 	const handleTaskSave = async (taskData: {
 		title: string;
 		description: string;
@@ -229,7 +241,10 @@ export function CalendarPage() {
 					popup
 					components={{
 						toolbar: (props) => (
-							<CustomToolbar {...props} onSidebarToggle={handleSidebarToggle} />
+							<CustomToolbar
+								{...props}
+								onSidebarToggle={toggleCalendarSidebar}
+							/>
 						),
 					}}
 				/>
