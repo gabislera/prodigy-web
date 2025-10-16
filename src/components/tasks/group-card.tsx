@@ -25,7 +25,12 @@ export const GroupCard = ({
 }: GroupCardProps) => {
 	return (
 		<Card
-			className={`p-4 ${group.bgColor} border-border/50 cursor-pointer hover:shadow-card transition-all group`}
+			className={`p-4 ${group.bgColor?.startsWith("bg-") ? group.bgColor : ""} border-border/50 cursor-pointer hover:shadow-card transition-all group`}
+			style={{
+				backgroundColor: group.bgColor?.startsWith("#")
+					? group.bgColor
+					: undefined,
+			}}
 			onClick={() => onGroupClick(group.id)}
 		>
 			<div className="flex items-center gap-3">
@@ -34,7 +39,10 @@ export const GroupCard = ({
 						iconOptions.find((option) => option.value === group.icon)?.icon ||
 							Folder,
 						{
-							className: `h-5 w-5 ${group.color}`,
+							className: `h-5 w-5 ${group.color?.startsWith("text-") ? group.color : ""}`,
+							style: {
+								color: group.color?.startsWith("#") ? group.color : undefined,
+							},
 						},
 					)}
 				</div>

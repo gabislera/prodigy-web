@@ -52,7 +52,7 @@ export const CreateGroupDialog = ({
 		defaultValues: {
 			name: editingGroup?.name || "",
 			icon: editingGroup?.icon || "briefcase",
-			color: editingGroup?.color || "text-blue-500",
+			color: editingGroup?.color || "#3B82F6",
 		},
 	});
 
@@ -70,7 +70,7 @@ export const CreateGroupDialog = ({
 			reset({
 				name: "",
 				icon: "briefcase",
-				color: "text-blue-500",
+				color: "#3B82F6",
 			});
 		}
 	}, [editingGroup, reset]);
@@ -90,7 +90,7 @@ export const CreateGroupDialog = ({
 						name: data.name,
 						icon: data.icon,
 						color: data.color,
-						bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
+						bgColor: selectedColorOption?.bgColor || "#3B82F61A",
 					},
 				});
 			} else {
@@ -100,7 +100,7 @@ export const CreateGroupDialog = ({
 					name: data.name,
 					icon: data.icon,
 					color: data.color,
-					bgColor: selectedColorOption?.bgColor || "bg-blue-500/10",
+					bgColor: selectedColorOption?.bgColor || "#3B82F61A",
 				});
 			}
 
@@ -151,7 +151,8 @@ export const CreateGroupDialog = ({
 										<div className="flex items-center gap-2">
 											{selectedIconOption && (
 												<selectedIconOption.icon
-													className={`h-4 w-4 ${selectedIconOption.color}`}
+													className={"h-4 w-4"}
+													style={{ color: selectedIconOption.color }}
 												/>
 											)}
 										</div>
@@ -161,7 +162,10 @@ export const CreateGroupDialog = ({
 									{iconOptions.map((option) => (
 										<SelectItem key={option.value} value={option.value}>
 											<div className="flex items-center gap-2">
-												<option.icon className={`h-4 w-4 ${option.color}`} />
+												<option.icon
+													className="h-4 w-4"
+													style={{ color: option.color }}
+												/>
 											</div>
 										</SelectItem>
 									))}
@@ -196,7 +200,11 @@ export const CreateGroupDialog = ({
 										<SelectItem key={option.value} value={option.value}>
 											<div className="flex items-center gap-2">
 												<div
-													className={`w-4 h-4 rounded-full ${option.bgColor} border`}
+													className="w-4 h-4 rounded-full border"
+													style={{
+														backgroundColor: option.bgColor,
+														borderColor: option.value,
+													}}
 												/>
 												<span>{option.label}</span>
 											</div>
@@ -211,12 +219,17 @@ export const CreateGroupDialog = ({
 					</div>
 
 					<div
-						className={`p-3 border rounded-lg ${selectedColorOption?.bgColor} `}
+						className={"p-3 border rounded-lg"}
+						style={{
+							backgroundColor: selectedColorOption?.bgColor,
+							borderColor: watchedValues.color,
+						}}
 					>
 						<div className="flex items-center gap-2 mb-2">
 							{selectedIconOption && (
 								<selectedIconOption.icon
-									className={`h-4 w-4 ${watchedValues.color}`}
+									className="h-4 w-4"
+									style={{ color: watchedValues.color }}
 								/>
 							)}
 							<span className="text-sm font-medium">

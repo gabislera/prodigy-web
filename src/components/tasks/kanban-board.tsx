@@ -108,7 +108,8 @@ export const KanbanBoard = ({
 							</div>
 							<Badge
 								variant="outline"
-								className={`text-xs px-2 py-0 w-12 text-center ${getPriorityColor(activeTask.priority)}`}
+								className={`text-xs px-2 py-0 w-12 text-center`}
+								style={getPriorityColor(activeTask.priority)}
 							>
 								{activeTask.priority === "high"
 									? "Alta"

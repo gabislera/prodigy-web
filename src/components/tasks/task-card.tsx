@@ -83,7 +83,8 @@ export const TaskCard = ({
 					<div className="flex items-center gap-2">
 						<Badge
 							variant="outline"
-							className={`text-xs px-2 py-0 w-12 text-center ${getPriorityColor(task.priority)}`}
+							className={`text-xs px-2 py-0 w-12 text-center`}
+							style={getPriorityColor(task.priority)}
 						>
 							{task.priority === "high"
 								? "Alta"
