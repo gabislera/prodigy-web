@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { MoreHorizontal, Move, Trash2 } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Move, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,6 +52,53 @@ export const TaskCard = ({
 		e.stopPropagation();
 		onToggleComplete(task.id, !task.completed);
 	};
+
+	// const formatTaskDateTime = () => {
+	// 	if (!task.startDate || !task.endDate) return null;
+
+	// 	const startDate = new Date(task.startDate);
+	// 	const endDate = new Date(task.endDate);
+
+	// 	const dateStr = startDate.toLocaleDateString("pt-BR", {
+	// 		day: "2-digit",
+	// 		month: "2-digit",
+	// 	});
+	// 	const startTime = startDate.toLocaleTimeString("pt-BR", {
+	// 		hour: "2-digit",
+	// 		minute: "2-digit",
+	// 	});
+	// 	const endTime = endDate.toLocaleTimeString("pt-BR", {
+	// 		hour: "2-digit",
+	// 		minute: "2-digit",
+	// 	});
+
+	// 	if (startDate.toDateString() === endDate.toDateString()) {
+	// 		return (
+	// 			<div className="flex items-center gap-1 text-xs text-muted-foreground">
+	// 				<Calendar className="h-3 w-3" />
+	// 				<span>{dateStr}</span>
+	// 				<Clock className="h-3 w-3 ml-1" />
+	// 				<span>
+	// 					{startTime} - {endTime}
+	// 				</span>
+	// 			</div>
+	// 		);
+	// 	} else {
+	// 		return (
+	// 			<div className="flex items-center gap-1 text-xs text-muted-foreground">
+	// 				<Calendar className="h-3 w-3" />
+	// 				<span>
+	// 					{dateStr} {startTime} →{" "}
+	// 					{endDate.toLocaleDateString("pt-BR", {
+	// 						day: "2-digit",
+	// 						month: "2-digit",
+	// 					})}{" "}
+	// 					{endTime}
+	// 				</span>
+	// 			</div>
+	// 		);
+	// 	}
+	// };
 
 	return (
 		<div ref={setNodeRef} style={style} {...attributes} {...listeners}>
@@ -142,6 +189,7 @@ export const TaskCard = ({
 						</DropdownMenu>
 					</div>
 				</div>
+				{/* {formatTaskDateTime()} */}
 			</Card>
 		</div>
 	);

@@ -53,8 +53,6 @@ export const TaskDialog = ({
 	const isEditMode = !!task;
 	const [hasDate, setHasDate] = useState(false);
 
-	// console.log(columns);
-
 	const {
 		register,
 		handleSubmit,
@@ -296,22 +294,6 @@ export const TaskDialog = ({
 								</div>
 							)}
 						</div>
-						{hasDate && watch("startDate") && watch("endDate") && (
-							<div className="text-sm text-muted-foreground">
-								<span>
-									{(() => {
-										const startDate = new Date(watch("startDate") as Date);
-										const endDate = new Date(watch("endDate") as Date);
-
-										if (startDate.getTime() === endDate.getTime()) {
-											return startDate.toLocaleDateString("pt-BR");
-										} else {
-											return `${startDate.toLocaleDateString("pt-BR")} → ${endDate.toLocaleDateString("pt-BR")}`;
-										}
-									})()}
-								</span>
-							</div>
-						)}
 					</div>
 
 					<DialogFooter>

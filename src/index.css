@@ -189,4 +189,14 @@
     background: transparent !important;
   }
 
+  .hide-picker::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
+  .hide-picker::-webkit-clear-button,
+  .hide-picker::-webkit-inner-spin-button {
+    display: none;
+  }
+
+
 }

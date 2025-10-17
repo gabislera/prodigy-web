@@ -42,28 +42,14 @@ export const tasksService = {
 	},
 
 	async createTask(data: CreateTaskData): Promise<ApiTask> {
-		const formattedData = {
-			...data,
-			startDate: data.startDate ? new Date(data.startDate).toISOString() : null,
-			endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
-		};
-
-		const response = await api.post("/tasks", formattedData);
+		// As datas já vêm como ISO string do task-dialog, não precisa converter novamente
+		const response = await api.post("/tasks", data);
 		return response.data;
 	},
 
 	async updateTask(taskId: string, data: UpdateTaskData): Promise<ApiTask> {
-		const formattedData = {
-			...data,
-			startDate: data.startDate
-				? new Date(data.startDate).toISOString()
-				: data.startDate,
-			endDate: data.endDate
-				? new Date(data.endDate).toISOString()
-				: data.endDate,
-		};
-
-		const response = await api.put(`/tasks/${taskId}`, formattedData);
+		// As datas já vêm como ISO string do task-dialog, não precisa converter novamente
+		const response = await api.put(`/tasks/${taskId}`, data);
 		return response.data;
 	},
 
