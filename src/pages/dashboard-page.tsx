@@ -1,5 +1,5 @@
+import { Link } from "@tanstack/react-router";
 import {
-	Circle,
 	Flame,
 	Folder,
 	Play,
@@ -9,13 +9,14 @@ import {
 	Zap,
 } from "lucide-react";
 import React from "react";
+import { TodayTasksList } from "@/components/tasks/today-tasks-list";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import type { Task } from "@/types/tasks";
-import { getPriorityColor, iconOptions } from "@/utils/taskUtils";
+import { iconOptions } from "@/utils/taskUtils";
 
 export function DashboardPage() {
 	const { taskGroupsWithDetails, isLoading: isLoadingGroups } =
@@ -25,6 +26,11 @@ export function DashboardPage() {
 	const recentGroups = React.useMemo(() => {
 		return [...taskGroupsWithDetails].reverse().slice(0, 3);
 	}, [taskGroupsWithDetails]);
+
+	const handleTaskClick = (task: Task) => {
+		// Navigate to tasks page or open task dialog
+		console.log("Task clicked:", task);
+	};
 
 	return (
 		<div className="p-3 pb-24 space-y-4">
@@ -62,14 +68,7 @@ export function DashboardPage() {
 						</p>
 					</div>
 
-					<div className="space-y-2"></div>
-
-					<Button
-						variant="outline"
-						className="w-full mt-3 h-8 text-xs bg-gradient-primary border-0 text-white hover:opacity-90"
-					>
-						Ver todas as tarefas
-					</Button>
+					<TodayTasksList onTaskClick={handleTaskClick} maxItems={3} />
 				</Card>
 
 				{/* Recent Task Groups */}
@@ -151,14 +150,7 @@ export function DashboardPage() {
 						</p>
 					</div>
 
-					<div className="space-y-2"></div>
-
-					<Button
-						variant="outline"
-						className="w-full mt-3 h-8 text-xs bg-gradient-primary border-0 text-white hover:opacity-90"
-					>
-						Ver todas as tarefas
-					</Button>
+					<TodayTasksList onTaskClick={handleTaskClick} maxItems={5} />
 				</Card>
 
 				{/* Recent Task Groups */}
@@ -236,24 +228,30 @@ export function DashboardPage() {
 
 				<div className="grid grid-cols-2 gap-3">
 					<Button
+						asChild
 						className="h-16 bg-gradient-primary border-0 shadow-glow hover:shadow-glow"
 						size="sm"
 					>
-						<div className="flex flex-col items-center gap-1">
-							<Play className="h-4 w-4" />
-							<span className="text-xs">Iniciar Pomodoro</span>
-						</div>
+						<Link to="/timer">
+							<div className="flex flex-col items-center gap-1">
+								<Play className="h-4 w-4" />
+								<span className="text-xs">Iniciar Pomodoro</span>
+							</div>
+						</Link>
 					</Button>
 
 					<Button
+						asChild
 						variant="outline"
 						className="h-16 border-primary/20 hover:bg-primary/10"
 						size="sm"
 					>
-						<div className="flex flex-col items-center gap-1">
-							<Plus className="h-4 w-4" />
-							<span className="text-xs">Nova Tarefa</span>
-						</div>
+						<Link to="/tasks">
+							<div className="flex flex-col items-center gap-1">
+								<Plus className="h-4 w-4" />
+								<span className="text-xs">Nova Tarefa</span>
+							</div>
+						</Link>
 					</Button>
 				</div>
 			</div>

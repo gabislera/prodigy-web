@@ -14,6 +14,7 @@ interface DateSelectorProps {
 	initialRange?: DateRange;
 	hasDate?: boolean;
 	onDateToggle?: (enabled: boolean) => void;
+	selectedEndDate?: Date | null;
 }
 
 // Helper to format date to time string (HH:mm)
@@ -29,6 +30,7 @@ export const DateSelector = ({
 	initialRange,
 	hasDate = false,
 	onDateToggle,
+	selectedEndDate: _selectedEndDate,
 }: DateSelectorProps) => {
 	const [open, setOpen] = useState(false);
 	const [range, setRange] = useState<DateRange | undefined>(initialRange);

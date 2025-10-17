@@ -292,6 +292,7 @@ export function CalendarPage() {
 				task={selectedTask}
 				columns={allColumns}
 				onSave={handleTaskSave}
+				type="event"
 			/>
 		</div>
 	);

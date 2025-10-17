@@ -30,6 +30,7 @@ interface TaskDialogProps {
 	task?: Task | null;
 	columnId?: string;
 	columns?: TaskColumn[];
+	type?: "task" | "event";
 	onSave: (taskData: {
 		title: string;
 		description: string;
@@ -45,6 +46,7 @@ interface TaskDialogProps {
 export const TaskDialog = ({
 	isOpen,
 	onOpenChange,
+	type = "task",
 	task,
 	columnId,
 	columns,
@@ -52,6 +54,7 @@ export const TaskDialog = ({
 }: TaskDialogProps) => {
 	const isEditMode = !!task;
 	const [hasDate, setHasDate] = useState(false);
+	const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
 
 	const {
 		register,
@@ -89,6 +92,7 @@ export const TaskDialog = ({
 			}
 			if (task.endDate) {
 				setValue("endDate", new Date(task.endDate));
+				setSelectedEndDate(new Date(task.endDate));
 			}
 		} else {
 			// Se não há columnId passado, usar a primeira coluna disponível
@@ -103,6 +107,7 @@ export const TaskDialog = ({
 				completed: false,
 				allDay: false,
 			});
+			setSelectedEndDate(null);
 			// setHasDate(false);
 		}
 	}, [task, columnId, columns, setValue, reset]);
@@ -240,9 +245,11 @@ export const TaskDialog = ({
 										if (hasDate && range) {
 											setValue("startDate", range.from ?? null);
 											setValue("endDate", range.to ?? null);
+											setSelectedEndDate(range.to ?? null);
 										} else {
 											setValue("startDate", null);
 											setValue("endDate", null);
+											setSelectedEndDate(null);
 										}
 									}}
 									initialRange={
@@ -253,9 +260,16 @@ export const TaskDialog = ({
 												}
 											: undefined
 									}
+									selectedEndDate={selectedEndDate}
 								>
 									<Button variant="outline" className="">
-										{hasDate ? "Editar Data" : "Definir Data"}
+										{hasDate && selectedEndDate
+											? selectedEndDate.toLocaleDateString("pt-BR", {
+													day: "2-digit",
+													month: "2-digit",
+													year: "2-digit",
+												})
+											: "Definir Data"}
 									</Button>
 								</DateSelector>
 								{errors.startDate && (
@@ -265,7 +279,7 @@ export const TaskDialog = ({
 								)}
 							</div>
 
-							{columns && columns.length > 0 && (
+							{columns && columns.length > 0 && type !== "event" && (
 								<div className="space-y-2 ">
 									<Label htmlFor="task-column">Coluna</Label>
 									<Select
