@@ -180,8 +180,33 @@ export function CalendarPage() {
 				borderRadius: "6px",
 				border: "none",
 				padding: "2px 4px",
+				opacity: task.completed ? 0.5 : 1,
+				textDecoration: task.completed ? "line-through" : "none",
+				position: "relative" as const,
 			},
 		};
+	};
+
+	const CustomEvent = ({ event }: { event: Task }) => {
+		return (
+			<div style={{ position: "relative", height: "100%", width: "100%" }}>
+				<span>{event.title}</span>
+				{event.completed && (
+					<div
+						style={{
+							position: "absolute",
+							top: "50%",
+							left: 0,
+							right: 0,
+							height: "1px",
+							backgroundColor: "white",
+							transform: "translateY(-50%)",
+							pointerEvents: "none",
+						}}
+					/>
+				)}
+			</div>
+		);
 	};
 
 	const handleTaskSave = async (taskData: {
@@ -246,6 +271,7 @@ export function CalendarPage() {
 								onSidebarToggle={toggleCalendarSidebar}
 							/>
 						),
+						event: CustomEvent,
 					}}
 				/>
 			</div>

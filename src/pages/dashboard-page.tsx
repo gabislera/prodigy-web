@@ -1,42 +1,30 @@
 import {
-	BookOpen,
 	Circle,
-	Clock,
 	Flame,
+	Folder,
 	Play,
 	Plus,
 	Target,
 	TrendingUp,
 	Zap,
 } from "lucide-react";
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import type { Task } from "@/types/tasks";
+import { getPriorityColor, iconOptions } from "@/utils/taskUtils";
 
 export function DashboardPage() {
-	const todayTasks = [
-		{ name: "Revisar relatório mensal", priority: "high", completed: false },
-		{ name: "Reunião com equipe às 14h", priority: "high", completed: false },
-		{
-			name: "Enviar proposta para cliente",
-			priority: "medium",
-			completed: true,
-		},
-	];
+	const { taskGroupsWithDetails, isLoading: isLoadingGroups } =
+		useTaskGroupsWithDetails();
 
-	const getPriorityColor = (priority: string) => {
-		switch (priority) {
-			case "high":
-				return "text-destructive";
-			case "medium":
-				return "text-warning";
-			case "low":
-				return "text-success";
-			default:
-				return "text-muted-foreground";
-		}
-	};
+	// Pegar os últimos 3 grupos criados (mais recentes primeiro)
+	const recentGroups = React.useMemo(() => {
+		return [...taskGroupsWithDetails].reverse().slice(0, 3);
+	}, [taskGroupsWithDetails]);
 
 	return (
 		<div className="p-3 pb-24 space-y-4">
@@ -74,20 +62,7 @@ export function DashboardPage() {
 						</p>
 					</div>
 
-					<div className="space-y-2">
-						{todayTasks.map((task) => (
-							<div key={task.name} className="flex items-center gap-2 py-1">
-								<Circle
-									className={`h-2 w-2 ${getPriorityColor(task.priority)} ${task.completed ? "fill-current" : ""}`}
-								/>
-								<span
-									className={`flex-1 text-xs ${task.completed ? "line-through text-muted-foreground" : ""}`}
-								>
-									{task.name}
-								</span>
-							</div>
-						))}
-					</div>
+					<div className="space-y-2"></div>
 
 					<Button
 						variant="outline"
@@ -97,55 +72,68 @@ export function DashboardPage() {
 					</Button>
 				</Card>
 
-				{/* Daily Goals */}
+				{/* Recent Task Groups */}
 				<Card className="bg-gradient-card border-border/50 p-4">
 					<h2 className="text-sm font-semibold flex items-center gap-2 mb-3">
 						<Target className="h-4 w-4 text-primary" />
-						Metas de Hoje
+						Grupos Recentes
 					</h2>
 
 					<div className="space-y-2">
-						{[
-							{
-								name: "Estudar 2 horas",
-								progress: 75,
-								icon: BookOpen,
-								completed: false,
-							},
-							{
-								name: "3 Pomodoros",
-								progress: 100,
-								icon: Clock,
-								completed: true,
-							},
-							{
-								name: "Revisar notas",
-								progress: 50,
-								icon: Zap,
-								completed: false,
-							},
-						].map((goal) => (
-							<div key={goal.name} className="p-3 bg-background/50 rounded-lg">
-								<div className="flex items-center gap-2 mb-2">
-									<goal.icon className="h-3 w-3 text-primary" />
-									<span className="flex-1 text-xs font-medium">
-										{goal.name}
-									</span>
-									{goal.completed && (
-										<Badge
-											variant="secondary"
-											className="bg-success text-success-foreground text-xs px-1 py-0"
-										>
-											✓
-										</Badge>
-									)}
-								</div>
-								<Progress value={goal.progress} className="h-1.5" />
-								<p className="text-xs text-muted-foreground mt-1">
-									{goal.progress}% concluído
-								</p>
-							</div>
-						))}
+						{isLoadingGroups ? (
+							<p className="text-xs text-muted-foreground text-center py-4">
+								Carregando...
+							</p>
+						) : recentGroups.length === 0 ? (
+							<p className="text-xs text-muted-foreground text-center py-4">
+								Nenhum grupo criado
+							</p>
+						) : (
+							recentGroups.map((group) => {
+								const progress =
+									group.taskCount > 0
+										? Math.round((group.completedCount / group.taskCount) * 100)
+										: 0;
+
+								return (
+									<div
+										key={group.id}
+										className="p-3 bg-background/50 rounded-lg"
+									>
+										<div className="flex items-center gap-2 mb-2">
+											{React.createElement(
+												iconOptions.find((opt) => opt.value === group.icon)
+													?.icon || Folder,
+												{
+													className: "h-3 w-3",
+													style: {
+														color: group.color?.startsWith("#")
+															? group.color
+															: undefined,
+													},
+												},
+											)}
+											<span className="flex-1 text-xs font-medium">
+												{group.name}
+											</span>
+											{progress === 100 && (
+												<Badge
+													variant="secondary"
+													className="bg-success text-success-foreground text-xs px-1 py-0"
+												>
+													✓
+												</Badge>
+											)}
+										</div>
+										<Progress value={progress} className="h-1.5" />
+										<p className="text-xs text-muted-foreground mt-1">
+											{group.completedCount} de {group.taskCount} concluídas (
+											{progress}%)
+										</p>
+									</div>
+								);
+							})
+						)}
 					</div>
 				</Card>
 			</div>
@@ -163,20 +151,7 @@ export function DashboardPage() {
 						</p>
 					</div>
 
-					<div className="space-y-2">
-						{todayTasks.map((task) => (
-							<div key={task.name} className="flex items-center gap-2 py-1">
-								<Circle
-									className={`h-2 w-2 ${getPriorityColor(task.priority)} ${task.completed ? "fill-current" : ""}`}
-								/>
-								<span
-									className={`flex-1 text-xs ${task.completed ? "line-through text-muted-foreground" : ""}`}
-								>
-									{task.name}
-								</span>
-							</div>
-						))}
-					</div>
+					<div className="space-y-2"></div>
 
 					<Button
 						variant="outline"
@@ -186,58 +161,68 @@ export function DashboardPage() {
 					</Button>
 				</Card>
 
-				{/* Daily Goals */}
+				{/* Recent Task Groups */}
 				<div className="space-y-3">
 					<h2 className="text-sm font-semibold flex items-center gap-2">
 						<Target className="h-4 w-4 text-primary" />
-						Metas de Hoje
+						Grupos Recentes
 					</h2>
 
 					<div className="space-y-2">
-						{[
-							{
-								name: "Estudar 2 horas",
-								progress: 75,
-								icon: BookOpen,
-								completed: false,
-							},
-							{
-								name: "3 Pomodoros",
-								progress: 100,
-								icon: Clock,
-								completed: true,
-							},
-							{
-								name: "Revisar notas",
-								progress: 50,
-								icon: Zap,
-								completed: false,
-							},
-						].map((goal) => (
-							<Card
-								key={goal.name}
-								className="p-3 bg-gradient-card border-border/50"
-							>
-								<div className="flex items-center gap-2 mb-2">
-									<goal.icon className="h-3 w-3 text-primary" />
-									<span className="flex-1 text-xs font-medium">
-										{goal.name}
-									</span>
-									{goal.completed && (
-										<Badge
-											variant="secondary"
-											className="bg-success text-success-foreground text-xs px-1 py-0"
-										>
-											✓
-										</Badge>
-									)}
-								</div>
-								<Progress value={goal.progress} className="h-1.5" />
-								<p className="text-xs text-muted-foreground mt-1">
-									{goal.progress}% concluído
-								</p>
-							</Card>
-						))}
+						{isLoadingGroups ? (
+							<p className="text-xs text-muted-foreground text-center py-4">
+								Carregando...
+							</p>
+						) : recentGroups.length === 0 ? (
+							<p className="text-xs text-muted-foreground text-center py-4">
+								Nenhum grupo criado
+							</p>
+						) : (
+							recentGroups.map((group) => {
+								const progress =
+									group.taskCount > 0
+										? Math.round((group.completedCount / group.taskCount) * 100)
+										: 0;
+
+								return (
+									<Card
+										key={group.id}
+										className="p-3 bg-gradient-card border-border/50"
+									>
+										<div className="flex items-center gap-2 mb-2">
+											{React.createElement(
+												iconOptions.find((opt) => opt.value === group.icon)
+													?.icon || Folder,
+												{
+													className: "h-3 w-3",
+													style: {
+														color: group.color?.startsWith("#")
+															? group.color
+															: undefined,
+													},
+												},
+											)}
+											<span className="flex-1 text-xs font-medium">
+												{group.name}
+											</span>
+											{progress === 100 && (
+												<Badge
+													variant="secondary"
+													className="bg-success text-success-foreground text-xs px-1 py-0"
+												>
+													✓
+												</Badge>
+											)}
+										</div>
+										<Progress value={progress} className="h-1.5" />
+										<p className="text-xs text-muted-foreground mt-1">
+											{group.completedCount} de {group.taskCount} concluídas (
+											{progress}%)
+										</p>
+									</Card>
+								);
+							})
+						)}
 					</div>
 				</div>
 			</div>
