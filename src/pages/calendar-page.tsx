@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 import moment from "@/lib/moment";
 
@@ -8,7 +9,11 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "@/styles/calendar.css";
 
-import { CustomToolbar, TasksSidebar } from "@/components/calendar";
+import {
+	CustomToolbar,
+	FiltersSidebar,
+	TasksSidebar,
+} from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
@@ -19,7 +24,7 @@ const DnDCalendar = withDragAndDrop<Task, object>(Calendar);
 
 export function CalendarPage() {
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
-	const { updateTask } = useTasks();
+	const { updateTask, createTask } = useTasks();
 	const getInitialCalendarSidebar = () => {
 		if (typeof window === "undefined") return false;
 		const stored = localStorage.getItem("calendar_sidebar_state");
@@ -29,6 +34,17 @@ export function CalendarPage() {
 	const [isTaskSidebarOpen, setIsTaskSidebarOpen] = useState<boolean>(
 		getInitialCalendarSidebar,
 	);
+	const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
+
+	// Filter states
+	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+	const [scheduleFilter, setScheduleFilter] = useState<
+		"all" | "scheduled" | "unscheduled"
+	>("all");
+	const [completionFilter, setCompletionFilter] = useState<
+		"all" | "completed" | "incomplete"
+	>("all");
+	const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
 	const toggleCalendarSidebar = () => {
 		setIsTaskSidebarOpen((prev) => {
@@ -38,19 +54,36 @@ export function CalendarPage() {
 		});
 	};
 
+	const toggleFiltersSidebar = () => {
+		setIsFiltersSidebarOpen((prev) => !prev);
+	};
+
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
 	const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+	const [initialStartDate, setInitialStartDate] = useState<Date | null>(null);
+	const [initialEndDate, setInitialEndDate] = useState<Date | null>(null);
+
+	const allTasks = useMemo(() => {
+		return (
+			taskGroupsWithDetails?.flatMap((group) =>
+				group.columns.flatMap((column) =>
+					column.tasks.map((task) => ({
+						...task,
+						groupId: group.id,
+						groupName: group.name,
+						groupColor: group.color,
+						groupBgColor: group.bgColor,
+					})),
+				),
+			) || []
+		);
+	}, [taskGroupsWithDetails]);
 
 	const calendarTasks = useMemo(
-		() =>
-			taskGroupsWithDetails?.flatMap((group) =>
-				group.columns
-					.flatMap((column) => column.tasks || [])
-					.filter((task) => task.startDate || task.endDate),
-			) || [],
-		[taskGroupsWithDetails],
+		() => allTasks.filter((task) => task.startDate || task.endDate),
+		[allTasks],
 	);
 
 	const allColumns = useMemo<TaskColumn[]>(
@@ -156,12 +189,24 @@ export function CalendarPage() {
 	};
 
 	const handleSelectSlot = ({ start }: { start: Date; end: Date }) => {
-		console.log("Slot selecionado:", start);
+		setSelectedTask(null);
+
+		const now = new Date();
+		const startWithCurrentTime = new Date(start);
+		startWithCurrentTime.setHours(now.getHours(), now.getMinutes(), 0, 0);
+
+		const endWithCurrentTime = new Date(start);
+		endWithCurrentTime.setHours(now.getHours(), now.getMinutes() + 30, 0, 0);
+
+		setInitialStartDate(startWithCurrentTime);
+		setInitialEndDate(endWithCurrentTime);
+		setIsTaskDialogOpen(true);
 	};
 
 	const handleSelectTask = (task: Task) => {
-		console.log("📋 Tarefa selecionada:", task);
 		setSelectedTask(task);
+		setInitialStartDate(null);
+		setInitialEndDate(null);
 		setIsTaskDialogOpen(true);
 	};
 
@@ -219,16 +264,25 @@ export function CalendarPage() {
 		startDate?: string | null;
 		endDate?: string | null;
 	}) => {
-		if (!selectedTask) return;
-
 		try {
-			await updateTask({
-				taskId: selectedTask.id,
-				data: taskData,
-			});
-			toast.success("Tarefa atualizada com sucesso!");
+			if (selectedTask) {
+				await updateTask({
+					taskId: selectedTask.id,
+					data: taskData,
+				});
+				toast.success("Tarefa atualizada com sucesso!");
+			} else {
+				await createTask({
+					...taskData,
+					position: 0,
+				});
+				toast.success("Tarefa criada com sucesso!");
+			}
+
 			setIsTaskDialogOpen(false);
 			setSelectedTask(null);
+			setInitialStartDate(null);
+			setInitialEndDate(null);
 		} catch (error) {
 			console.error("Erro ao salvar tarefa:", error);
 		}
@@ -282,7 +336,34 @@ export function CalendarPage() {
 				}`}
 			>
 				<div className="w-80">
-					<TasksSidebar taskGroupsWithDetails={taskGroupsWithDetails} />
+					<TasksSidebar
+						taskGroupsWithDetails={taskGroupsWithDetails}
+						selectedGroupIds={selectedGroupIds}
+						scheduleFilter={scheduleFilter}
+						completionFilter={completionFilter}
+						dateRange={dateRange}
+						onFiltersToggle={toggleFiltersSidebar}
+					/>
+				</div>
+			</div>
+
+			<div
+				className={`transition-all duration-300 ease-in-out overflow-hidden ${
+					isFiltersSidebarOpen ? "w-64" : "w-0"
+				}`}
+			>
+				<div className="w-64">
+					<FiltersSidebar
+						taskGroupsWithDetails={taskGroupsWithDetails}
+						selectedGroupIds={selectedGroupIds}
+						setSelectedGroupIds={setSelectedGroupIds}
+						scheduleFilter={scheduleFilter}
+						setScheduleFilter={setScheduleFilter}
+						completionFilter={completionFilter}
+						setCompletionFilter={setCompletionFilter}
+						dateRange={dateRange}
+						setDateRange={setDateRange}
+					/>
 				</div>
 			</div>
 
@@ -291,6 +372,8 @@ export function CalendarPage() {
 				onOpenChange={setIsTaskDialogOpen}
 				task={selectedTask}
 				columns={allColumns}
+				initialStartDate={initialStartDate}
+				initialEndDate={initialEndDate}
 				onSave={handleTaskSave}
 				type="event"
 			/>

@@ -1,15 +1,27 @@
-import { GripVertical } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Filter, GripVertical } from "lucide-react";
+import { useMemo } from "react";
+import type { DateRange } from "react-day-picker";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { ApiTaskGroup } from "@/types/tasks";
 
 interface TasksSidebarProps {
 	taskGroupsWithDetails: ApiTaskGroup[];
+	selectedGroupIds: string[];
+	scheduleFilter: "all" | "scheduled" | "unscheduled";
+	completionFilter: "all" | "completed" | "incomplete";
+	dateRange: DateRange | undefined;
+	onFiltersToggle: () => void;
 }
 
-export const TasksSidebar = ({ taskGroupsWithDetails }: TasksSidebarProps) => {
-	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
-
+export const TasksSidebar = ({
+	taskGroupsWithDetails,
+	selectedGroupIds,
+	scheduleFilter,
+	completionFilter,
+	dateRange,
+	onFiltersToggle,
+}: TasksSidebarProps) => {
 	const allTasks = useMemo(() => {
 		return taskGroupsWithDetails.flatMap((group) =>
 			group.columns.flatMap((column) =>
@@ -24,73 +36,92 @@ export const TasksSidebar = ({ taskGroupsWithDetails }: TasksSidebarProps) => {
 		);
 	}, [taskGroupsWithDetails]);
 
-	const tasksToShow = useMemo(() => {
-		if (selectedGroupIds.length === 0) return allTasks;
-		return allTasks.filter((task) => selectedGroupIds.includes(task.groupId));
-	}, [allTasks, selectedGroupIds]);
+	const filteredTasks = useMemo(() => {
+		let filtered = allTasks;
 
-	const toggleGroupSelection = (groupId: string) => {
-		setSelectedGroupIds((prev) =>
-			prev.includes(groupId)
-				? prev.filter((id) => id !== groupId)
-				: [...prev, groupId],
-		);
-	};
+		// Filter by group
+		if (selectedGroupIds.length > 0) {
+			if (selectedGroupIds.includes("no-group")) {
+				filtered = filtered.filter(
+					(task) => !task.groupId || selectedGroupIds.includes(task.groupId),
+				);
+			} else {
+				filtered = filtered.filter((task) =>
+					selectedGroupIds.includes(task.groupId),
+				);
+			}
+		}
 
+		// Filter by schedule
+		if (scheduleFilter === "scheduled") {
+			filtered = filtered.filter((task) => task.startDate);
+		} else if (scheduleFilter === "unscheduled") {
+			filtered = filtered.filter((task) => !task.startDate);
+		}
+
+		// Filter by completion
+		if (completionFilter === "completed") {
+			filtered = filtered.filter((task) => task.completed);
+		} else if (completionFilter === "incomplete") {
+			filtered = filtered.filter((task) => !task.completed);
+		}
+
+		// Filter by date range
+		if (dateRange?.from) {
+			const rangeStart = new Date(
+				dateRange.from.getFullYear(),
+				dateRange.from.getMonth(),
+				dateRange.from.getDate(),
+			);
+			const rangeEnd = dateRange.to
+				? new Date(
+						dateRange.to.getFullYear(),
+						dateRange.to.getMonth(),
+						dateRange.to.getDate(),
+					)
+				: rangeStart;
+
+			filtered = filtered.filter((task) => {
+				if (!task.startDate) return false;
+				const taskDate = new Date(task.startDate);
+				const taskDay = new Date(
+					taskDate.getFullYear(),
+					taskDate.getMonth(),
+					taskDate.getDate(),
+				);
+
+				return taskDay >= rangeStart && taskDay <= rangeEnd;
+			});
+		}
+
+		return filtered;
+	}, [allTasks, selectedGroupIds, scheduleFilter, completionFilter, dateRange]);
 	return (
 		<div className="h-full bg-card rounded-lg border border-border p-4 overflow-y-auto flex flex-col gap-4">
 			<div>
-				<h2 className="text-lg font-semibold mb-2">Tarefas</h2>
+				<div className="flex items-center justify-between">
+					<h2 className="text-lg font-semibold mb-2">Tarefas</h2>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onFiltersToggle}
+						className="h-8 w-8 p-0"
+					>
+						<Filter className="h-4 w-4" />
+					</Button>
+				</div>
 				<p className="text-xs text-muted-foreground">
 					Arraste as tarefas para o calendário
 				</p>
 			</div>
 
-			<div className="flex gap-2 flex-wrap">
-				{taskGroupsWithDetails
-					.filter((group) => group.name?.toLowerCase() !== "calendar")
-					.map((group) => {
-						const isSelected = selectedGroupIds.includes(group.id);
-						const hasSelection = selectedGroupIds.length > 0;
-
-						return (
-							<Badge
-								key={group.id}
-								onClick={() => toggleGroupSelection(group.id)}
-								className={`text-xs border transition-all cursor-pointer ${
-									group.bgColor.startsWith("bg-")
-										? `${group.bgColor} ${group.color}`
-										: ""
-								} ${!hasSelection ? "opacity-40" : hasSelection && !isSelected ? "opacity-40" : "opacity-100"} ${
-									isSelected ? "ring-2 ring-primary/50 scale-105" : ""
-								}`}
-								style={
-									group.bgColor.startsWith("#")
-										? {
-												backgroundColor: group.bgColor,
-												color: group.color?.startsWith("#")
-													? group.color
-													: undefined,
-												borderColor: group.color?.startsWith("#")
-													? `${group.color}4D` // ~30% alpha for border
-													: group.color,
-											}
-										: undefined
-								}
-							>
-								{group.name}
-							</Badge>
-						);
-					})}
-			</div>
-
 			<div className="flex-1 overflow-y-auto space-y-2">
-				{tasksToShow.length === 0 ? (
+				{filteredTasks.length === 0 ? (
 					<p className="text-sm text-muted-foreground text-center py-8">
 						Nenhuma tarefa encontrada
 					</p>
 				) : (
-					tasksToShow.map((task) => (
+					filteredTasks.map((task) => (
 						<button
 							key={task.id}
 							type="button"

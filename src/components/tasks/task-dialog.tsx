@@ -31,6 +31,8 @@ interface TaskDialogProps {
 	columnId?: string;
 	columns?: TaskColumn[];
 	type?: "task" | "event";
+	initialStartDate?: Date | null;
+	initialEndDate?: Date | null;
 	onSave: (taskData: {
 		title: string;
 		description: string;
@@ -50,6 +52,8 @@ export const TaskDialog = ({
 	task,
 	columnId,
 	columns,
+	initialStartDate,
+	initialEndDate,
 	onSave,
 }: TaskDialogProps) => {
 	const isEditMode = !!task;
@@ -99,6 +103,9 @@ export const TaskDialog = ({
 			const defaultColumnId =
 				columnId || (columns && columns.length > 0 ? columns[0].id : "");
 
+			const hasInitialDates = !!(initialStartDate || initialEndDate);
+			setHasDate(hasInitialDates);
+
 			reset({
 				title: "",
 				description: "",
@@ -107,10 +114,26 @@ export const TaskDialog = ({
 				completed: false,
 				allDay: false,
 			});
-			setSelectedEndDate(null);
-			// setHasDate(false);
+
+			if (initialStartDate) {
+				setValue("startDate", initialStartDate);
+			}
+			if (initialEndDate) {
+				setValue("endDate", initialEndDate);
+				setSelectedEndDate(initialEndDate);
+			} else {
+				setSelectedEndDate(null);
+			}
 		}
-	}, [task, columnId, columns, setValue, reset]);
+	}, [
+		task,
+		columnId,
+		columns,
+		initialStartDate,
+		initialEndDate,
+		setValue,
+		reset,
+	]);
 
 	const onSubmit = (data: {
 		title: string;
@@ -258,7 +281,12 @@ export const TaskDialog = ({
 													from: new Date(task.startDate),
 													to: new Date(task.endDate),
 												}
-											: undefined
+											: initialStartDate && initialEndDate
+												? {
+														from: initialStartDate,
+														to: initialEndDate,
+													}
+												: undefined
 									}
 									selectedEndDate={selectedEndDate}
 								>
