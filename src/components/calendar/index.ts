@@ -1,9 +1,3 @@
 export { AIDialog } from "./ai-dialog";
-export { CalendarHeader } from "./calendar-header";
 export { CustomToolbar } from "./custom-toolbar";
-export { DayView } from "./day-view";
-export { EventDetailsDialog } from "./event-details-dialog";
-export { EventDialog } from "./event-dialog";
-export { MonthView } from "./month-view";
 export { TasksSidebar } from "./tasks-sidebar";
-export { WeekView } from "./week-view";
