@@ -60,7 +60,7 @@ export const taskFormSchema = z.object({
 	priority: z.enum(["low", "medium", "high"], {
 		message: "Prioridade deve ser baixa, média ou alta",
 	}),
-	columnId: z.string().min(1, "Coluna é obrigatória"),
+	columnId: z.string().min(1, "Coluna é obrigatória").nullable().optional(),
 	completed: z.boolean(),
 	allDay: z.boolean().optional().default(false),
 });

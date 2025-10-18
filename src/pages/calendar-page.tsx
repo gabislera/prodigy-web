@@ -16,8 +16,8 @@ import {
 } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
-import { useTasks } from "@/hooks/use-tasks";
-import type { Task, TaskColumn } from "@/types/tasks";
+import { useAllTasks, useTasks } from "@/hooks/use-tasks";
+import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop<Task, object>(Calendar);
@@ -25,6 +25,7 @@ const DnDCalendar = withDragAndDrop<Task, object>(Calendar);
 export function CalendarPage() {
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
 	const { updateTask, createTask } = useTasks();
+	const { allTasks: allTasksFromApi } = useAllTasks();
 	const getInitialCalendarSidebar = () => {
 		if (typeof window === "undefined") return false;
 		const stored = localStorage.getItem("calendar_sidebar_state");
@@ -66,7 +67,7 @@ export function CalendarPage() {
 	const [initialEndDate, setInitialEndDate] = useState<Date | null>(null);
 
 	const allTasks = useMemo(() => {
-		return (
+		const tasksFromGroups =
 			taskGroupsWithDetails?.flatMap((group) =>
 				group.columns.flatMap((column) =>
 					column.tasks.map((task) => ({
@@ -77,9 +78,25 @@ export function CalendarPage() {
 						groupBgColor: group.bgColor,
 					})),
 				),
-			) || []
+			) || [];
+
+		const tasksWithoutGroup = allTasksFromApi
+			.filter((task: ApiTask) => !task.columnId)
+			.map((task: ApiTask) => ({
+				...task,
+				groupId: null,
+				groupName: "Sem grupo",
+				groupColor: "#6b7280",
+				groupBgColor: "#f3f4f6",
+			}));
+
+		const taskIds = new Set(tasksFromGroups.map((task: any) => task.id));
+		const uniqueTasksWithoutGroup = tasksWithoutGroup.filter(
+			(task: any) => !taskIds.has(task.id),
 		);
-	}, [taskGroupsWithDetails]);
+
+		return [...tasksFromGroups, ...uniqueTasksWithoutGroup];
+	}, [taskGroupsWithDetails, allTasksFromApi]);
 
 	const calendarTasks = useMemo(
 		() => allTasks.filter((task) => task.startDate || task.endDate),
@@ -203,7 +220,7 @@ export function CalendarPage() {
 		setIsTaskDialogOpen(true);
 	};
 
-	const handleSelectTask = (task: Task) => {
+	const handleSelectTask = (task: Task | any) => {
 		setSelectedTask(task);
 		setInitialStartDate(null);
 		setInitialEndDate(null);
@@ -258,7 +275,7 @@ export function CalendarPage() {
 		title: string;
 		description: string;
 		priority: "low" | "medium" | "high";
-		columnId: string;
+		columnId?: string | null;
 		completed: boolean;
 		allDay: boolean;
 		startDate?: string | null;
@@ -337,12 +354,13 @@ export function CalendarPage() {
 			>
 				<div className="w-80">
 					<TasksSidebar
-						taskGroupsWithDetails={taskGroupsWithDetails}
+						allTasks={allTasks}
 						selectedGroupIds={selectedGroupIds}
 						scheduleFilter={scheduleFilter}
 						completionFilter={completionFilter}
 						dateRange={dateRange}
 						onFiltersToggle={toggleFiltersSidebar}
+						onTaskClick={handleSelectTask}
 					/>
 				</div>
 			</div>

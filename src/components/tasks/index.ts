@@ -5,3 +5,4 @@ export { KanbanBoard } from "./kanban-board";
 export { SettingsDialog } from "./settings-dialog";
 export { TaskCard } from "./task-card";
 export { TaskDialog } from "./task-dialog";
+export { MoveToGroupDialog } from "./move-to-group-dialog";

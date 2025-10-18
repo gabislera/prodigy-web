@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +20,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { DateSelector } from "./date-selector";
+import { MoveToGroupDialog } from "./move-to-group-dialog";
 
 interface TaskDialogProps {
 	isOpen: boolean;
@@ -37,7 +39,7 @@ interface TaskDialogProps {
 		title: string;
 		description: string;
 		priority: "low" | "medium" | "high";
-		columnId: string;
+		columnId?: string | null;
 		completed: boolean;
 		allDay: boolean;
 		startDate?: string | null;
@@ -59,6 +61,17 @@ export const TaskDialog = ({
 	const isEditMode = !!task;
 	const [hasDate, setHasDate] = useState(false);
 	const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
+	const [showGroupSelector, setShowGroupSelector] = useState(false);
+	const [isMoveToGroupDialogOpen, setIsMoveToGroupDialogOpen] = useState(false);
+	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
+
+	const taskHasNoGroup = useMemo(() => {
+		return task && !task.columnId;
+	}, [task]);
+
+	const visibleGroups = useMemo(() => {
+		return taskGroupsWithDetails;
+	}, [taskGroupsWithDetails]);
 
 	const {
 		register,
@@ -74,7 +87,9 @@ export const TaskDialog = ({
 			description: "",
 			priority: "low" as const,
 			columnId:
-				columnId || (columns && columns.length > 0 ? columns[0].id : ""),
+				type === "event"
+					? undefined
+					: columnId || (columns && columns.length > 0 ? columns[0].id : ""),
 			completed: false,
 			allDay: false,
 		},
@@ -86,7 +101,9 @@ export const TaskDialog = ({
 			setValue("description", task.description);
 			setValue("priority", task.priority);
 			setValue("completed", task.completed);
-			setValue("columnId", task.columnId);
+			if (task.columnId) {
+				setValue("columnId", task.columnId);
+			}
 
 			const hasDates = !!(task.startDate || task.endDate);
 			setHasDate(hasDates);
@@ -98,10 +115,13 @@ export const TaskDialog = ({
 				setValue("endDate", new Date(task.endDate));
 				setSelectedEndDate(new Date(task.endDate));
 			}
+
+			setShowGroupSelector(!task.columnId);
 		} else {
-			// Se não há columnId passado, usar a primeira coluna disponível
 			const defaultColumnId =
-				columnId || (columns && columns.length > 0 ? columns[0].id : "");
+				type === "event"
+					? undefined
+					: columnId || (columns && columns.length > 0 ? columns[0].id : "");
 
 			const hasInitialDates = !!(initialStartDate || initialEndDate);
 			setHasDate(hasInitialDates);
@@ -124,6 +144,8 @@ export const TaskDialog = ({
 			} else {
 				setSelectedEndDate(null);
 			}
+
+			setShowGroupSelector(false);
 		}
 	}, [
 		task,
@@ -133,13 +155,14 @@ export const TaskDialog = ({
 		initialEndDate,
 		setValue,
 		reset,
+		type,
 	]);
 
 	const onSubmit = (data: {
 		title: string;
 		description: string;
 		priority: "low" | "medium" | "high";
-		columnId: string;
+		columnId?: string | null;
 		completed: boolean;
 		allDay: boolean;
 		startDate?: Date | null;
@@ -307,11 +330,12 @@ export const TaskDialog = ({
 								)}
 							</div>
 
+							{/* Seletor de coluna para tasks normais */}
 							{columns && columns.length > 0 && type !== "event" && (
 								<div className="space-y-2 ">
 									<Label htmlFor="task-column">Coluna</Label>
 									<Select
-										value={watch("columnId")}
+										value={watch("columnId") || undefined}
 										onValueChange={(value) => setValue("columnId", value)}
 									>
 										<SelectTrigger
@@ -338,30 +362,55 @@ export const TaskDialog = ({
 						</div>
 					</div>
 
-					<DialogFooter>
-						<Button type="button" variant="outline" onClick={handleCancel}>
-							Cancelar
-						</Button>
-						<Button
-							type="submit"
-							disabled={isSubmitting}
-							className={
-								isEditMode
-									? "bg-gradient-primary border-0 cursor-pointer"
-									: "cursor-pointer"
-							}
-						>
-							{isSubmitting
-								? isEditMode
-									? "Salvando..."
-									: "Criando..."
-								: isEditMode
-									? "Salvar"
-									: "Criar Tarefa"}
-						</Button>
+					<DialogFooter className="flex items-center justify-between">
+						{taskHasNoGroup && showGroupSelector && visibleGroups.length > 0 ? (
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsMoveToGroupDialogOpen(true)}
+								className="mr-auto"
+							>
+								Mover para Grupo
+							</Button>
+						) : (
+							<div />
+						)}
+						<div className="flex gap-2">
+							<Button type="button" variant="outline" onClick={handleCancel}>
+								Cancelar
+							</Button>
+							<Button
+								type="submit"
+								disabled={isSubmitting}
+								className={
+									isEditMode
+										? "bg-gradient-primary border-0 cursor-pointer"
+										: "cursor-pointer"
+								}
+							>
+								{isSubmitting
+									? isEditMode
+										? "Salvando..."
+										: "Criando..."
+									: isEditMode
+										? "Salvar"
+										: "Criar Tarefa"}
+							</Button>
+						</div>
 					</DialogFooter>
 				</form>
 			</DialogContent>
+
+			<MoveToGroupDialog
+				isOpen={isMoveToGroupDialogOpen}
+				onOpenChange={setIsMoveToGroupDialogOpen}
+				groups={visibleGroups}
+				onMove={(_groupId, columnId) => {
+					setValue("columnId", columnId);
+					setShowGroupSelector(false);
+					setIsMoveToGroupDialogOpen(false);
+				}}
+			/>
 		</Dialog>
 	);
 };

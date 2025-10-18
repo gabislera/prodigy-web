@@ -3,7 +3,7 @@ export interface Task {
 	title: string;
 	description: string;
 	priority: "high" | "medium" | "low";
-	columnId: string;
+	columnId: string | null;
 	position: number;
 	completed: boolean;
 	startDate?: string | null;
@@ -41,7 +41,7 @@ export interface ApiTask {
 	title: string;
 	description: string;
 	priority: "high" | "medium" | "low";
-	columnId: string;
+	columnId: string | null;
 	position: number;
 	completed: boolean;
 	startDate?: string | null;
@@ -78,7 +78,7 @@ export interface CreateTaskData {
 	title: string;
 	description?: string;
 	priority: "high" | "medium" | "low";
-	columnId: string;
+	columnId?: string | null;
 	position: number;
 	completed?: boolean;
 	startDate?: string | null;
@@ -91,7 +91,7 @@ export interface UpdateTaskData {
 	title?: string;
 	description?: string;
 	priority?: "high" | "medium" | "low";
-	columnId?: string;
+	columnId?: string | null;
 	position?: number;
 	completed?: boolean;
 	startDate?: string | null;

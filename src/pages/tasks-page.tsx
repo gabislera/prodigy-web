@@ -98,9 +98,10 @@ export function TasksPage() {
 	const handleSaveTask = async (taskData: {
 		title: string;
 		description: string;
-		priority: string;
-		columnId?: string;
+		priority: "low" | "medium" | "high";
+		columnId?: string | null;
 		completed: boolean;
+		allDay: boolean;
 		startDate?: string | null;
 		endDate?: string | null;
 	}) => {
@@ -156,8 +157,9 @@ export function TasksPage() {
 		updatedTask: {
 			title: string;
 			description: string;
-			priority: string;
+			priority: "low" | "medium" | "high";
 			completed: boolean;
+			allDay: boolean;
 			startDate?: string | null;
 			endDate?: string | null;
 		},
@@ -175,11 +177,11 @@ export function TasksPage() {
 			} = {
 				title: updatedTask.title,
 				description: updatedTask.description,
-				priority: updatedTask.priority as "high" | "medium" | "low",
+				priority: updatedTask.priority,
 				completed: updatedTask.completed,
 				startDate: updatedTask.startDate,
 				endDate: updatedTask.endDate,
-				allDay: false,
+				allDay: updatedTask.allDay,
 				status: "pending",
 			};
 
@@ -484,9 +486,7 @@ export function TasksPage() {
 		);
 	}
 
-	const visibleGroups = taskGroupsWithDetails.filter(
-		(group) => group.name.toLowerCase() !== "calendar",
-	);
+	const visibleGroups = taskGroupsWithDetails;
 
 	return (
 		<div className="p-4 pb-24 space-y-6">

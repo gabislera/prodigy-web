@@ -57,13 +57,11 @@ export const FiltersSidebar = ({
 	};
 
 	const groupOptions = [
-		...taskGroupsWithDetails
-			.filter((group) => group.name?.toLowerCase() !== "calendar")
-			.map((group) => ({
-				id: group.id,
-				label: group.name || "",
-				value: group.id,
-			})),
+		...taskGroupsWithDetails.map((group) => ({
+			id: group.id,
+			label: group.name || "",
+			value: group.id,
+		})),
 		{
 			id: "no-group",
 			label: "Sem grupo",

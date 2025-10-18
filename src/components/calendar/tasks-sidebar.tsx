@@ -3,53 +3,52 @@ import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { ApiTaskGroup } from "@/types/tasks";
+
+interface TaskWithGroup {
+	id: string;
+	title: string;
+	description: string;
+	startDate?: string | null;
+	completed: boolean;
+	groupId: string | null;
+	groupName: string;
+	groupColor: string;
+	groupBgColor: string;
+}
 
 interface TasksSidebarProps {
-	taskGroupsWithDetails: ApiTaskGroup[];
+	allTasks: TaskWithGroup[];
 	selectedGroupIds: string[];
 	scheduleFilter: "all" | "scheduled" | "unscheduled";
 	completionFilter: "all" | "completed" | "incomplete";
 	dateRange: DateRange | undefined;
 	onFiltersToggle: () => void;
+	onTaskClick?: (task: TaskWithGroup) => void;
 }
 
 export const TasksSidebar = ({
-	taskGroupsWithDetails,
+	allTasks,
 	selectedGroupIds,
 	scheduleFilter,
 	completionFilter,
 	dateRange,
 	onFiltersToggle,
+	onTaskClick,
 }: TasksSidebarProps) => {
-	const allTasks = useMemo(() => {
-		return taskGroupsWithDetails.flatMap((group) =>
-			group.columns.flatMap((column) =>
-				column.tasks.map((task) => ({
-					...task,
-					groupId: group.id,
-					groupName: group.name,
-					groupColor: group.color,
-					groupBgColor: group.bgColor,
-				})),
-			),
-		);
-	}, [taskGroupsWithDetails]);
-
 	const filteredTasks = useMemo(() => {
 		let filtered = allTasks;
 
 		// Filter by group
 		if (selectedGroupIds.length > 0) {
-			if (selectedGroupIds.includes("no-group")) {
-				filtered = filtered.filter(
-					(task) => !task.groupId || selectedGroupIds.includes(task.groupId),
-				);
-			} else {
-				filtered = filtered.filter((task) =>
-					selectedGroupIds.includes(task.groupId),
-				);
-			}
+			filtered = filtered.filter((task) => {
+				if (selectedGroupIds.includes("no-group") && !task.groupId) {
+					return true;
+				}
+				if (task.groupId && selectedGroupIds.includes(task.groupId)) {
+					return true;
+				}
+				return false;
+			});
 		}
 
 		// Filter by schedule
@@ -126,6 +125,7 @@ export const TasksSidebar = ({
 							key={task.id}
 							type="button"
 							draggable={!task.startDate}
+							onClick={() => onTaskClick?.(task)}
 							onDragStart={(e) => {
 								sessionStorage.setItem("draggingTaskId", task.id);
 								e.dataTransfer.effectAllowed = "move";
@@ -146,20 +146,22 @@ export const TasksSidebar = ({
 									<h3 className="font-medium text-sm flex-1 line-clamp-2">
 										{task.title}
 									</h3>
-									<Badge
-										className="text-xs shrink-0"
-										style={{
-											backgroundColor: task.groupBgColor,
-											color: task.groupColor?.startsWith("#")
-												? task.groupColor
-												: undefined,
-											borderColor: task.groupColor?.startsWith("#")
-												? `${task.groupColor}4D`
-												: task.groupColor,
-										}}
-									>
-										{task.groupName}
-									</Badge>
+									{task.groupId && (
+										<Badge
+											className="text-xs shrink-0"
+											style={{
+												backgroundColor: task.groupBgColor || "#f3f4f6",
+												color: task.groupColor?.startsWith("#")
+													? task.groupColor
+													: "#6b7280",
+												borderColor: task.groupColor?.startsWith("#")
+													? `${task.groupColor}4D`
+													: "#d1d5db",
+											}}
+										>
+											{task.groupName}
+										</Badge>
+									)}
 								</div>
 							</div>
 
