@@ -103,6 +103,11 @@ export function CalendarPage() {
 		[allTasks],
 	);
 
+	const unscheduledTasks = useMemo(
+		() => allTasks.filter((task) => !task.startDate && !task.endDate),
+		[allTasks],
+	);
+
 	const allColumns = useMemo<TaskColumn[]>(
 		() => taskGroupsWithDetails?.flatMap((group) => group.columns) || [],
 		[taskGroupsWithDetails],
@@ -185,6 +190,27 @@ export function CalendarPage() {
 			console.warn("⚠️ Nenhuma task sendo arrastada");
 			return;
 		}
+
+		// Buscar a task original
+		// const originalTask = allTasks.find(task => task.id === taskId);
+		// if (!originalTask) {
+		// 	console.warn("⚠️ Task não encontrada");
+		// 	sessionStorage.removeItem("draggingTaskId");
+		// 	return;
+		// }
+
+		// const startDate = typeof start === "string" ? new Date(start) : start;
+		// let endDate = typeof end === "string" ? new Date(end) : end;
+
+		// // Se a task já tinha datas, calcular a duração original e aplicar
+		// if (originalTask.startDate && originalTask.endDate) {
+		// 	const originalStart = new Date(originalTask.startDate);
+		// 	const originalEnd = new Date(originalTask.endDate);
+		// 	const durationMs = originalEnd.getTime() - originalStart.getTime();
+
+		// 	// Aplicar a mesma duração ao novo startDate
+		// 	endDate = new Date(startDate.getTime() + durationMs);
+		// }
 
 		const startDate = typeof start === "string" ? new Date(start) : start;
 		const endDate = typeof end === "string" ? new Date(end) : end;
@@ -354,7 +380,7 @@ export function CalendarPage() {
 			>
 				<div className="w-80">
 					<TasksSidebar
-						allTasks={allTasks}
+						allTasks={unscheduledTasks}
 						selectedGroupIds={selectedGroupIds}
 						scheduleFilter={scheduleFilter}
 						completionFilter={completionFilter}

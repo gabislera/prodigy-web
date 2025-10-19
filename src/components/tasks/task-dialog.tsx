@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarX } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -178,10 +179,32 @@ export const TaskDialog = ({
 		onOpenChange(false);
 	};
 
+	const handleRemoveFromCalendar = () => {
+		if (!task) return;
+
+		const formattedData = {
+			title: watch("title"),
+			description: watch("description") || "",
+			priority: watch("priority"),
+			columnId: watch("columnId"),
+			completed: watch("completed"),
+			allDay: watch("allDay") || false,
+			startDate: null,
+			endDate: null,
+		};
+
+		onSave(formattedData);
+		onOpenChange(false);
+	};
+
 	const handleCancel = () => {
 		reset();
 		onOpenChange(false);
 	};
+
+	const taskIsScheduled = useMemo(() => {
+		return task && (task.startDate || task.endDate);
+	}, [task]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleCancel}>
@@ -363,18 +386,30 @@ export const TaskDialog = ({
 					</div>
 
 					<DialogFooter className="flex items-center justify-between">
-						{taskHasNoGroup && showGroupSelector && visibleGroups.length > 0 ? (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setIsMoveToGroupDialogOpen(true)}
-								className="mr-auto"
-							>
-								Mover para Grupo
-							</Button>
-						) : (
-							<div />
-						)}
+						<div className="flex gap-2">
+							{taskHasNoGroup &&
+								showGroupSelector &&
+								visibleGroups.length > 0 && (
+									<Button
+										type="button"
+										variant="outline"
+										onClick={() => setIsMoveToGroupDialogOpen(true)}
+									>
+										Mover para Grupo
+									</Button>
+								)}
+							{taskIsScheduled && (
+								<Button
+									type="button"
+									variant="outline"
+									onClick={handleRemoveFromCalendar}
+									className="gap-2"
+								>
+									<CalendarX className="h-4 w-4" />
+									Remover do Calendário
+								</Button>
+							)}
+						</div>
 						<div className="flex gap-2">
 							<Button type="button" variant="outline" onClick={handleCancel}>
 								Cancelar

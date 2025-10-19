@@ -16,8 +16,6 @@ interface FiltersSidebarProps {
 	taskGroupsWithDetails: ApiTaskGroup[];
 	selectedGroupIds: string[];
 	setSelectedGroupIds: (ids: string[]) => void;
-	scheduleFilter: "all" | "scheduled" | "unscheduled";
-	setScheduleFilter: (filter: "all" | "scheduled" | "unscheduled") => void;
 	completionFilter: "all" | "completed" | "incomplete";
 	setCompletionFilter: (filter: "all" | "completed" | "incomplete") => void;
 	dateRange: DateRange | undefined;
@@ -28,15 +26,12 @@ export const FiltersSidebar = ({
 	taskGroupsWithDetails,
 	selectedGroupIds,
 	setSelectedGroupIds,
-	scheduleFilter,
-	setScheduleFilter,
 	completionFilter,
 	setCompletionFilter,
 	dateRange,
 	setDateRange,
 }: FiltersSidebarProps) => {
 	const [groupsOpen, setGroupsOpen] = useState(false);
-	const [scheduleOpen, setScheduleOpen] = useState(false);
 	const [completionOpen, setCompletionOpen] = useState(false);
 	const [dateRangeOpen, setDateRangeOpen] = useState(false);
 	const [tempDateRange, setTempDateRange] = useState<DateRange | undefined>(
@@ -44,7 +39,6 @@ export const FiltersSidebar = ({
 	);
 
 	const hasGroupFilter = selectedGroupIds.length > 0;
-	const hasScheduleFilter = scheduleFilter !== "all";
 	const hasCompletionFilter = completionFilter !== "all";
 	const hasDateFilter = !!dateRange?.from;
 
@@ -67,11 +61,6 @@ export const FiltersSidebar = ({
 			label: "Sem grupo",
 			value: "no-group",
 		},
-	];
-
-	const scheduleOptions = [
-		{ id: "scheduled", label: "Agendadas", value: "scheduled" },
-		{ id: "unscheduled", label: "Não agendadas", value: "unscheduled" },
 	];
 
 	const completionOptions = [
@@ -97,22 +86,6 @@ export const FiltersSidebar = ({
 					onClear={() => {
 						setSelectedGroupIds([]);
 						setGroupsOpen(false);
-					}}
-				/>
-
-				<FilterSection
-					title="Agendamento"
-					isOpen={scheduleOpen}
-					onToggle={setScheduleOpen}
-					hasFilter={hasScheduleFilter}
-					options={scheduleOptions}
-					selectedValues={scheduleFilter !== "all" ? [scheduleFilter] : []}
-					onSelect={(value) =>
-						setScheduleFilter(value as "scheduled" | "unscheduled")
-					}
-					onClear={() => {
-						setScheduleFilter("all");
-						setScheduleOpen(false);
 					}}
 				/>
 
