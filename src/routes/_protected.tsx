@@ -97,9 +97,9 @@ function RouteComponent() {
 				<Sidebar collapsible="icon" className="border-r border-white/10">
 					<SidebarHeader className="border-b border-white/10 p-4">
 						<div className="flex items-center gap-3">
-							<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+							{/* <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
 								<Trophy className="w-4 h-4 text-white" />
-							</div>
+							</div> */}
 							<div className="flex flex-col group-data-[collapsible=icon]:hidden">
 								<h2 className="font-bold text-white">Prodigy</h2>
 							</div>
@@ -131,7 +131,7 @@ function RouteComponent() {
 														"px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/5",
 														"group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:mx-auto",
 														"group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:p-0",
-														isActive && "bg-gradient-primary",
+														isActive && "!bg-primary/20",
 													)}
 												>
 													<Link

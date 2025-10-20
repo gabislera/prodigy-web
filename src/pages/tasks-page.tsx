@@ -3,7 +3,7 @@ import type {
 	DragOverEvent,
 	DragStartEvent,
 } from "@dnd-kit/core";
-import { ArrowLeft, Plus, Settings } from "lucide-react";
+import { ArrowLeft, Plus, Search, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CreateGroupDialog } from "@/components/tasks/create-group-dialog";
@@ -12,6 +12,7 @@ import { KanbanBoard } from "@/components/tasks/kanban-board";
 import { SettingsDialog } from "@/components/tasks/settings-dialog";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
@@ -490,29 +491,40 @@ export function TasksPage() {
 
 	return (
 		<div className="p-4 pb-24 space-y-6">
-			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h1 className="text-xl font-bold text-foreground">Grupos de Tarefas</h1>
+				<div className="relative">
+					<Search
+						className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+						size={16}
+					/>
+					<Input
+						placeholder="Buscar grupos..."
+						className="pl-9 bg-card border-border"
+						disabled
+					/>
+				</div>
+				{/* <div className="flex items-center gap-2">
+						<Filter className="text-primary" size={20} />
+					</div> */}
 				<Button
-					className="bg-gradient-primary border-0 shadow-glow text-xs"
+					className="bg-gradient-primary shadow-glow"
 					onClick={() => setIsCreateGroupDialogOpen(true)}
 				>
-					<Plus className="h-3 w-3 mr-1" />
+					<Plus size={16} />
 					Novo Grupo
 				</Button>
 			</div>
 
 			{/* Groups Grid */}
-			<div className="flex flex-wrap gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				{visibleGroups.map((group) => (
-					<div key={group.id} className="w-80 flex-shrink-0">
-						<GroupCard
-							group={group}
-							onGroupClick={setSelectedGroup}
-							onEditGroup={handleEditGroup}
-							onDeleteGroup={handleDeleteGroup}
-						/>
-					</div>
+					<GroupCard
+						key={group.id}
+						group={group}
+						onGroupClick={setSelectedGroup}
+						onEditGroup={handleEditGroup}
+						onDeleteGroup={handleDeleteGroup}
+					/>
 				))}
 			</div>
 
