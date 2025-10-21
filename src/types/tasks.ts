@@ -26,6 +26,7 @@ export interface TaskColumn {
 export interface TaskGroup {
 	id: string;
 	name: string;
+	description?: string;
 	columns: TaskColumn[];
 	taskCount: number;
 	completedCount: number;
@@ -61,6 +62,7 @@ export interface ApiTaskColumn {
 export interface ApiTaskGroup {
 	id: string;
 	name: string;
+	description?: string;
 	createdAt: string;
 	updatedAt: string;
 	columns: ApiTaskColumn[];
@@ -97,10 +99,12 @@ export interface UpdateTaskData {
 export interface CreateTaskGroupData {
 	id?: string;
 	name: string;
+	description?: string;
 }
 
 export interface UpdateTaskGroupData {
 	name?: string;
+	description?: string;
 }
 
 export interface CreateTaskColumnData {

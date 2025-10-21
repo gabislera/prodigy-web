@@ -424,10 +424,15 @@ export function TasksPage() {
 						>
 							<ArrowLeft className="h-4 w-4" />
 						</Button>
-						<div className="flex items-center gap-2">
+						<div>
 							<h1 className="text-xl font-bold text-foreground">
 								{group?.name || "Tarefas"}
 							</h1>
+							{group?.description && (
+								<p className="text-sm text-muted-foreground mt-0.5">
+									{group.description}
+								</p>
+							)}
 						</div>
 					</div>
 					<div className="flex items-center gap-2">

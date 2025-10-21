@@ -10,6 +10,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import {
 	type CreateGroupFormData,
@@ -41,6 +42,7 @@ export const CreateGroupDialog = ({
 		resolver: zodResolver(createGroupSchema),
 		defaultValues: {
 			name: editingGroup?.name || "",
+			description: editingGroup?.description || "",
 		},
 	});
 
@@ -49,10 +51,12 @@ export const CreateGroupDialog = ({
 		if (editingGroup) {
 			reset({
 				name: editingGroup.name,
+				description: editingGroup.description || "",
 			});
 		} else {
 			reset({
 				name: "",
+				description: "",
 			});
 		}
 	}, [editingGroup, reset]);
@@ -65,6 +69,7 @@ export const CreateGroupDialog = ({
 					groupId: editingGroup.id,
 					data: {
 						name: data.name,
+						description: data.description,
 					},
 				});
 			} else {
@@ -72,6 +77,7 @@ export const CreateGroupDialog = ({
 				await createTaskGroup({
 					id: "",
 					name: data.name,
+					description: data.description,
 				});
 			}
 
@@ -101,6 +107,18 @@ export const CreateGroupDialog = ({
 						/>
 						{errors.name && (
 							<p className="text-sm text-red-500">{errors.name.message}</p>
+						)}
+					</div>
+
+					<div className="space-y-2">
+						<Textarea
+							{...register("description")}
+							id="group-description"
+							placeholder="Descrição do grupo (opcional)"
+							rows={3}
+						/>
+						{errors.description && (
+							<p className="text-sm text-red-500">{errors.description.message}</p>
 						)}
 					</div>
 

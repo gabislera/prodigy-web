@@ -41,10 +41,15 @@ export const GroupCard = ({
 		>
 			<div className="p-6 space-y-4">
 				<div className="flex items-start justify-between">
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-4 flex-1">
 						<Folder className="text-accent" />
-						<div>
+						<div className="flex-1">
 							<h3 className="font-semibold text-xl mb-1">{group.name}</h3>
+							{group.description && (
+								<p className="text-sm text-muted-foreground line-clamp-2">
+									{group.description}
+								</p>
+							)}
 						</div>
 					</div>
 					<DropdownMenu>

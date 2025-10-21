@@ -58,9 +58,16 @@ export function RecentTaskGroupsCard({
 							>
 								<div className="flex items-center gap-2 mb-2">
 									<Folder className="h-4 w-4 text-accent" />
-									<span className="flex-1 text-sm font-medium">
-										{group.name}
-									</span>
+									<div className="flex-1">
+										<span className="text-sm font-medium block">
+											{group.name}
+										</span>
+										{group.description && (
+											<p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+												{group.description}
+											</p>
+										)}
+									</div>
 									{progress === 100 && (
 										<Badge
 											variant="secondary"

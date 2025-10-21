@@ -30,6 +30,7 @@ export const createGroupSchema = z.object({
 		.min(2, "Nome deve ter pelo menos 2 caracteres")
 		.max(50, "Nome deve ter no máximo 50 caracteres")
 		.trim(),
+	description: z.string().optional(),
 });
 
 export const taskFormSchema = z.object({
