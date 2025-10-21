@@ -10,20 +10,12 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import {
 	type CreateGroupFormData,
 	createGroupSchema,
 } from "@/schemas/taskSchema";
 import type { TaskGroup } from "@/types/tasks";
-import { colorOptions, iconOptions } from "@/utils/taskUtils";
 
 interface CreateGroupDialogProps {
 	isOpen: boolean;
@@ -44,53 +36,35 @@ export const CreateGroupDialog = ({
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
-		watch,
-		setValue,
 		reset,
 	} = useForm<CreateGroupFormData>({
 		resolver: zodResolver(createGroupSchema),
 		defaultValues: {
 			name: editingGroup?.name || "",
-			icon: editingGroup?.icon || "briefcase",
-			color: editingGroup?.color || "#3B82F6",
 		},
 	});
-
-	const watchedValues = watch();
 
 	// Reset form when editingGroup changes
 	useEffect(() => {
 		if (editingGroup) {
 			reset({
 				name: editingGroup.name,
-				icon: editingGroup.icon,
-				color: editingGroup.color,
 			});
 		} else {
 			reset({
 				name: "",
-				icon: "briefcase",
-				color: "#3B82F6",
 			});
 		}
 	}, [editingGroup, reset]);
 
 	const onSubmit = async (data: CreateGroupFormData) => {
 		try {
-			// Get the background color for the selected color
-			const selectedColorOption = colorOptions.find(
-				(option) => option.value === data.color,
-			);
-
 			if (editingGroup) {
 				// Update existing group
 				await updateTaskGroup({
 					groupId: editingGroup.id,
 					data: {
 						name: data.name,
-						icon: data.icon,
-						color: data.color,
-						bgColor: selectedColorOption?.bgColor || "#3B82F61A",
 					},
 				});
 			} else {
@@ -98,9 +72,6 @@ export const CreateGroupDialog = ({
 				await createTaskGroup({
 					id: "",
 					name: data.name,
-					icon: data.icon,
-					color: data.color,
-					bgColor: selectedColorOption?.bgColor || "#3B82F61A",
 				});
 			}
 
@@ -111,13 +82,6 @@ export const CreateGroupDialog = ({
 			toast.error("Erro ao salvar grupo. Tente novamente.");
 		}
 	};
-
-	const selectedIconOption = iconOptions.find(
-		(option) => option.value === watchedValues.icon,
-	);
-	const selectedColorOption = colorOptions.find(
-		(option) => option.value === watchedValues.color,
-	);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -138,105 +102,6 @@ export const CreateGroupDialog = ({
 						{errors.name && (
 							<p className="text-sm text-red-500">{errors.name.message}</p>
 						)}
-					</div>
-
-					<div className="flex items-center gap-4">
-						<div className="space-y-2">
-							<Select
-								value={watchedValues.icon}
-								onValueChange={(value) => setValue("icon", value)}
-							>
-								<SelectTrigger>
-									<SelectValue>
-										<div className="flex items-center gap-2">
-											{selectedIconOption && (
-												<selectedIconOption.icon
-													className={"h-4 w-4"}
-													style={{ color: selectedIconOption.color }}
-												/>
-											)}
-										</div>
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{iconOptions.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											<div className="flex items-center gap-2">
-												<option.icon
-													className="h-4 w-4"
-													style={{ color: option.color }}
-												/>
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							{errors.icon && (
-								<p className="text-sm text-red-500">{errors.icon.message}</p>
-							)}
-						</div>
-
-						<div className="space-y-2">
-							<Select
-								value={watchedValues.color}
-								onValueChange={(value) => setValue("color", value)}
-							>
-								<SelectTrigger>
-									<SelectValue>
-										<div className="flex items-center gap-2">
-											{selectedColorOption && (
-												<>
-													<div
-														className={`w-4 h-4 rounded-full ${selectedColorOption.bgColor} border`}
-													/>
-													<span>{selectedColorOption.label}</span>
-												</>
-											)}
-										</div>
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{colorOptions.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											<div className="flex items-center gap-2">
-												<div
-													className="w-4 h-4 rounded-full border"
-													style={{
-														backgroundColor: option.bgColor,
-														borderColor: option.value,
-													}}
-												/>
-												<span>{option.label}</span>
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							{errors.color && (
-								<p className="text-sm text-red-500">{errors.color.message}</p>
-							)}
-						</div>
-					</div>
-
-					<div
-						className={"p-3 border rounded-lg"}
-						style={{
-							backgroundColor: selectedColorOption?.bgColor,
-							borderColor: watchedValues.color,
-						}}
-					>
-						<div className="flex items-center gap-2 mb-2">
-							{selectedIconOption && (
-								<selectedIconOption.icon
-									className="h-4 w-4"
-									style={{ color: watchedValues.color }}
-								/>
-							)}
-							<span className="text-sm font-medium">
-								{watchedValues.name || "Nome do Grupo"}
-							</span>
-						</div>
-						<p className="text-xs text-muted-foreground">Preview do grupo</p>
 					</div>
 
 					<div className="flex gap-2 pt-2">

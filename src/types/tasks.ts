@@ -26,9 +26,6 @@ export interface TaskColumn {
 export interface TaskGroup {
 	id: string;
 	name: string;
-	color: string;
-	bgColor: string;
-	icon: string;
 	columns: TaskColumn[];
 	taskCount: number;
 	completedCount: number;
@@ -64,9 +61,6 @@ export interface ApiTaskColumn {
 export interface ApiTaskGroup {
 	id: string;
 	name: string;
-	icon: string;
-	color: string;
-	bgColor: string;
 	createdAt: string;
 	updatedAt: string;
 	columns: ApiTaskColumn[];
@@ -103,16 +97,10 @@ export interface UpdateTaskData {
 export interface CreateTaskGroupData {
 	id?: string;
 	name: string;
-	icon: string;
-	color: string;
-	bgColor: string;
 }
 
 export interface UpdateTaskGroupData {
 	name?: string;
-	icon?: string;
-	color?: string;
-	bgColor?: string;
 }
 
 export interface CreateTaskColumnData {

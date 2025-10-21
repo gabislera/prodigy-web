@@ -39,9 +39,6 @@ export function CalendarPage() {
 
 	// Filter states
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
-	const [scheduleFilter, setScheduleFilter] = useState<
-		"all" | "scheduled" | "unscheduled"
-	>("all");
 	const [completionFilter, setCompletionFilter] = useState<
 		"all" | "completed" | "incomplete"
 	>("all");
@@ -74,8 +71,6 @@ export function CalendarPage() {
 						...task,
 						groupId: group.id,
 						groupName: group.name,
-						groupColor: group.color,
-						groupBgColor: group.bgColor,
 					})),
 				),
 			) || [];
@@ -86,8 +81,6 @@ export function CalendarPage() {
 				...task,
 				groupId: null,
 				groupName: "Sem grupo",
-				groupColor: "#6b7280",
-				groupBgColor: "#f3f4f6",
 			}));
 
 		const taskIds = new Set(tasksFromGroups.map((task: any) => task.id));
@@ -333,7 +326,7 @@ export function CalendarPage() {
 
 	return (
 		<div className="flex h-[calc(100vh-80px)] pb-20 md:p-4 gap-4">
-			<div className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
+			<div className="flex-1 rounded-lg overflow-hidden">
 				<DnDCalendar
 					localizer={localizer}
 					events={calendarTasks}
@@ -382,7 +375,7 @@ export function CalendarPage() {
 					<TasksSidebar
 						allTasks={unscheduledTasks}
 						selectedGroupIds={selectedGroupIds}
-						scheduleFilter={scheduleFilter}
+						scheduleFilter="unscheduled"
 						completionFilter={completionFilter}
 						dateRange={dateRange}
 						onFiltersToggle={toggleFiltersSidebar}
@@ -401,8 +394,6 @@ export function CalendarPage() {
 						taskGroupsWithDetails={taskGroupsWithDetails}
 						selectedGroupIds={selectedGroupIds}
 						setSelectedGroupIds={setSelectedGroupIds}
-						scheduleFilter={scheduleFilter}
-						setScheduleFilter={setScheduleFilter}
 						completionFilter={completionFilter}
 						setCompletionFilter={setCompletionFilter}
 						dateRange={dateRange}

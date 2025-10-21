@@ -1,5 +1,9 @@
-import { Folder, MoreHorizontal, Trash2 } from "lucide-react";
-import React from "react";
+import {
+	Folder,
+	MoreHorizontal,
+	Pencil,
+	Trash2,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
 	DropdownMenu,
@@ -8,7 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TaskGroup } from "@/types/tasks";
-import { getProgressBarColor, iconOptions } from "@/utils/taskUtils";
+import { Progress } from "../ui/progress";
 
 interface GroupCardProps {
 	group: TaskGroup;
@@ -23,90 +27,81 @@ export const GroupCard = ({
 	onEditGroup,
 	onDeleteGroup,
 }: GroupCardProps) => {
-	const progressPercentage =
+	const progress =
 		group.taskCount > 0
 			? Math.round((group.completedCount / group.taskCount) * 100)
 			: 0;
+	const pending = group.taskCount - group.completedCount;
 
 	return (
 		<Card
-			className={`p-4 ${group.bgColor?.startsWith("bg-") ? group.bgColor : ""} border-border/50 cursor-pointer hover:shadow-card transition-all group`}
-			style={{
-				backgroundColor: group.bgColor?.startsWith("#")
-					? group.bgColor
-					: undefined,
-			}}
+			key={group.id}
+			className="cursor-pointer hover:scale-[1.01] transition-all shadow-card bg-card border-border group"
 			onClick={() => onGroupClick(group.id)}
 		>
-			<div className="flex items-center gap-3">
-				<div className={`p-2 rounded-lg `}>
-					{React.createElement(
-						iconOptions.find((option) => option.value === group.icon)?.icon ||
-							Folder,
-						{
-							className: `h-5 w-5 ${group.color?.startsWith("text-") ? group.color : ""}`,
-							style: {
-								color: group.color?.startsWith("#") ? group.color : undefined,
-							},
-						},
-					)}
-				</div>
-				<div className="flex-1">
-					<h3 className="font-semibold text-sm">{group.name}</h3>
-					<p className="text-xs text-muted-foreground">
-						{group.completedCount} de {group.taskCount} concluídas
-					</p>
-				</div>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							className="p-1 rounded-sm hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+			<div className="p-6 space-y-4">
+				<div className="flex items-start justify-between">
+					<div className="flex items-center gap-4">
+						<Folder className="text-accent" />
+						<div>
+							<h3 className="font-semibold text-xl mb-1">{group.name}</h3>
+						</div>
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								className="p-1 rounded-sm "
+								onClick={(e) => e.stopPropagation()}
+							>
+								<MoreHorizontal className="h-4 w-4" />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-48"
 							onClick={(e) => e.stopPropagation()}
 						>
-							<MoreHorizontal className="h-4 w-4" />
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="end"
-						className="w-48"
-						onClick={(e) => e.stopPropagation()}
-					>
-						<DropdownMenuItem
-							onClick={(e) => {
-								e.stopPropagation();
-								onEditGroup(group);
-							}}
-						>
-							Editar
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							variant="destructive"
-							onClick={(e) => {
-								e.stopPropagation();
-								onDeleteGroup(group.id);
-							}}
-						>
-							<Trash2 className="mr-2 h-4 w-4" />
-							Excluir
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
+							<DropdownMenuItem
+								onClick={(e) => {
+									e.stopPropagation();
+									onEditGroup(group);
+								}}
+							>
+								<Pencil className="h-4 w-4" />
+								Editar
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								variant="destructive"
+								onClick={(e) => {
+									e.stopPropagation();
+									onDeleteGroup(group.id);
+								}}
+							>
+								<Trash2 className="h-4 w-4" />
+								Excluir
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 
-			<div className="w-full bg-background/30 rounded-full h-2 mb-2">
-				<div
-					className="h-2 rounded-full transition-all"
-					style={{
-						width: `${progressPercentage}%`,
-						backgroundColor: getProgressBarColor(group.color),
-					}}
-				/>
-			</div>
-
-			<div className="flex items-center justify-between text-xs">
-				<span className="text-muted-foreground">Progresso</span>
-				<span className="font-medium">{progressPercentage}%</span>
+				<div className="space-y-3">
+					<div className="flex justify-between items-center">
+						<span className="text-sm text-muted-foreground">Progresso</span>
+						<span className="font-semibold">
+							{group.completedCount}/{group.taskCount} tarefas
+						</span>
+					</div>
+					<Progress value={progress} className="h-2" />
+					<div className="flex justify-between items-center">
+						<span className="text-sm text-success font-medium">
+							{progress}% completo
+						</span>
+						<span className="text-sm text-muted-foreground">
+							{pending} pendentes
+						</span>
+					</div>
+				</div>
 			</div>
 		</Card>
 	);

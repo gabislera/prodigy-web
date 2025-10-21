@@ -1,10 +1,8 @@
 import { Folder, Target } from "lucide-react";
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { ApiTaskGroup } from "@/types/tasks";
-import { iconOptions } from "@/utils/taskUtils";
 
 interface RecentTaskGroupsCardProps {
 	taskGroups: ApiTaskGroup[];
@@ -17,9 +15,7 @@ export function RecentTaskGroupsCard({
 	isLoading,
 	maxGroups = 3,
 }: RecentTaskGroupsCardProps) {
-	const recentGroups = React.useMemo(() => {
-		return [...taskGroups].reverse().slice(0, maxGroups);
-	}, [taskGroups, maxGroups]);
+	const recentGroups = [...taskGroups].reverse().slice(0, maxGroups);
 
 	return (
 		<Card className="bg-card border-border">
@@ -61,18 +57,7 @@ export function RecentTaskGroupsCard({
 								className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
 							>
 								<div className="flex items-center gap-2 mb-2">
-									{React.createElement(
-										iconOptions.find((opt) => opt.value === group.icon)?.icon ||
-											Folder,
-										{
-											className: "h-4 w-4",
-											style: {
-												color: group.color?.startsWith("#")
-													? group.color
-													: undefined,
-											},
-										},
-									)}
+									<Folder className="h-4 w-4 text-accent" />
 									<span className="flex-1 text-sm font-medium">
 										{group.name}
 									</span>

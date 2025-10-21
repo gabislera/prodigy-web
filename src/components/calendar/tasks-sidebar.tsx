@@ -12,8 +12,6 @@ interface TaskWithGroup {
 	completed: boolean;
 	groupId: string | null;
 	groupName: string;
-	groupColor: string;
-	groupBgColor: string;
 }
 
 interface TasksSidebarProps {
@@ -148,16 +146,8 @@ export const TasksSidebar = ({
 									</h3>
 									{task.groupId && (
 										<Badge
+											variant="outline"
 											className="text-xs shrink-0"
-											style={{
-												backgroundColor: task.groupBgColor || "#f3f4f6",
-												color: task.groupColor?.startsWith("#")
-													? task.groupColor
-													: "#6b7280",
-												borderColor: task.groupColor?.startsWith("#")
-													? `${task.groupColor}4D`
-													: "#d1d5db",
-											}}
 										>
 											{task.groupName}
 										</Badge>
