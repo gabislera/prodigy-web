@@ -41,14 +41,24 @@ export const tasksService = {
 		return response.data;
 	},
 
+	async updateTaskColumn(
+		columnId: string,
+		data: { title: string },
+	): Promise<ApiTaskColumn> {
+		const response = await api.put(`/columns/${columnId}`, data);
+		return response.data;
+	},
+
+	async deleteTaskColumn(columnId: string): Promise<void> {
+		await api.delete(`/columns/${columnId}`);
+	},
+
 	async createTask(data: CreateTaskData): Promise<ApiTask> {
-		// As datas já vêm como ISO string do task-dialog, não precisa converter novamente
 		const response = await api.post("/tasks", data);
 		return response.data;
 	},
 
 	async updateTask(taskId: string, data: UpdateTaskData): Promise<ApiTask> {
-		// As datas já vêm como ISO string do task-dialog, não precisa converter novamente
 		const response = await api.put(`/tasks/${taskId}`, data);
 		return response.data;
 	},

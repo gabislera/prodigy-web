@@ -90,6 +90,64 @@ export function useTaskGroupsWithDetails() {
 		},
 	});
 
+	const createTaskColumnMutation = useMutation({
+		mutationFn: (data: {
+			groupId: string;
+			title: string;
+			order: number;
+		}) => tasksService.createTaskColumn(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
+			toast.success("Coluna criada com sucesso!");
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao criar coluna. Tente novamente.",
+			);
+		},
+	});
+
+	const updateTaskColumnMutation = useMutation({
+		mutationFn: ({
+			columnId,
+			title,
+		}: {
+			columnId: string;
+			title: string;
+		}) => tasksService.updateTaskColumn(columnId, { title }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
+			toast.success("Coluna atualizada com sucesso!");
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao atualizar coluna. Tente novamente.",
+			);
+		},
+	});
+
+	const deleteTaskColumnMutation = useMutation({
+		mutationFn: (columnId: string) => tasksService.deleteTaskColumn(columnId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+			});
+			toast.success("Coluna excluída com sucesso!");
+		},
+		onError: (error: ApiError) => {
+			toast.error(
+				error?.response?.data?.message ||
+					"Erro ao excluir coluna. Tente novamente.",
+			);
+		},
+	});
+
 	return {
 		taskGroupsWithDetails,
 		isLoading,
@@ -97,5 +155,8 @@ export function useTaskGroupsWithDetails() {
 		updateTaskGroup: updateTaskGroupMutation.mutateAsync,
 		deleteTaskGroup: deleteTaskGroupMutation.mutateAsync,
 		updateColumnOrder: updateColumnOrderMutation.mutateAsync,
+		createTaskColumn: createTaskColumnMutation.mutateAsync,
+		updateTaskColumn: updateTaskColumnMutation.mutateAsync,
+		deleteTaskColumn: deleteTaskColumnMutation.mutateAsync,
 	};
 }

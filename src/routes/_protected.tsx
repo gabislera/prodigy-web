@@ -14,7 +14,6 @@ import {
 	LogOut,
 	Settings,
 	Timer,
-	Trophy,
 } from "lucide-react";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import {
@@ -82,8 +81,8 @@ function RouteComponent() {
 
 	if (isMobile) {
 		return (
-			<div className="min-h-screen bg-background text-foreground">
-				<main className="relative pb-20">
+			<div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+				<main className="flex-1 overflow-hidden pb-20">
 					<Outlet /> {/* Mobile pages */}
 				</main>
 				<BottomNavigation />
@@ -171,7 +170,7 @@ function RouteComponent() {
 						</SidebarMenu>
 					</SidebarFooter>
 				</Sidebar>
-				<SidebarInset>
+				<SidebarInset className="flex flex-col overflow-hidden">
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
 						<SidebarTrigger className="-ml-1" />
 						<div className="flex items-center justify-between w-full">
@@ -184,7 +183,7 @@ function RouteComponent() {
 							</div>
 						</div>
 					</header>
-					<main className="flex-1 overflow-auto">
+					<main className="flex-1 overflow-hidden">
 						<Outlet /> {/* Desktop pages */}
 					</main>
 				</SidebarInset>

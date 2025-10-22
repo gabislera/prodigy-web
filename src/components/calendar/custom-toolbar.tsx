@@ -68,14 +68,6 @@ export function CustomToolbar({
 			</div>
 
 			<div className="flex items-center gap-2">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={onSidebarToggle}
-					className="h-8 w-8 p-0"
-				>
-					<Logs className="h-4 w-4" />
-				</Button>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
@@ -94,6 +86,14 @@ export function CustomToolbar({
 						))}
 					</DropdownMenuContent>
 				</DropdownMenu>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={onSidebarToggle}
+					className="h-8 w-8 p-0"
+				>
+					<Logs className="h-4 w-4" />
+				</Button>
 			</div>
 		</div>
 	);

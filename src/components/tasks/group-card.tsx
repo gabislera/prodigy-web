@@ -1,9 +1,4 @@
-import {
-	Folder,
-	MoreHorizontal,
-	Pencil,
-	Trash2,
-} from "lucide-react";
+import { Folder, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
 	DropdownMenu,

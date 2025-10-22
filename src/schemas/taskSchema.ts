@@ -33,6 +33,15 @@ export const createGroupSchema = z.object({
 	description: z.string().optional(),
 });
 
+export const createColumnSchema = z.object({
+	title: z
+		.string()
+		.min(1, "Título da coluna é obrigatório")
+		.min(2, "Título deve ter pelo menos 2 caracteres")
+		.max(20, "Título deve ter no máximo 20 caracteres")
+		.trim(),
+});
+
 export const taskFormSchema = z.object({
 	title: z
 		.string()
@@ -54,3 +63,4 @@ export type TaskFormData = z.infer<typeof taskFormSchema>;
 export type CreateTaskFormData = z.infer<typeof createTaskSchema>;
 export type UpdateTaskFormData = z.infer<typeof updateTaskSchema>;
 export type CreateGroupFormData = z.infer<typeof createGroupSchema>;
+export type CreateColumnFormData = z.infer<typeof createColumnSchema>;

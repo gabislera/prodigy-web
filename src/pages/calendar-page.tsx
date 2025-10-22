@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 import moment from "@/lib/moment";
 
@@ -9,11 +8,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "@/styles/calendar.css";
 
-import {
-	CustomToolbar,
-	FiltersSidebar,
-	TasksSidebar,
-} from "@/components/calendar";
+import { CustomToolbar, TasksSidebar } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useAllTasks, useTasks } from "@/hooks/use-tasks";
@@ -35,14 +30,12 @@ export function CalendarPage() {
 	const [isTaskSidebarOpen, setIsTaskSidebarOpen] = useState<boolean>(
 		getInitialCalendarSidebar,
 	);
-	const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
 
 	// Filter states
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 	const [completionFilter, setCompletionFilter] = useState<
 		"all" | "completed" | "incomplete"
 	>("all");
-	const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
 	const toggleCalendarSidebar = () => {
 		setIsTaskSidebarOpen((prev) => {
@@ -50,10 +43,6 @@ export function CalendarPage() {
 			localStorage.setItem("calendar_sidebar_state", JSON.stringify(next));
 			return next;
 		});
-	};
-
-	const toggleFiltersSidebar = () => {
-		setIsFiltersSidebarOpen((prev) => !prev);
 	};
 
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -325,7 +314,9 @@ export function CalendarPage() {
 	};
 
 	return (
-		<div className="flex h-[calc(100vh-80px)] pb-20 md:p-4 gap-4">
+		<div
+			className={`flex h-[calc(100vh-80px)] pb-20 md:p-4 gap-0 ${isTaskSidebarOpen ? "gap-4" : ""}`}
+		>
 			<div className="flex-1 rounded-lg overflow-hidden">
 				<DnDCalendar
 					localizer={localizer}
@@ -367,39 +358,19 @@ export function CalendarPage() {
 			</div>
 
 			<div
-				className={`transition-all duration-300 ease-in-out overflow-hidden ${
-					isTaskSidebarOpen ? "w-80" : "w-0"
+				className={`transition-all duration-300 ease-in-out overflow-hidden h-full  ${
+					isTaskSidebarOpen ? "w-80 opacity-100" : "w-0 opacity-0"
 				}`}
 			>
-				<div className="w-80">
-					<TasksSidebar
-						allTasks={unscheduledTasks}
-						selectedGroupIds={selectedGroupIds}
-						scheduleFilter="unscheduled"
-						completionFilter={completionFilter}
-						dateRange={dateRange}
-						onFiltersToggle={toggleFiltersSidebar}
-						onTaskClick={handleSelectTask}
-					/>
-				</div>
-			</div>
-
-			<div
-				className={`transition-all duration-300 ease-in-out overflow-hidden ${
-					isFiltersSidebarOpen ? "w-64" : "w-0"
-				}`}
-			>
-				<div className="w-64">
-					<FiltersSidebar
-						taskGroupsWithDetails={taskGroupsWithDetails}
-						selectedGroupIds={selectedGroupIds}
-						setSelectedGroupIds={setSelectedGroupIds}
-						completionFilter={completionFilter}
-						setCompletionFilter={setCompletionFilter}
-						dateRange={dateRange}
-						setDateRange={setDateRange}
-					/>
-				</div>
+				<TasksSidebar
+					allTasks={unscheduledTasks}
+					taskGroupsWithDetails={taskGroupsWithDetails}
+					selectedGroupIds={selectedGroupIds}
+					setSelectedGroupIds={setSelectedGroupIds}
+					completionFilter={completionFilter}
+					setCompletionFilter={setCompletionFilter}
+					onTaskClick={handleSelectTask}
+				/>
 			</div>
 
 			<TaskDialog
