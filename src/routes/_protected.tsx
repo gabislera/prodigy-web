@@ -32,7 +32,9 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTimer } from "@/hooks/use-timer";
 import { cn } from "@/lib/utils";
+import { formatTime } from "@/utils/format-time";
 
 export const Route = createFileRoute("/_protected")({
 	beforeLoad: async () => {
@@ -68,12 +70,16 @@ const navigation = [
 function RouteComponent() {
 	const location = useLocation();
 	const { user, logout, isLogoutLoading } = useAuth();
+	const timer = useTimer();
 
 	const currentNavItem = navigation.find(
 		(item) => item.href === location.pathname,
 	);
 
 	const isMobile = useIsMobile();
+
+	// Mostrar mini contador se timer está rodando e não está na página do timer
+	const showMiniTimer = timer.isRunning && location.pathname !== "/timer";
 
 	const handleLogout = () => {
 		logout();
@@ -177,9 +183,25 @@ function RouteComponent() {
 							<h1 className="text-xl font-bold text-white">
 								{currentNavItem?.name}
 							</h1>
-							<div className="flex items-center gap-2 bg-gradient-streak rounded-full px-3 py-1">
-								<Flame className="size-4 text-white" />
-								<span className="text-sm font-bold text-white">7</span>
+							<div className="flex items-center gap-3">
+								{/* Mini Timer - mostra quando timer está rodando e não está na página do timer */}
+								{showMiniTimer && (
+									<Link
+										to="/timer"
+										className="flex items-center gap-2 rounded-full px-3 py-1 transition-all duration-200 hover:scale-105 cursor-pointer bg-gradient-primary/20 hover:bg-gradient-primary/30"
+									>
+										<Timer className="size-4 text-primary" />
+										<span className="text-sm font-bold tabular-nums text-primary">
+											{formatTime(timer.timeRemaining)}
+										</span>
+									</Link>
+								)}
+
+								{/* Streak */}
+								<div className="flex items-center gap-2 bg-gradient-streak rounded-full px-3 py-1">
+									<Flame className="size-4 text-white" />
+									<span className="text-sm font-bold text-white">7</span>
+								</div>
 							</div>
 						</div>
 					</header>

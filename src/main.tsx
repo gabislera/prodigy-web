@@ -7,6 +7,7 @@ import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { TimerProvider } from "./contexts/timer-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -35,8 +36,10 @@ if (!rootElement) throw new Error("Failed to find the root element");
 createRoot(rootElement).render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-			<Toaster richColors position="bottom-center" />
+			<TimerProvider>
+				<RouterProvider router={router} />
+				<Toaster richColors position="bottom-center" />
+			</TimerProvider>
 		</QueryClientProvider>
 	</StrictMode>,
 );
