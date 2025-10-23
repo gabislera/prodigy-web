@@ -159,13 +159,7 @@ export function CalendarPage() {
 		}
 	};
 
-	const handleDropFromOutside = async ({
-		start,
-		end,
-	}: {
-		start: Date | string;
-		end: Date | string;
-	}) => {
+	const handleDropFromOutside = async ({ start }: { start: Date | string }) => {
 		// Buscar o taskId armazenado no drag
 		const taskId = sessionStorage.getItem("draggingTaskId");
 		if (!taskId) {
@@ -173,29 +167,14 @@ export function CalendarPage() {
 			return;
 		}
 
-		// Buscar a task original
-		// const originalTask = allTasks.find(task => task.id === taskId);
-		// if (!originalTask) {
-		// 	console.warn("⚠️ Task não encontrada");
-		// 	sessionStorage.removeItem("draggingTaskId");
-		// 	return;
-		// }
+		const dropDate = typeof start === "string" ? new Date(start) : start;
 
-		// const startDate = typeof start === "string" ? new Date(start) : start;
-		// let endDate = typeof end === "string" ? new Date(end) : end;
+		const now = new Date();
+		const startDate = new Date(dropDate);
+		startDate.setHours(now.getHours(), now.getMinutes(), 0, 0);
 
-		// // Se a task já tinha datas, calcular a duração original e aplicar
-		// if (originalTask.startDate && originalTask.endDate) {
-		// 	const originalStart = new Date(originalTask.startDate);
-		// 	const originalEnd = new Date(originalTask.endDate);
-		// 	const durationMs = originalEnd.getTime() - originalStart.getTime();
-
-		// 	// Aplicar a mesma duração ao novo startDate
-		// 	endDate = new Date(startDate.getTime() + durationMs);
-		// }
-
-		const startDate = typeof start === "string" ? new Date(start) : start;
-		const endDate = typeof end === "string" ? new Date(end) : end;
+		const endDate = new Date(dropDate);
+		endDate.setHours(now.getHours(), now.getMinutes() + 30, 0, 0);
 
 		try {
 			await updateTask({
