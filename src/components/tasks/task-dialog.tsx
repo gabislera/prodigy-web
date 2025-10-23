@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarX } from "lucide-react";
+import { CalendarX, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
 	Dialog,
 	DialogContent,
@@ -22,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTasks } from "@/hooks/use-tasks";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { DateSelector } from "./date-selector";
@@ -64,7 +67,9 @@ export const TaskDialog = ({
 	const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
 	const [showGroupSelector, setShowGroupSelector] = useState(false);
 	const [isMoveToGroupDialogOpen, setIsMoveToGroupDialogOpen] = useState(false);
+	const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
+	const { deleteTask } = useTasks();
 
 	const taskHasNoGroup = useMemo(() => {
 		return task && !task.columnId;
@@ -205,6 +210,18 @@ export const TaskDialog = ({
 	const taskIsScheduled = useMemo(() => {
 		return task && (task.startDate || task.endDate);
 	}, [task]);
+
+	const handleDeleteConfirm = async () => {
+		if (!task) return;
+
+		try {
+			await deleteTask(task.id);
+			toast.success("Tarefa excluída com sucesso!");
+			onOpenChange(false);
+		} catch (error) {
+			console.error("Erro ao excluir tarefa:", error);
+		}
+	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleCancel}>
@@ -387,6 +404,17 @@ export const TaskDialog = ({
 
 					<DialogFooter className="flex items-center justify-between">
 						<div className="flex gap-2">
+							{isEditMode && (
+								<Button
+									type="button"
+									variant="destructive"
+									onClick={() => setIsDeleteAlertOpen(true)}
+									className="gap-2"
+								>
+									<Trash2 className="h-4 w-4" />
+									Excluir
+								</Button>
+							)}
 							{taskHasNoGroup &&
 								showGroupSelector &&
 								visibleGroups.length > 0 && (
@@ -445,6 +473,17 @@ export const TaskDialog = ({
 					setShowGroupSelector(false);
 					setIsMoveToGroupDialogOpen(false);
 				}}
+			/>
+
+			<ConfirmDialog
+				open={isDeleteAlertOpen}
+				onOpenChange={setIsDeleteAlertOpen}
+				title="Excluir tarefa?"
+				description="Esta ação não pode ser desfeita. A tarefa será excluída permanentemente."
+				confirmLabel="Excluir"
+				cancelLabel="Cancelar"
+				onConfirm={handleDeleteConfirm}
+				variant="destructive"
 			/>
 		</Dialog>
 	);
