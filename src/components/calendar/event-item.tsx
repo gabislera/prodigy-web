@@ -4,13 +4,13 @@ import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { differenceInMinutes, format, getMinutes, isPast } from "date-fns";
 import { useMemo } from "react";
+import { dateFnsLocale } from "@/lib/date-fns-locale";
+import { cn } from "@/lib/utils";
 import {
 	type CalendarEvent,
 	getBorderRadiusClasses,
 	getEventColorClasses,
-} from "@/components/event-calendar";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
-import { cn } from "@/lib/utils";
+} from ".";
 
 // Using date-fns format with custom formatting:
 // 'h' - hours (1-12)

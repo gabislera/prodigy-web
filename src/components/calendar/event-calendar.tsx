@@ -21,6 +21,15 @@ import {
 	PlusIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { dateFnsLocale } from "@/lib/date-fns-locale";
+import { cn } from "@/lib/utils";
 import {
 	AgendaDaysToShow,
 	AgendaView,
@@ -33,16 +42,7 @@ import {
 	MonthView,
 	WeekCellsHeight,
 	WeekView,
-} from "@/components/event-calendar";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
-import { cn } from "@/lib/utils";
+} from ".";
 
 export interface EventCalendarProps {
 	events?: CalendarEvent[];

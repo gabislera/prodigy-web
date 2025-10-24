@@ -3,11 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { differenceInDays } from "date-fns";
 import { useRef, useState } from "react";
 
-import {
-	type CalendarEvent,
-	EventItem,
-	useCalendarDnd,
-} from "@/components/event-calendar";
+import { type CalendarEvent, EventItem, useCalendarDnd } from ".";
 
 interface DraggableEventProps {
 	event: CalendarEvent;

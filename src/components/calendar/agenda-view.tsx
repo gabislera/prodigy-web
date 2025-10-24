@@ -3,13 +3,13 @@
 import { RiCalendarEventLine } from "@remixicon/react";
 import { addDays, format, isToday } from "date-fns";
 import { useMemo } from "react";
+import { dateFnsLocale } from "@/lib/date-fns-locale";
 import {
 	AgendaDaysToShow,
 	type CalendarEvent,
 	EventItem,
 	getAgendaEventsForDay,
-} from "@/components/event-calendar";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
+} from ".";
 
 interface AgendaViewProps {
 	currentDate: Date;

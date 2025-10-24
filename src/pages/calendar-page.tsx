@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { TasksSidebar } from "@/components/calendar";
-import type { CalendarEvent } from "@/components/event-calendar";
-import { EventCalendar } from "@/components/event-calendar";
+import {
+	type CalendarEvent,
+	EventCalendar,
+	TasksSidebar,
+} from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useAllTasks, useTasks } from "@/hooks/use-tasks";

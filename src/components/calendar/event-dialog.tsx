@@ -1,13 +1,13 @@
 import { RiCalendarLine, RiDeleteBinLine } from "@remixicon/react";
 import { format, isBefore } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import type { CalendarEvent, EventColor } from "@/components/event-calendar";
+import type { CalendarEvent, EventColor } from ".";
 import {
 	DefaultEndHour,
 	DefaultStartHour,
 	EndHour,
 	StartHour,
-} from "@/components/event-calendar/constants";
+} from "./constants";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";

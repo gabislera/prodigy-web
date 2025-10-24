@@ -24,8 +24,8 @@ import {
 	isMultiDayEvent,
 	useCurrentTimeIndicator,
 	WeekCellsHeight,
-} from "@/components/event-calendar";
-import { EndHour, StartHour } from "@/components/event-calendar/constants";
+} from ".";
+import { EndHour, StartHour } from "./constants";
 import { dateFnsLocale } from "@/lib/date-fns-locale";
 import { cn } from "@/lib/utils";
 

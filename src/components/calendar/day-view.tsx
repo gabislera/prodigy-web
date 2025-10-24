@@ -21,8 +21,8 @@ import {
 	isMultiDayEvent,
 	useCurrentTimeIndicator,
 	WeekCellsHeight,
-} from "@/components/event-calendar";
-import { EndHour, StartHour } from "@/components/event-calendar/constants";
+} from ".";
+import { EndHour, StartHour } from "./constants";
 import { cn } from "@/lib/utils";
 
 interface DayViewProps {
