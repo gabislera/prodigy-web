@@ -26,6 +26,10 @@ import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
+import {
+	combineDateAndTime,
+	formatTimeFromDate,
+} from "@/utils/date-helpers";
 import { DateSelector } from "./date-selector";
 import { MoveToGroupDialog } from "./move-to-group-dialog";
 
@@ -61,7 +65,6 @@ export const TaskDialog = ({
 	initialEndDate,
 	onSave,
 }: TaskDialogProps) => {
-	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 	const [startTime, setStartTime] = useState<string>("");
 	const [endTime, setEndTime] = useState<string>("");
 	const [showGroupSelector, setShowGroupSelector] = useState(false);
@@ -112,47 +115,20 @@ export const TaskDialog = ({
 		// Set date and times from task or initial dates
 		if (task.startDate) {
 			const startDate = new Date(task.startDate);
-			setSelectedDate(startDate);
 			setValue("startDate", startDate);
-
-			// Extract start time
-			const startHours = startDate.getHours().toString().padStart(2, "0");
-			const startMinutes = startDate.getMinutes().toString().padStart(2, "0");
-			setStartTime(`${startHours}:${startMinutes}`);
+			setStartTime(formatTimeFromDate(startDate));
 		} else if (initialStartDate) {
-			// Use initial date if task doesn't have a date
-			setSelectedDate(initialStartDate);
 			setValue("startDate", initialStartDate);
-
-			const startHours = initialStartDate
-				.getHours()
-				.toString()
-				.padStart(2, "0");
-			const startMinutes = initialStartDate
-				.getMinutes()
-				.toString()
-				.padStart(2, "0");
-			setStartTime(`${startHours}:${startMinutes}`);
+			setStartTime(formatTimeFromDate(initialStartDate));
 		}
 
 		if (task.endDate) {
 			const endDate = new Date(task.endDate);
 			setValue("endDate", endDate);
-
-			// Extract end time
-			const endHours = endDate.getHours().toString().padStart(2, "0");
-			const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
-			setEndTime(`${endHours}:${endMinutes}`);
+			setEndTime(formatTimeFromDate(endDate));
 		} else if (initialEndDate) {
-			// Use initial end date if task doesn't have an end date
 			setValue("endDate", initialEndDate);
-
-			const endHours = initialEndDate.getHours().toString().padStart(2, "0");
-			const endMinutes = initialEndDate
-				.getMinutes()
-				.toString()
-				.padStart(2, "0");
-			setEndTime(`${endHours}:${endMinutes}`);
+			setEndTime(formatTimeFromDate(initialEndDate));
 		}
 
 		setShowGroupSelector(!task.columnId);
@@ -297,34 +273,19 @@ export const TaskDialog = ({
 							<div className="space-y-2">
 								<Label htmlFor="task-date">Data</Label>
 								<DateSelector
-									selectedDate={selectedDate}
-									initialDate={selectedDate}
+									selectedDate={watch("startDate")}
+									initialDate={watch("startDate")}
 									initialStartTime={startTime}
 									initialEndTime={endTime}
 									onSelectDate={(date, start, end) => {
 										if (date) {
-											setSelectedDate(date);
 											setStartTime(start);
 											setEndTime(end);
-
-											// Combine date with start time
-											const [startHours, startMinutes] = start
-												.split(":")
-												.map(Number);
-											const startDateTime = new Date(date);
-											startDateTime.setHours(startHours, startMinutes, 0, 0);
-
-											// Combine date with end time
-											const [endHours, endMinutes] = end.split(":").map(Number);
-											const endDateTime = new Date(date);
-											endDateTime.setHours(endHours, endMinutes, 0, 0);
-
-											setValue("startDate", startDateTime);
-											setValue("endDate", endDateTime);
+											setValue("startDate", combineDateAndTime(date, start));
+											setValue("endDate", combineDateAndTime(date, end));
 										}
 									}}
 									onClearDate={() => {
-										setSelectedDate(null);
 										setValue("startDate", null);
 										setValue("endDate", null);
 									}}
@@ -333,11 +294,10 @@ export const TaskDialog = ({
 										variant="outline"
 										className="w-full justify-start pr-8"
 									>
-										{selectedDate
-											? `${selectedDate.toLocaleDateString("pt-BR", {
+										{watch("startDate")
+											? `${watch("startDate")?.toLocaleDateString("pt-BR", {
 													day: "2-digit",
 													month: "2-digit",
-													// year: "2-digit",
 												})} • ${startTime} - ${endTime}`
 											: "Definir Data"}
 									</Button>

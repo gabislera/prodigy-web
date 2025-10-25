@@ -1,6 +1,10 @@
 import { ptBR } from "date-fns/locale";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+	formatTimeFromDate,
+	getDefaultTimes,
+} from "@/utils/date-helpers";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
@@ -20,23 +24,6 @@ interface DateSelectorProps {
 	selectedDate?: Date | null;
 	onClearDate?: () => void;
 }
-
-// Helper to format date to time string (HH:mm)
-const formatTimeFromDate = (date: Date): string => {
-	const hours = date.getHours().toString().padStart(2, "0");
-	const minutes = date.getMinutes().toString().padStart(2, "0");
-	return `${hours}:${minutes}`;
-};
-
-// Helper to get default times
-const getDefaultTimes = () => {
-	const now = new Date();
-	const later = new Date(now.getTime() + 30 * 60000); // +30 minutes
-	return {
-		start: formatTimeFromDate(now),
-		end: formatTimeFromDate(later),
-	};
-};
 
 export const DateSelector = ({
 	children,
