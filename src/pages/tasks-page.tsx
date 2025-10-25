@@ -21,7 +21,6 @@ import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 export function TasksPage() {
 	const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 	const [activeId, setActiveId] = useState<string | null>(null);
-	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
@@ -134,50 +133,9 @@ export function TasksPage() {
 		endDate?: string | null;
 	}) => {
 		if (selectedTask) {
-			// Modo de edição
 			await handleUpdateTask(selectedTask.id, taskData);
-			setIsDetailDialogOpen(false);
-		} else {
-			// Modo de criação - usar columnId selecionada pelo usuário
-			if (taskData.columnId) {
-				try {
-					const createData: {
-						title: string;
-						description: string;
-						priority: "high" | "medium" | "low";
-						columnId: string;
-						position: number;
-						completed: boolean;
-						startDate?: string | null;
-						endDate?: string | null;
-						allDay?: boolean;
-						status?: string;
-					} = {
-						title: taskData.title,
-						description: taskData.description,
-						priority: taskData.priority as "high" | "medium" | "low",
-						columnId: taskData.columnId,
-						position: 0,
-						completed: taskData.completed,
-						startDate: taskData.startDate,
-						endDate: taskData.endDate,
-						allDay: false,
-						status: "pending",
-					};
-
-					await createTask(createData);
-
-					toast.success("Tarefa criada com sucesso!");
-					setIsCreateDialogOpen(false);
-				} catch (error) {
-					console.error("Erro ao criar tarefa:", error);
-					toast.error("Erro ao criar tarefa. Tente novamente.");
-				}
-			} else {
-				console.error("Coluna é obrigatória para criar a tarefa");
-				toast.error("Selecione uma coluna para criar a tarefa.");
-			}
 		}
+		setIsDetailDialogOpen(false);
 	};
 
 	const handleUpdateTask = async (
@@ -513,9 +471,9 @@ export function TasksPage() {
 			const column = taskColumns.find((col) => col.id === columnId);
 			const nextPosition = column?.tasks.length || 0;
 
-			await createTask({
+			const newTask = await createTask({
 				title: "Nova Tarefa",
-				description: "Clique aqui para editar",
+				description: "",
 				priority: "low",
 				columnId,
 				position: nextPosition,
@@ -526,7 +484,8 @@ export function TasksPage() {
 				status: "pending",
 			});
 
-			toast.success("Tarefa criada com sucesso!");
+			setSelectedTask(newTask);
+			setIsDetailDialogOpen(true);
 		} catch (error) {
 			console.error("Erro ao criar tarefa:", error);
 			toast.error("Erro ao criar tarefa. Tente novamente.");
@@ -622,19 +581,14 @@ export function TasksPage() {
 				</div>
 
 				{/* Dialogs */}
-				<TaskDialog
-					isOpen={isCreateDialogOpen}
-					onOpenChange={setIsCreateDialogOpen}
-					columns={taskColumns}
-					onSave={handleSaveTask}
-				/>
-
-				<TaskDialog
-					isOpen={isDetailDialogOpen}
-					onOpenChange={setIsDetailDialogOpen}
-					task={selectedTask}
-					onSave={handleSaveTask}
-				/>
+				{selectedTask && (
+					<TaskDialog
+						isOpen={isDetailDialogOpen}
+						onOpenChange={setIsDetailDialogOpen}
+						task={selectedTask}
+						onSave={handleSaveTask}
+					/>
+				)}
 
 				<SettingsDialog
 					isOpen={isSettingsDialogOpen}
@@ -708,12 +662,6 @@ export function TasksPage() {
 					}
 				}}
 				editingGroup={editingGroup}
-			/>
-
-			<TaskDialog
-				isOpen={isCreateDialogOpen}
-				onOpenChange={setIsCreateDialogOpen}
-				onSave={handleSaveTask}
 			/>
 		</div>
 	);

@@ -8,7 +8,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -33,7 +32,7 @@ import { MoveToGroupDialog } from "./move-to-group-dialog";
 interface TaskDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	task?: Task | null;
+	task: Task;
 	columnId?: string;
 	columns?: TaskColumn[];
 	type?: "task" | "event";
@@ -62,9 +61,9 @@ export const TaskDialog = ({
 	initialEndDate,
 	onSave,
 }: TaskDialogProps) => {
-	const isEditMode = !!task;
-	const [hasDate, setHasDate] = useState(false);
-	const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
+	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const [startTime, setStartTime] = useState<string>("");
+	const [endTime, setEndTime] = useState<string>("");
 	const [showGroupSelector, setShowGroupSelector] = useState(false);
 	const [isMoveToGroupDialogOpen, setIsMoveToGroupDialogOpen] = useState(false);
 	const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
@@ -102,67 +101,62 @@ export const TaskDialog = ({
 	});
 
 	useEffect(() => {
-		if (task) {
-			setValue("title", task.title);
-			setValue("description", task.description);
-			setValue("priority", task.priority);
-			setValue("completed", task.completed);
-			if (task.columnId) {
-				setValue("columnId", task.columnId);
-			}
-
-			const hasDates = !!(task.startDate || task.endDate);
-			setHasDate(hasDates);
-
-			if (task.startDate) {
-				setValue("startDate", new Date(task.startDate));
-			}
-			if (task.endDate) {
-				setValue("endDate", new Date(task.endDate));
-				setSelectedEndDate(new Date(task.endDate));
-			}
-
-			setShowGroupSelector(!task.columnId);
-		} else {
-			const defaultColumnId =
-				type === "event"
-					? undefined
-					: columnId || (columns && columns.length > 0 ? columns[0].id : "");
-
-			const hasInitialDates = !!(initialStartDate || initialEndDate);
-			setHasDate(hasInitialDates);
-
-			reset({
-				title: "",
-				description: "",
-				priority: "low",
-				columnId: defaultColumnId,
-				completed: false,
-				allDay: false,
-			});
-
-			if (initialStartDate) {
-				setValue("startDate", initialStartDate);
-			}
-			if (initialEndDate) {
-				setValue("endDate", initialEndDate);
-				setSelectedEndDate(initialEndDate);
-			} else {
-				setSelectedEndDate(null);
-			}
-
-			setShowGroupSelector(false);
+		setValue("title", task.title);
+		setValue("description", task.description);
+		setValue("priority", task.priority);
+		setValue("completed", task.completed);
+		if (task.columnId) {
+			setValue("columnId", task.columnId);
 		}
-	}, [
-		task,
-		columnId,
-		columns,
-		initialStartDate,
-		initialEndDate,
-		setValue,
-		reset,
-		type,
-	]);
+
+		// Set date and times from task or initial dates
+		if (task.startDate) {
+			const startDate = new Date(task.startDate);
+			setSelectedDate(startDate);
+			setValue("startDate", startDate);
+
+			// Extract start time
+			const startHours = startDate.getHours().toString().padStart(2, "0");
+			const startMinutes = startDate.getMinutes().toString().padStart(2, "0");
+			setStartTime(`${startHours}:${startMinutes}`);
+		} else if (initialStartDate) {
+			// Use initial date if task doesn't have a date
+			setSelectedDate(initialStartDate);
+			setValue("startDate", initialStartDate);
+
+			const startHours = initialStartDate
+				.getHours()
+				.toString()
+				.padStart(2, "0");
+			const startMinutes = initialStartDate
+				.getMinutes()
+				.toString()
+				.padStart(2, "0");
+			setStartTime(`${startHours}:${startMinutes}`);
+		}
+
+		if (task.endDate) {
+			const endDate = new Date(task.endDate);
+			setValue("endDate", endDate);
+
+			// Extract end time
+			const endHours = endDate.getHours().toString().padStart(2, "0");
+			const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
+			setEndTime(`${endHours}:${endMinutes}`);
+		} else if (initialEndDate) {
+			// Use initial end date if task doesn't have an end date
+			setValue("endDate", initialEndDate);
+
+			const endHours = initialEndDate.getHours().toString().padStart(2, "0");
+			const endMinutes = initialEndDate
+				.getMinutes()
+				.toString()
+				.padStart(2, "0");
+			setEndTime(`${endHours}:${endMinutes}`);
+		}
+
+		setShowGroupSelector(!task.columnId);
+	}, [task, setValue, initialStartDate, initialEndDate]);
 
 	const onSubmit = (data: {
 		title: string;
@@ -185,8 +179,6 @@ export const TaskDialog = ({
 	};
 
 	const handleRemoveFromCalendar = () => {
-		if (!task) return;
-
 		const formattedData = {
 			title: watch("title"),
 			description: watch("description") || "",
@@ -208,12 +200,10 @@ export const TaskDialog = ({
 	};
 
 	const taskIsScheduled = useMemo(() => {
-		return task && (task.startDate || task.endDate);
+		return !!(task.startDate || task.endDate);
 	}, [task]);
 
 	const handleDeleteConfirm = async () => {
-		if (!task) return;
-
 		try {
 			await deleteTask(task.id);
 			toast.success("Tarefa excluída com sucesso!");
@@ -225,41 +215,29 @@ export const TaskDialog = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleCancel}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>
-						{isEditMode ? "Editar Tarefa" : "Nova Tarefa"}
-					</DialogTitle>
-					{!isEditMode && (
-						<DialogDescription>
-							Adicione uma nova tarefa à sua lista.
-						</DialogDescription>
-					)}
-				</DialogHeader>
-
-				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-					<div className="flex items-start flex-col gap-4 w-full">
-						<div className="space-y-2 w-full">
-							<Label htmlFor="task-title">Título</Label>
+			<DialogContent className="p-0">
+				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+					<DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+						<DialogTitle>
 							<Input
 								id="task-title"
 								placeholder="Digite o título da tarefa"
 								{...register("title")}
-								className="font-medium focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+								className="p-1 !bg-transparent border-none !text-2xl !font-semibold"
 							/>
 							{errors.title && (
 								<p className="text-sm text-red-500">{errors.title.message}</p>
 							)}
-						</div>
-
+						</DialogTitle>
+					</DialogHeader>
+					<div className="flex items-start flex-col gap-4 w-full px-6">
 						<div className="space-y-2 w-full">
-							<Label htmlFor="task-description">Descrição</Label>
+							{/* <Label htmlFor="task-description ">Descrição</Label> */}
 							<Textarea
 								id="task-description"
 								placeholder="Descreva os detalhes da tarefa"
 								{...register("description")}
-								rows={isEditMode ? 6 : 4}
-								className="resize-none focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+								className="resize-none min-h-[200px] max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
 							/>
 							{errors.description && (
 								<p className="text-sm text-red-500">
@@ -268,8 +246,8 @@ export const TaskDialog = ({
 							)}
 						</div>
 
-						<div className="flex items-center gap-4">
-							<div className="space-y-2 ">
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+							<div className="space-y-2">
 								<Label htmlFor="task-priority">Prioridade</Label>
 								<Select
 									value={watch("priority")}
@@ -277,10 +255,7 @@ export const TaskDialog = ({
 										setValue("priority", value as "low" | "medium" | "high")
 									}
 								>
-									<SelectTrigger
-										id="task-priority"
-										className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-									>
+									<SelectTrigger id="task-priority" className="w-full">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
@@ -304,10 +279,7 @@ export const TaskDialog = ({
 										setValue("completed", value === "completed")
 									}
 								>
-									<SelectTrigger
-										id="task-status"
-										className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-									>
+									<SelectTrigger id="task-status" className="w-full">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
@@ -322,49 +294,56 @@ export const TaskDialog = ({
 								)}
 							</div>
 
-							<div className="space-y-2 mb-2">
+							<div className="space-y-2">
 								<Label htmlFor="task-date">Data</Label>
 								<DateSelector
-									hasDate={hasDate}
-									onDateToggle={setHasDate}
-									onSelectRange={(range) => {
-										if (hasDate && range) {
-											setValue("startDate", range.from ?? null);
-											setValue("endDate", range.to ?? null);
-											setSelectedEndDate(range.to ?? null);
-										} else {
-											setValue("startDate", null);
-											setValue("endDate", null);
-											setSelectedEndDate(null);
+									selectedDate={selectedDate}
+									initialDate={selectedDate}
+									initialStartTime={startTime}
+									initialEndTime={endTime}
+									onSelectDate={(date, start, end) => {
+										if (date) {
+											setSelectedDate(date);
+											setStartTime(start);
+											setEndTime(end);
+
+											// Combine date with start time
+											const [startHours, startMinutes] = start
+												.split(":")
+												.map(Number);
+											const startDateTime = new Date(date);
+											startDateTime.setHours(startHours, startMinutes, 0, 0);
+
+											// Combine date with end time
+											const [endHours, endMinutes] = end.split(":").map(Number);
+											const endDateTime = new Date(date);
+											endDateTime.setHours(endHours, endMinutes, 0, 0);
+
+											setValue("startDate", startDateTime);
+											setValue("endDate", endDateTime);
 										}
 									}}
-									initialRange={
-										task?.startDate && task?.endDate
-											? {
-													from: new Date(task.startDate),
-													to: new Date(task.endDate),
-												}
-											: initialStartDate && initialEndDate
-												? {
-														from: initialStartDate,
-														to: initialEndDate,
-													}
-												: undefined
-									}
-									selectedEndDate={selectedEndDate}
+									onClearDate={() => {
+										setSelectedDate(null);
+										setValue("startDate", null);
+										setValue("endDate", null);
+									}}
 								>
-									<Button variant="outline" className="">
-										{hasDate && selectedEndDate
-											? selectedEndDate.toLocaleDateString("pt-BR", {
+									<Button
+										variant="outline"
+										className="w-full justify-start pr-8"
+									>
+										{selectedDate
+											? `${selectedDate.toLocaleDateString("pt-BR", {
 													day: "2-digit",
 													month: "2-digit",
-													year: "2-digit",
-												})
+													// year: "2-digit",
+												})} • ${startTime} - ${endTime}`
 											: "Definir Data"}
 									</Button>
 								</DateSelector>
 								{errors.startDate && (
-									<p className="text-sm text-red-500">
+									<p className="text-xs text-red-500">
 										{errors.startDate.message}
 									</p>
 								)}
@@ -378,10 +357,7 @@ export const TaskDialog = ({
 										value={watch("columnId") || undefined}
 										onValueChange={(value) => setValue("columnId", value)}
 									>
-										<SelectTrigger
-											id="task-column"
-											className="focus:outline-none focus:ring-0 focus:ring-offset-0 focus:border-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-										>
+										<SelectTrigger id="task-column">
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent>
@@ -402,19 +378,17 @@ export const TaskDialog = ({
 						</div>
 					</div>
 
-					<DialogFooter className="flex items-center justify-between">
-						<div className="flex gap-2">
-							{isEditMode && (
-								<Button
-									type="button"
-									variant="destructive"
-									onClick={() => setIsDeleteAlertOpen(true)}
-									className="gap-2"
-								>
-									<Trash2 className="h-4 w-4" />
-									Excluir
-								</Button>
-							)}
+					<DialogFooter className="flex items-center justify-between p-6 border-t border-border">
+						<div className="flex gap-2 w-full">
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={() => setIsDeleteAlertOpen(true)}
+								size="icon"
+								title="Excluir"
+							>
+								<Trash2 className="h-4 w-4" />
+							</Button>
 							{taskHasNoGroup &&
 								showGroupSelector &&
 								visibleGroups.length > 0 && (
@@ -429,12 +403,12 @@ export const TaskDialog = ({
 							{taskIsScheduled && (
 								<Button
 									type="button"
-									variant="outline"
+									variant="ghost"
 									onClick={handleRemoveFromCalendar}
-									className="gap-2"
+									size="icon"
+									title="Remover do Calendário"
 								>
 									<CalendarX className="h-4 w-4" />
-									Remover do Calendário
 								</Button>
 							)}
 						</div>
@@ -445,19 +419,9 @@ export const TaskDialog = ({
 							<Button
 								type="submit"
 								disabled={isSubmitting}
-								className={
-									isEditMode
-										? "bg-gradient-primary border-0 cursor-pointer"
-										: "cursor-pointer"
-								}
+								className="bg-gradient-primary border-0 cursor-pointer"
 							>
-								{isSubmitting
-									? isEditMode
-										? "Salvando..."
-										: "Criando..."
-									: isEditMode
-										? "Salvar"
-										: "Criar Tarefa"}
+								{isSubmitting ? "Salvando..." : "Salvar"}
 							</Button>
 						</div>
 					</DialogFooter>

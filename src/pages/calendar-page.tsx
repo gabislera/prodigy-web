@@ -20,6 +20,10 @@ const taskToCalendarEvent = (task: Task): CalendarEvent => {
 		low: "emerald",
 	};
 
+	if (!task) {
+		throw new Error("Task is null or undefined");
+	}
+
 	return {
 		id: task.id,
 		title: task.title,
@@ -69,16 +73,18 @@ export function CalendarPage() {
 		const tasksFromGroups =
 			taskGroupsWithDetails?.flatMap((group) =>
 				group.columns.flatMap((column) =>
-					column.tasks.map((task) => ({
-						...task,
-						groupId: group.id,
-						groupName: group.name,
-					})),
+					column.tasks
+						.filter((task) => task != null)
+						.map((task) => ({
+							...task,
+							groupId: group.id,
+							groupName: group.name,
+						})),
 				),
 			) || [];
 
 		const tasksWithoutGroup = allTasksFromApi
-			.filter((task: ApiTask) => !task.columnId)
+			.filter((task: ApiTask) => task != null && !task.columnId)
 			.map((task: ApiTask) => ({
 				...task,
 				groupId: null,
@@ -115,7 +121,7 @@ export function CalendarPage() {
 
 	// Convert tasks to calendar events
 	const calendarEvents = useMemo(
-		() => calendarTasks.map(taskToCalendarEvent),
+		() => calendarTasks.filter((task) => task != null).map(taskToCalendarEvent),
 		[calendarTasks],
 	);
 
@@ -292,16 +298,18 @@ export function CalendarPage() {
 				/>
 			</div>
 
-			<TaskDialog
-				isOpen={isTaskDialogOpen}
-				onOpenChange={setIsTaskDialogOpen}
-				task={selectedTask}
-				columns={allColumns}
-				initialStartDate={initialStartDate}
-				initialEndDate={initialEndDate}
-				onSave={handleTaskSave}
-				type="event"
-			/>
+			{selectedTask && (
+				<TaskDialog
+					isOpen={isTaskDialogOpen}
+					onOpenChange={setIsTaskDialogOpen}
+					task={selectedTask}
+					columns={allColumns}
+					initialStartDate={initialStartDate}
+					initialEndDate={initialEndDate}
+					onSave={handleTaskSave}
+					type="event"
+				/>
+			)}
 		</div>
 	);
 }
