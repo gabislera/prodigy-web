@@ -80,8 +80,8 @@ export function WeekView({
 				return event.allDay || isMultiDayEvent(event);
 			})
 			.filter((event) => {
-				const eventStart = new Date(event.start);
-				const eventEnd = new Date(event.end);
+				const eventStart = new Date(event.startDate);
+				const eventEnd = new Date(event.endDate);
 				return days.some(
 					(day) =>
 						isSameDay(day, eventStart) ||
@@ -99,8 +99,8 @@ export function WeekView({
 				// Skip all-day events and multi-day events
 				if (event.allDay || isMultiDayEvent(event)) return false;
 
-				const eventStart = new Date(event.start);
-				const eventEnd = new Date(event.end);
+				const eventStart = new Date(event.startDate);
+				const eventEnd = new Date(event.endDate);
 
 				// Check if event is on this day
 				return (
@@ -112,10 +112,10 @@ export function WeekView({
 
 			// Sort events by start time and duration
 			const sortedEvents = [...dayEvents].sort((a, b) => {
-				const aStart = new Date(a.start);
-				const bStart = new Date(b.start);
-				const aEnd = new Date(a.end);
-				const bEnd = new Date(b.end);
+				const aStart = new Date(a.startDate);
+				const bStart = new Date(b.startDate);
+				const aEnd = new Date(a.endDate);
+				const bEnd = new Date(b.endDate);
 
 				// First sort by start time
 				if (aStart < bStart) return -1;
@@ -135,8 +135,8 @@ export function WeekView({
 			const columns: { event: CalendarEvent; end: Date }[][] = [];
 
 			sortedEvents.forEach((event) => {
-				const eventStart = new Date(event.start);
-				const eventEnd = new Date(event.end);
+				const eventStart = new Date(event.startDate);
+				const eventEnd = new Date(event.endDate);
 
 				// Adjust start and end times if they're outside this day
 				const adjustedStart = isSameDay(day, eventStart)
@@ -169,8 +169,8 @@ export function WeekView({
 							areIntervalsOverlapping(
 								{ start: adjustedStart, end: adjustedEnd },
 								{
-									start: new Date(c.event.start),
-									end: new Date(c.event.end),
+									start: new Date(c.event.startDate),
+									end: new Date(c.event.endDate),
 								},
 							),
 						);
@@ -251,8 +251,8 @@ export function WeekView({
 						</div>
 						{days.map((day, dayIndex) => {
 							const dayAllDayEvents = allDayEvents.filter((event) => {
-								const eventStart = new Date(event.start);
-								const eventEnd = new Date(event.end);
+								const eventStart = new Date(event.startDate);
+								const eventEnd = new Date(event.endDate);
 								return (
 									isSameDay(day, eventStart) ||
 									(day > eventStart && day < eventEnd) ||
@@ -267,8 +267,8 @@ export function WeekView({
 									data-today={isToday(day) || undefined}
 								>
 									{dayAllDayEvents.map((event) => {
-										const eventStart = new Date(event.start);
-										const eventEnd = new Date(event.end);
+										const eventStart = new Date(event.startDate);
+										const eventEnd = new Date(event.endDate);
 										const isFirstDay = isSameDay(day, eventStart);
 										const isLastDay = isSameDay(day, eventEnd);
 

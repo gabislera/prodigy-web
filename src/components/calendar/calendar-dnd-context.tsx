@@ -150,7 +150,7 @@ export function CalendarDndProvider({
 		setActiveEvent(calendarEvent);
 		setActiveId(active.id);
 		setActiveView(view);
-		setCurrentTime(new Date(calendarEvent.start));
+		setCurrentTime(new Date(calendarEvent.startDate));
 		setIsMultiDay(eventIsMultiDay || false);
 		setMultiDayWidth(eventMultiDayWidth || null);
 		setDragHandlePosition(eventDragHandlePosition || null);
@@ -286,8 +286,8 @@ export function CalendarDndProvider({
 			}
 
 			// Calculate new end time based on the original duration
-			const originalStart = new Date(calendarEvent.start);
-			const originalEnd = new Date(calendarEvent.end);
+			const originalStart = new Date(calendarEvent.startDate);
+			const originalEnd = new Date(calendarEvent.endDate);
 			const durationMinutes = differenceInMinutes(originalEnd, originalStart);
 			const newEnd = addMinutes(newStart, durationMinutes);
 
@@ -303,8 +303,8 @@ export function CalendarDndProvider({
 				// Update the event only if the time has changed
 				onEventUpdate({
 					...calendarEvent,
-					start: newStart,
-					end: newEnd,
+					startDate: newStart.toISOString(),
+					endDate: newEnd.toISOString(),
 				});
 			}
 		} catch (error) {

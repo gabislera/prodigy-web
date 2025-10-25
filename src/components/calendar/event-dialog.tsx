@@ -1,7 +1,7 @@
 import { RiCalendarLine, RiDeleteBinLine } from "@remixicon/react";
 import { format, isBefore } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import type { CalendarEvent, EventColor } from ".";
+import type { CalendarEvent } from ".";
 import {
 	DefaultEndHour,
 	DefaultStartHour,
@@ -26,7 +26,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
 	Select,
 	SelectContent,
@@ -59,8 +58,6 @@ export function EventDialog({
 	const [startTime, setStartTime] = useState(`${DefaultStartHour}:00`);
 	const [endTime, setEndTime] = useState(`${DefaultEndHour}:00`);
 	const [allDay, setAllDay] = useState(false);
-	const [location, setLocation] = useState("");
-	const [color, setColor] = useState<EventColor>("sky");
 	const [error, setError] = useState<string | null>(null);
 	const [startDateOpen, setStartDateOpen] = useState(false);
 	const [endDateOpen, setEndDateOpen] = useState(false);
@@ -76,16 +73,14 @@ export function EventDialog({
 			setTitle(event.title || "");
 			setDescription(event.description || "");
 
-			const start = new Date(event.start);
-			const end = new Date(event.end);
+			const start = new Date(event.startDate);
+			const end = new Date(event.endDate);
 
 			setStartDate(start);
 			setEndDate(end);
 			setStartTime(formatTimeForInput(start));
 			setEndTime(formatTimeForInput(end));
 			setAllDay(event.allDay || false);
-			setLocation(event.location || "");
-			setColor((event.color as EventColor) || "sky");
 			setError(null); // Reset error when opening dialog
 		} else {
 			resetForm();
@@ -100,8 +95,6 @@ export function EventDialog({
 		setStartTime(`${DefaultStartHour}:00`);
 		setEndTime(`${DefaultEndHour}:00`);
 		setAllDay(false);
-		setLocation("");
-		setColor("sky");
 		setError(null);
 	};
 
@@ -167,15 +160,22 @@ export function EventDialog({
 		const eventTitle = title.trim() ? title : "(no title)";
 
 		onSave({
+			...event,
 			id: event?.id || "",
 			title: eventTitle,
 			description,
-			start,
-			end,
+			startDate: start.toISOString(),
+			endDate: end.toISOString(),
 			allDay,
-			location,
-			color,
-		});
+			priority: event?.priority || "medium",
+			columnId: event?.columnId || null,
+			position: event?.position || 0,
+			completed: event?.completed || false,
+			status: event?.status || "pending",
+			type: event?.type || "event",
+			createdAt: event?.createdAt || new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		} as CalendarEvent);
 	};
 
 	const handleDelete = () => {
@@ -183,51 +183,6 @@ export function EventDialog({
 			onDelete(event.id);
 		}
 	};
-
-	// Updated color options to match types.ts
-	const colorOptions: Array<{
-		value: EventColor;
-		label: string;
-		bgClass: string;
-		borderClass: string;
-	}> = [
-		{
-			value: "sky",
-			label: "Sky",
-			bgClass: "bg-sky-400 data-[state=checked]:bg-sky-400",
-			borderClass: "border-sky-400 data-[state=checked]:border-sky-400",
-		},
-		{
-			value: "amber",
-			label: "Amber",
-			bgClass: "bg-amber-400 data-[state=checked]:bg-amber-400",
-			borderClass: "border-amber-400 data-[state=checked]:border-amber-400",
-		},
-		{
-			value: "violet",
-			label: "Violet",
-			bgClass: "bg-violet-400 data-[state=checked]:bg-violet-400",
-			borderClass: "border-violet-400 data-[state=checked]:border-violet-400",
-		},
-		{
-			value: "rose",
-			label: "Rose",
-			bgClass: "bg-rose-400 data-[state=checked]:bg-rose-400",
-			borderClass: "border-rose-400 data-[state=checked]:border-rose-400",
-		},
-		{
-			value: "emerald",
-			label: "Emerald",
-			bgClass: "bg-emerald-400 data-[state=checked]:bg-emerald-400",
-			borderClass: "border-emerald-400 data-[state=checked]:border-emerald-400",
-		},
-		{
-			value: "orange",
-			label: "Orange",
-			bgClass: "bg-orange-400 data-[state=checked]:bg-orange-400",
-			borderClass: "border-orange-400 data-[state=checked]:border-orange-400",
-		},
-	];
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -406,40 +361,6 @@ export function EventDialog({
 						/>
 						<Label htmlFor="all-day">All day</Label>
 					</div>
-
-					<div className="*:not-first:mt-1.5">
-						<Label htmlFor="location">Location</Label>
-						<Input
-							id="location"
-							value={location}
-							onChange={(e) => setLocation(e.target.value)}
-						/>
-					</div>
-					<fieldset className="space-y-4">
-						<legend className="text-sm leading-none font-medium text-foreground">
-							Etiquette
-						</legend>
-						<RadioGroup
-							className="flex gap-1.5"
-							defaultValue={colorOptions[0]?.value}
-							value={color}
-							onValueChange={(value: EventColor) => setColor(value)}
-						>
-							{colorOptions.map((colorOption) => (
-								<RadioGroupItem
-									key={colorOption.value}
-									id={`color-${colorOption.value}`}
-									value={colorOption.value}
-									aria-label={colorOption.label}
-									className={cn(
-										"size-6 shadow-none",
-										colorOption.bgClass,
-										colorOption.borderClass,
-									)}
-								/>
-							))}
-						</RadioGroup>
-					</fieldset>
 				</div>
 				<DialogFooter className="flex-row sm:justify-between">
 					{event?.id && (

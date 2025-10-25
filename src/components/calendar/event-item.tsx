@@ -2,7 +2,7 @@
 
 import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { differenceInMinutes, format, getMinutes, isPast } from "date-fns";
+import { differenceInMinutes, format, getMinutes } from "date-fns";
 import { useMemo } from "react";
 import { dateFnsLocale } from "@/lib/date-fns-locale";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,6 @@ interface EventWrapperProps {
 	onClick?: (e: React.MouseEvent) => void;
 	className?: string;
 	children: React.ReactNode;
-	currentTime?: Date;
 	dndListeners?: SyntheticListenerMap;
 	dndAttributes?: DraggableAttributes;
 	onMouseDown?: (e: React.MouseEvent) => void;
@@ -46,32 +45,32 @@ function EventWrapper({
 	onClick,
 	className,
 	children,
-	currentTime,
 	dndListeners,
 	dndAttributes,
 	onMouseDown,
 	onTouchStart,
 }: EventWrapperProps) {
-	// Always use the currentTime (if provided) to determine if the event is in the past
-	const displayEnd = currentTime
-		? new Date(
-				new Date(currentTime).getTime() +
-					(new Date(event.end).getTime() - new Date(event.start).getTime()),
-			)
-		: new Date(event.end);
+	// Check if the event is completed
+	const isEventCompleted = event.completed || false;
 
-	const isEventInPast = isPast(displayEnd);
+	// Map priority to color
+	const priorityColorMap: Record<CalendarEvent["priority"], "sky" | "amber" | "violet" | "rose" | "emerald" | "orange"> = {
+		high: "rose",
+		medium: "amber",
+		low: "emerald",
+	};
+	const eventColor = priorityColorMap[event.priority];
 
 	return (
 		<button
 			className={cn(
 				"flex size-full overflow-hidden px-1 text-left font-medium backdrop-blur-md transition outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2",
-				getEventColorClasses(event.color),
+				getEventColorClasses(eventColor),
 				getBorderRadiusClasses(isFirstDay, isLastDay),
 				className,
 			)}
 			data-dragging={isDragging || undefined}
-			data-past-event={isEventInPast || undefined}
+			data-past-event={isEventCompleted || undefined}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
 			onTouchStart={onTouchStart}
@@ -116,21 +115,28 @@ export function EventItem({
 	onMouseDown,
 	onTouchStart,
 }: EventItemProps) {
-	const eventColor = event.color;
+	// Map priority to color
+	const priorityColorMap: Record<CalendarEvent["priority"], "sky" | "amber" | "violet" | "rose" | "emerald" | "orange"> = {
+		high: "rose",
+		medium: "amber",
+		low: "emerald",
+	};
+	const eventColor = priorityColorMap[event.priority];
 
 	// Use the provided currentTime (for dragging) or the event's actual time
 	const displayStart = useMemo(() => {
-		return currentTime || new Date(event.start);
-	}, [currentTime, event.start]);
+		return currentTime || new Date(event.startDate);
+	}, [currentTime, event.startDate]);
 
 	const displayEnd = useMemo(() => {
-		return currentTime
-			? new Date(
-					new Date(currentTime).getTime() +
-						(new Date(event.end).getTime() - new Date(event.start).getTime()),
-				)
-			: new Date(event.end);
-	}, [currentTime, event.start, event.end]);
+		if (currentTime && event.startDate && event.endDate) {
+			return new Date(
+				new Date(currentTime).getTime() +
+					(new Date(event.endDate).getTime() - new Date(event.startDate).getTime()),
+			);
+		}
+		return new Date(event.endDate);
+	}, [currentTime, event.startDate, event.endDate]);
 
 	// Calculate event duration in minutes
 	const durationMinutes = useMemo(() => {
@@ -161,7 +167,6 @@ export function EventItem({
 					"mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[10px] sm:text-xs",
 					className,
 				)}
-				currentTime={currentTime}
 				dndListeners={dndListeners}
 				dndAttributes={dndAttributes}
 				onMouseDown={onMouseDown}
@@ -195,7 +200,6 @@ export function EventItem({
 					view === "week" ? "text-[10px] sm:text-xs" : "text-xs",
 					className,
 				)}
-				currentTime={currentTime}
 				dndListeners={dndListeners}
 				dndAttributes={dndAttributes}
 				onMouseDown={onMouseDown}
@@ -232,7 +236,7 @@ export function EventItem({
 				getEventColorClasses(eventColor),
 				className,
 			)}
-			data-past-event={isPast(new Date(event.end)) || undefined}
+			data-past-event={event.completed || undefined}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
 			onTouchStart={onTouchStart}
@@ -248,12 +252,6 @@ export function EventItem({
 						{formatTimeWithOptionalMinutes(displayStart)} -{" "}
 						{formatTimeWithOptionalMinutes(displayEnd)}
 					</span>
-				)}
-				{event.location && (
-					<>
-						<span className="px-1 opacity-35"> · </span>
-						<span>{event.location}</span>
-					</>
 				)}
 			</div>
 			{event.description && (

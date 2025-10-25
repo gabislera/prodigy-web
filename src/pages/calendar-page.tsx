@@ -13,26 +13,11 @@ import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
 
 // Helper functions to convert between Task and CalendarEvent
 const taskToCalendarEvent = (task: Task): CalendarEvent => {
-	// Map priority to color
-	const priorityColorMap: Record<Task["priority"], CalendarEvent["color"]> = {
-		high: "rose",
-		medium: "amber",
-		low: "emerald",
-	};
-
-	if (!task) {
-		throw new Error("Task is null or undefined");
+	if (!task || !task.startDate || !task.endDate) {
+		throw new Error("Task is null or undefined, or missing dates");
 	}
 
-	return {
-		id: task.id,
-		title: task.title,
-		description: task.description,
-		start: task.startDate ? new Date(task.startDate) : new Date(),
-		end: task.endDate ? new Date(task.endDate) : new Date(),
-		allDay: task.allDay || false,
-		color: priorityColorMap[task.priority],
-	};
+	return task as CalendarEvent;
 };
 
 export function CalendarPage() {
@@ -121,7 +106,9 @@ export function CalendarPage() {
 
 	// Convert tasks to calendar events
 	const calendarEvents = useMemo(
-		() => calendarTasks.filter((task) => task != null).map(taskToCalendarEvent),
+		() => calendarTasks
+			.filter((task) => task != null && task.startDate && task.endDate)
+			.map(taskToCalendarEvent),
 		[calendarTasks],
 	);
 
@@ -133,8 +120,8 @@ export function CalendarPage() {
 			await updateTask({
 				taskId: event.id,
 				data: {
-					startDate: event.start.toISOString(),
-					endDate: event.end.toISOString(),
+					startDate: event.startDate,
+					endDate: event.endDate,
 					allDay: event.allDay,
 				},
 			});

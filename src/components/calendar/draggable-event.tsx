@@ -38,8 +38,8 @@ export function DraggableEvent({
 	} | null>(null);
 
 	// Check if this is a multi-day event
-	const eventStart = new Date(event.start);
-	const eventEnd = new Date(event.end);
+	const eventStart = new Date(event.startDate);
+	const eventEnd = new Date(event.endDate);
 	const isMultiDayEvent =
 		isMultiDay || event.allDay || differenceInDays(eventEnd, eventStart) >= 1;
 

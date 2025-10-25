@@ -160,8 +160,8 @@ export function MonthView({
 											className="flex-1 overflow-hidden min-h-0"
 										>
 											{sortEvents(allDayEvents).map((event, index) => {
-												const eventStart = new Date(event.start);
-												const eventEnd = new Date(event.end);
+												const eventStart = new Date(event.startDate);
+												const eventEnd = new Date(event.endDate);
 												const isFirstDay = isSameDay(day, eventStart);
 												const isLastDay = isSameDay(day, eventEnd);
 
@@ -188,7 +188,7 @@ export function MonthView({
 																	{!event.allDay && (
 																		<span>
 																			{format(
-																				new Date(event.start),
+																				new Date(event.startDate),
 																				"h:mm",
 																			)}{" "}
 																		</span>
@@ -248,8 +248,8 @@ export function MonthView({
 															</div>
 															<div className="space-y-1">
 																{sortEvents(allEvents).map((event) => {
-																	const eventStart = new Date(event.start);
-																	const eventEnd = new Date(event.end);
+																	const eventStart = new Date(event.startDate);
+																	const eventEnd = new Date(event.endDate);
 																	const isFirstDay = isSameDay(day, eventStart);
 																	const isLastDay = isSameDay(day, eventEnd);
 

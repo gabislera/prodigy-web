@@ -1,14 +1,10 @@
+import type { Task } from "@/types/tasks"
+
 export type CalendarView = "month" | "week" | "day" | "agenda"
 
-export interface CalendarEvent {
-  id: string
-  title: string
-  description?: string
-  start: Date
-  end: Date
-  allDay?: boolean
-  color?: EventColor
-  location?: string
+export type CalendarEvent = Task & {
+  startDate: string
+  endDate: string
 }
 
 export type EventColor =
