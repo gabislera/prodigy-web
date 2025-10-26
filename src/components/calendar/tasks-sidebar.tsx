@@ -21,6 +21,7 @@ interface TaskWithGroup {
 	completed: boolean;
 	groupId: string | null;
 	groupName: string;
+	type?: "task" | "event";
 }
 
 interface TasksSidebarProps {
@@ -64,6 +65,9 @@ export const TasksSidebar = ({
 		} else if (completionFilter === "incomplete") {
 			filtered = filtered.filter((task) => !task.completed);
 		}
+
+		// Filter out events (tasks that are already in calendar)
+		filtered = filtered.filter((task) => task.type !== "event");
 
 		return filtered;
 	}, [allTasks, selectedGroupIds, completionFilter]);
@@ -126,19 +130,14 @@ export const TasksSidebar = ({
 						<button
 							type="button"
 							key={task.id}
-							draggable={!task.startDate}
+							draggable={true}
 							onDragStart={(e) => {
 								sessionStorage.setItem("draggingTaskId", task.id);
 								e.dataTransfer.effectAllowed = "move";
 								e.currentTarget.classList.add("opacity-50");
 							}}
 							onDragEnd={(e) => e.currentTarget.classList.remove("opacity-50")}
-							className={cn(
-								"w-full text-left",
-								!task.startDate
-									? "cursor-grab active:cursor-grabbing"
-									: "cursor-pointer",
-							)}
+							className="w-full text-left cursor-grab active:cursor-grabbing"
 						>
 							<Card
 								className="p-4 hover:shadow-lg transition-all cursor-pointer bg-card group"
@@ -147,9 +146,7 @@ export const TasksSidebar = ({
 								<div className="space-y-3">
 									<div className="flex items-start justify-between gap-2">
 										<div className="flex items-center gap-2 flex-1 min-w-0">
-											{!task.startDate && (
-												<GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-											)}
+											<GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
 											<p className="text-sm font-medium flex-1 line-clamp-2">
 												{task.title}
 											</p>

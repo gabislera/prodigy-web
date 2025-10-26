@@ -151,6 +151,10 @@ export function TasksPage() {
 		},
 	) => {
 		try {
+			const task = taskColumns
+				.flatMap((col) => col.tasks)
+				.find((t) => t.id === taskId);
+
 			const updateData: {
 				title: string;
 				description: string;
@@ -160,6 +164,7 @@ export function TasksPage() {
 				endDate?: string | null;
 				allDay?: boolean;
 				status?: string;
+				type?: "task" | "event";
 			} = {
 				title: updatedTask.title,
 				description: updatedTask.description,
@@ -169,6 +174,7 @@ export function TasksPage() {
 				endDate: updatedTask.endDate,
 				allDay: updatedTask.allDay,
 				status: "pending",
+				...(task?.type && { type: task.type }),
 			};
 
 			await updateTask({
@@ -198,9 +204,17 @@ export function TasksPage() {
 
 	const handleMoveTask = async (taskId: string, columnId: string) => {
 		try {
+			// Find the task to preserve its type
+			const task = taskColumns
+				.flatMap((col) => col.tasks)
+				.find((t) => t.id === taskId);
+
 			await updateTask({
 				taskId,
-				data: { columnId },
+				data: {
+					columnId,
+					...(task?.type && { type: task.type }),
+				},
 			});
 		} catch (error) {
 			console.error("Erro ao mover task:", error);
@@ -209,9 +223,16 @@ export function TasksPage() {
 
 	const handleToggleComplete = async (taskId: string, completed: boolean) => {
 		try {
+			const task = taskColumns
+				.flatMap((col) => col.tasks)
+				.find((t) => t.id === taskId);
+
 			await updateTask({
 				taskId,
-				data: { completed },
+				data: {
+					completed,
+					...(task?.type && { type: task.type }),
+				},
 			});
 		} catch (error) {
 			console.error("Erro ao atualizar status da task:", error);
@@ -411,22 +432,30 @@ export function TasksPage() {
 						targetColumn,
 					);
 
-					// Update all affected tasks
+					// Update all affected tasks - preserve type
 					await Promise.all(
-						positionUpdates.map(({ taskId, position }) =>
-							updateTask({
+						positionUpdates.map(({ taskId, position }) => {
+							const task = taskColumns
+								.flatMap((col) => col.tasks)
+								.find((t) => t.id === taskId);
+
+							return updateTask({
 								taskId,
-								data: { position },
-							}),
-						),
+								data: {
+									position,
+									...(task?.type && { type: task.type }),
+								},
+							});
+						}),
 					);
 				} else {
-					// Moving to a different column or to empty space
+					// Moving to a different column or to empty space - preserve type
 					await updateTask({
 						taskId: activeId,
 						data: {
 							columnId: targetColumn,
 							position: targetPosition,
+							...(activeTask?.type && { type: activeTask.type }),
 						},
 					});
 				}

@@ -7,6 +7,7 @@ import {
 	TasksSidebar,
 } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useAllTasks, useTasks } from "@/hooks/use-tasks";
 import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
@@ -54,6 +55,11 @@ export function CalendarPage() {
 	const [initialStartDate, setInitialStartDate] = useState<Date | null>(null);
 	const [initialEndDate, setInitialEndDate] = useState<Date | null>(null);
 
+	const [isDragConfirmDialogOpen, setIsDragConfirmDialogOpen] = useState(false);
+	const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+	const [dragStartDate, setDragStartDate] = useState<Date | null>(null);
+	const [dragEndDate, setDragEndDate] = useState<Date | null>(null);
+
 	const allTasks = useMemo(() => {
 		const tasksFromGroups =
 			taskGroupsWithDetails?.flatMap((group) =>
@@ -90,12 +96,12 @@ export function CalendarPage() {
 	}, [taskGroupsWithDetails, allTasksFromApi]);
 
 	const calendarTasks = useMemo(
-		() => allTasks.filter((task) => task.startDate || task.endDate),
+		() => allTasks.filter((task) => task.type === "event"),
 		[allTasks],
 	);
 
 	const unscheduledTasks = useMemo(
-		() => allTasks.filter((task) => !task.startDate && !task.endDate),
+		() => allTasks.filter((task) => task.type !== "event"),
 		[allTasks],
 	);
 
@@ -106,9 +112,10 @@ export function CalendarPage() {
 
 	// Convert tasks to calendar events
 	const calendarEvents = useMemo(
-		() => calendarTasks
-			.filter((task) => task != null && task.startDate && task.endDate)
-			.map(taskToCalendarEvent),
+		() =>
+			calendarTasks
+				.filter((task) => task?.startDate && task?.endDate)
+				.map(taskToCalendarEvent),
 		[calendarTasks],
 	);
 
@@ -123,6 +130,7 @@ export function CalendarPage() {
 					startDate: event.startDate,
 					endDate: event.endDate,
 					allDay: event.allDay,
+					type: "event",
 				},
 			});
 			toast.success("Tarefa movida com sucesso!");
@@ -162,7 +170,20 @@ export function CalendarPage() {
 		const endTime = new Date(startTime);
 		endTime.setHours(startTime.getHours() + 1);
 
-		setSelectedTask(null);
+		const newTask: Task = {
+			id: "",
+			title: "",
+			description: "",
+			priority: "medium",
+			columnId: null,
+			position: 0,
+			completed: false,
+			type: "event",
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		};
+
+		setSelectedTask(newTask);
 		setInitialStartDate(startTime);
 		setInitialEndDate(endTime);
 		setIsTaskDialogOpen(true);
@@ -202,20 +223,35 @@ export function CalendarPage() {
 		const endDate = new Date(startDate);
 		endDate.setHours(startDate.getHours() + 1);
 
+		// Store drag data and show confirmation dialog
+		setDragTaskId(taskId);
+		setDragStartDate(startDate);
+		setDragEndDate(endDate);
+		setIsDragConfirmDialogOpen(true);
+		sessionStorage.removeItem("draggingTaskId");
+	};
+
+	const handleDragConfirm = async () => {
+		if (!dragTaskId || !dragStartDate || !dragEndDate) return;
+
 		try {
 			await updateTask({
-				taskId,
+				taskId: dragTaskId,
 				data: {
-					startDate: startDate.toISOString(),
-					endDate: endDate.toISOString(),
+					type: "event",
+					startDate: dragStartDate.toISOString(),
+					endDate: dragEndDate.toISOString(),
 				},
 			});
 			toast.success("Tarefa adicionada ao calendário!");
-			sessionStorage.removeItem("draggingTaskId");
 		} catch (error) {
 			console.error("Erro ao adicionar tarefa ao calendário:", error);
 			toast.error("Erro ao adicionar tarefa");
-			sessionStorage.removeItem("draggingTaskId");
+		} finally {
+			setIsDragConfirmDialogOpen(false);
+			setDragTaskId(null);
+			setDragStartDate(null);
+			setDragEndDate(null);
 		}
 	};
 
@@ -226,11 +262,12 @@ export function CalendarPage() {
 		columnId?: string | null;
 		completed: boolean;
 		allDay: boolean;
+		type?: "task" | "event";
 		startDate?: string | null;
 		endDate?: string | null;
 	}) => {
 		try {
-			if (selectedTask) {
+			if (selectedTask?.id) {
 				await updateTask({
 					taskId: selectedTask.id,
 					data: taskData,
@@ -239,6 +276,7 @@ export function CalendarPage() {
 			} else {
 				await createTask({
 					...taskData,
+					type: "event",
 					position: 0,
 				});
 				toast.success("Tarefa criada com sucesso!");
@@ -297,6 +335,45 @@ export function CalendarPage() {
 					type="event"
 				/>
 			)}
+
+			<ConfirmDialog
+				open={isDragConfirmDialogOpen}
+				onOpenChange={setIsDragConfirmDialogOpen}
+				title="Adicionar tarefa ao calendário?"
+				description={
+					<div className="space-y-2">
+						<p>Tem certeza que deseja adicionar esta tarefa ao calendário?</p>
+						{dragStartDate && dragEndDate && (
+							<div className="text-sm text-muted-foreground">
+								<p>
+									<strong>Data:</strong>{" "}
+									{dragStartDate.toLocaleDateString("pt-BR", {
+										day: "2-digit",
+										month: "2-digit",
+										year: "numeric",
+									})}
+								</p>
+								<p>
+									<strong>Horário:</strong>{" "}
+									{dragStartDate.toLocaleTimeString("pt-BR", {
+										hour: "2-digit",
+										minute: "2-digit",
+									})}{" "}
+									-{" "}
+									{dragEndDate.toLocaleTimeString("pt-BR", {
+										hour: "2-digit",
+										minute: "2-digit",
+									})}
+								</p>
+							</div>
+						)}
+					</div>
+				}
+				confirmLabel="Adicionar ao Calendário"
+				cancelLabel="Cancelar"
+				onConfirm={handleDragConfirm}
+				variant="default"
+			/>
 		</div>
 	);
 }

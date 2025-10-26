@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarX, Trash2 } from "lucide-react";
+import { CalendarPlus, CalendarX, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,6 +46,7 @@ interface TaskDialogProps {
 		columnId?: string | null;
 		completed: boolean;
 		allDay: boolean;
+		type?: "task" | "event";
 		startDate?: string | null;
 		endDate?: string | null;
 	}) => void;
@@ -144,6 +145,7 @@ export const TaskDialog = ({
 	}) => {
 		const formattedData = {
 			...data,
+			type: task.type || "task",
 			startDate: data.startDate ? data.startDate.toISOString() : null,
 			endDate: data.endDate ? data.endDate.toISOString() : null,
 		};
@@ -152,7 +154,19 @@ export const TaskDialog = ({
 		onOpenChange(false);
 	};
 
-	const handleRemoveFromCalendar = () => {
+	const handleToggleCalendar = () => {
+		const isCurrentlyEvent = task.type === "event";
+
+		if (!isCurrentlyEvent) {
+			const startDate = watch("startDate");
+			const endDate = watch("endDate");
+
+			if (!startDate || !endDate) {
+				toast.error("Defina uma data e hora antes de adicionar ao calendário");
+				return;
+			}
+		}
+
 		const formattedData = {
 			title: watch("title"),
 			description: watch("description") || "",
@@ -160,8 +174,13 @@ export const TaskDialog = ({
 			columnId: watch("columnId"),
 			completed: watch("completed"),
 			allDay: watch("allDay") || false,
-			startDate: null,
-			endDate: null,
+			type: isCurrentlyEvent ? ("task" as const) : ("event" as const),
+			startDate: isCurrentlyEvent
+				? null
+				: watch("startDate")?.toISOString() || null,
+			endDate: isCurrentlyEvent
+				? null
+				: watch("endDate")?.toISOString() || null,
 		};
 
 		onSave(formattedData);
@@ -173,8 +192,8 @@ export const TaskDialog = ({
 		onOpenChange(false);
 	};
 
-	const taskIsScheduled = useMemo(() => {
-		return !!(task.startDate || task.endDate);
+	const taskIsInCalendar = useMemo(() => {
+		return task.type === "event";
 	}, [task]);
 
 	const handleDeleteConfirm = async () => {
@@ -366,17 +385,23 @@ export const TaskDialog = ({
 										Mover para Grupo
 									</Button>
 								)}
-							{taskIsScheduled && (
-								<Button
-									type="button"
-									variant="ghost"
-									onClick={handleRemoveFromCalendar}
-									size="icon"
-									title="Remover do Calendário"
-								>
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={handleToggleCalendar}
+								size="icon"
+								title={
+									taskIsInCalendar
+										? "Remover do Calendário"
+										: "Adicionar ao Calendário"
+								}
+							>
+								{taskIsInCalendar ? (
 									<CalendarX className="h-4 w-4" />
-								</Button>
-							)}
+								) : (
+									<CalendarPlus className="h-4 w-4" />
+								)}
+							</Button>
 						</div>
 						<div className="flex gap-2">
 							<Button type="button" variant="outline" onClick={handleCancel}>

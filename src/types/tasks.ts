@@ -10,7 +10,7 @@ export interface Task {
 	endDate?: string | null;
 	allDay?: boolean;
 	status?: string;
-	type?: string;
+	type?: "task" | "event";
 	createdAt: string;
 	updatedAt: string;
 }
@@ -46,7 +46,7 @@ export interface ApiTask {
 	endDate?: string | null;
 	allDay?: boolean;
 	status?: string;
-	type?: string;
+	type?: "task" | "event";
 	createdAt: string;
 	updatedAt: string;
 }
@@ -81,6 +81,7 @@ export interface CreateTaskData {
 	endDate?: string | null;
 	allDay?: boolean;
 	status?: string;
+	type?: "task" | "event";
 }
 
 export interface UpdateTaskData {
@@ -94,6 +95,7 @@ export interface UpdateTaskData {
 	endDate?: string | null;
 	allDay?: boolean;
 	status?: string;
+	type?: "task" | "event";
 }
 
 export interface CreateTaskGroupData {
