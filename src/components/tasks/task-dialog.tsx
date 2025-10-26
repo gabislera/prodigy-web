@@ -26,10 +26,7 @@ import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
-import {
-	combineDateAndTime,
-	formatTimeFromDate,
-} from "@/utils/date-helpers";
+import { combineDateAndTime, formatTimeFromDate } from "@/utils/date-helpers";
 import { DateSelector } from "./date-selector";
 import { MoveToGroupDialog } from "./move-to-group-dialog";
 
@@ -70,6 +67,7 @@ export const TaskDialog = ({
 	const [showGroupSelector, setShowGroupSelector] = useState(false);
 	const [isMoveToGroupDialogOpen, setIsMoveToGroupDialogOpen] = useState(false);
 	const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+	const [dateValidationError, setDateValidationError] = useState<string>("");
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
 	const { deleteTask } = useTasks();
 
@@ -283,11 +281,16 @@ export const TaskDialog = ({
 											setEndTime(end);
 											setValue("startDate", combineDateAndTime(date, start));
 											setValue("endDate", combineDateAndTime(date, end));
+											setDateValidationError(""); // Clear error when date is successfully selected
 										}
 									}}
 									onClearDate={() => {
 										setValue("startDate", null);
 										setValue("endDate", null);
+										setDateValidationError("");
+									}}
+									onValidationError={(error) => {
+										setDateValidationError(error);
 									}}
 								>
 									<Button
@@ -306,6 +309,9 @@ export const TaskDialog = ({
 									<p className="text-xs text-red-500">
 										{errors.startDate.message}
 									</p>
+								)}
+								{dateValidationError && (
+									<p className="text-xs text-red-500">{dateValidationError}</p>
 								)}
 							</div>
 

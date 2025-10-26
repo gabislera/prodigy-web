@@ -471,7 +471,7 @@ export function TasksPage() {
 			const column = taskColumns.find((col) => col.id === columnId);
 			const nextPosition = column?.tasks.length || 0;
 
-			const newTask = await createTask({
+			await createTask({
 				title: "Nova Tarefa",
 				description: "",
 				priority: "low",
@@ -483,9 +483,6 @@ export function TasksPage() {
 				allDay: false,
 				status: "pending",
 			});
-
-			setSelectedTask(newTask);
-			setIsDetailDialogOpen(true);
 		} catch (error) {
 			console.error("Erro ao criar tarefa:", error);
 			toast.error("Erro ao criar tarefa. Tente novamente.");

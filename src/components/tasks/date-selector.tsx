@@ -1,10 +1,7 @@
 import { ptBR } from "date-fns/locale";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	formatTimeFromDate,
-	getDefaultTimes,
-} from "@/utils/date-helpers";
+import { formatTimeFromDate, getDefaultTimes } from "@/utils/date-helpers";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
@@ -23,6 +20,7 @@ interface DateSelectorProps {
 	initialEndTime?: string;
 	selectedDate?: Date | null;
 	onClearDate?: () => void;
+	onValidationError?: (error: string) => void;
 }
 
 export const DateSelector = ({
@@ -33,9 +31,11 @@ export const DateSelector = ({
 	initialEndTime,
 	selectedDate,
 	onClearDate,
+	onValidationError,
 }: DateSelectorProps) => {
 	const [open, setOpen] = useState(false);
 	const [date, setDate] = useState<Date | undefined>(initialDate || undefined);
+	const [validationError, setValidationError] = useState<string>("");
 
 	const defaultTimes = getDefaultTimes();
 
@@ -118,7 +118,56 @@ export const DateSelector = ({
 	const handleClearDate = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		setDate(undefined);
+		setValidationError("");
 		onClearDate?.();
+	};
+
+	const validateDate = (
+		selectedDate: Date,
+		startTime: string,
+		endTime: string,
+	): boolean => {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		// Verificar se a data não é anterior à data atual
+		if (selectedDate < today) {
+			const error = "A data não pode ser anterior à data atual";
+			setValidationError(error);
+			onValidationError?.(error);
+			return false;
+		}
+
+		// Verificar se a hora de fim é posterior à hora de início
+		const [startHours, startMinutes] = startTime.split(":").map(Number);
+		const [endHours, endMinutes] = endTime.split(":").map(Number);
+		const startTotalMinutes = startHours * 60 + startMinutes;
+		const endTotalMinutes = endHours * 60 + endMinutes;
+
+		if (endTotalMinutes <= startTotalMinutes) {
+			const error = "A hora de fim deve ser posterior à hora de início";
+			setValidationError(error);
+			onValidationError?.(error);
+			return false;
+		}
+
+		// Se chegou até aqui, a validação passou
+		setValidationError("");
+		return true;
+	};
+
+	const handleAddDate = () => {
+		if (!date) {
+			const error = "Selecione uma data";
+			setValidationError(error);
+			onValidationError?.(error);
+			return;
+		}
+
+		if (validateDate(date, startTime, endTime)) {
+			onSelectDate?.(date, startTime, endTime);
+			setOpen(false);
+		}
 	};
 
 	const inputClassName =
@@ -182,6 +231,30 @@ export const DateSelector = ({
 								className={inputClassName}
 							/>
 						</div>
+					</div>
+
+					{validationError && (
+						<div className="w-full">
+							<p className="text-sm text-red-500">{validationError}</p>
+						</div>
+					)}
+
+					<div className="flex gap-2 w-full">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setOpen(false)}
+							className="flex-1"
+						>
+							Cancelar
+						</Button>
+						<Button
+							type="button"
+							onClick={handleAddDate}
+							className="flex-1 bg-gradient-primary border-0"
+						>
+							Adicionar
+						</Button>
 					</div>
 				</div>
 			</PopoverContent>
