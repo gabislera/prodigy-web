@@ -47,24 +47,33 @@ export function TimerProvider({ children }: { children: ReactNode }) {
 		try {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved) {
-				const parsed = JSON.parse(saved) as TimerState;
+				const parsed = JSON.parse(saved);
+
+				// Construct new object with ONLY the 4 fields we need
+				const state: TimerState = {
+					isRunning: parsed.isRunning ?? false,
+					startTime: parsed.startTime ?? null,
+					duration: parsed.duration ?? DEFAULT_FOCUS_DURATION,
+					focusDuration: parsed.focusDuration ?? DEFAULT_FOCUS_DURATION,
+				};
 
 				// If it was running, recalculate based on elapsed time
-				if (parsed.isRunning && parsed.startTime) {
-					const elapsed = Date.now() - parsed.startTime;
-					const remaining = parsed.duration - elapsed;
+				if (state.isRunning && state.startTime) {
+					const elapsed = Date.now() - state.startTime;
+					const remaining = state.duration - elapsed;
 
 					// If time has passed, don't restore as running
 					if (remaining <= 0) {
 						return {
-							...parsed,
 							isRunning: false,
 							startTime: null,
+							duration: state.focusDuration,
+							focusDuration: state.focusDuration,
 						};
 					}
 				}
 
-				return parsed;
+				return state;
 			}
 		} catch (error) {
 			console.error("Error loading timer state:", error);
