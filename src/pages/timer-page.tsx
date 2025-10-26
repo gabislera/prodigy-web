@@ -200,7 +200,7 @@ export function TimerPage() {
 									key={task.id}
 									className="group relative rounded-lg border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50"
 								>
-									<div
+									{/* <div
 										className={`absolute left-0 top-0 h-full w-1 rounded-l-lg ${
 											task.status === "completed"
 												? "bg-foreground/20"
@@ -208,7 +208,7 @@ export function TimerPage() {
 													? "bg-foreground"
 													: "bg-muted"
 										}`}
-									/>
+									/> */}
 
 									<div className="pl-3">
 										<div className="flex items-start justify-between gap-2">

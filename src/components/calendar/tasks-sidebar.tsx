@@ -151,11 +151,14 @@ export const TasksSidebar = ({
 												{task.title}
 											</p>
 										</div>
-										{task.groupId && (
-											<Badge variant="outline" className="text-xs shrink-0">
-												{task.groupName}
-											</Badge>
-										)}
+										<span
+											className={cn(
+												"rounded-full w-2 h-2",
+												task.priority === "high" && "bg-destructive",
+												task.priority === "medium" && "bg-warning",
+												task.priority === "low" && "bg-success",
+											)}
+										/>
 									</div>
 
 									{task.description && (
@@ -163,25 +166,6 @@ export const TasksSidebar = ({
 											{task.description}
 										</p>
 									)}
-
-									<div className="flex items-center justify-between gap-2">
-										<div
-											className={cn(
-												"px-2 py-1 rounded text-xs font-medium",
-												task.priority === "high" &&
-													"bg-destructive/20 text-destructive",
-												task.priority === "medium" &&
-													"bg-warning/20 text-warning",
-												task.priority === "low" && "bg-success/20 text-success",
-											)}
-										>
-											{task.priority === "high"
-												? "Alta"
-												: task.priority === "medium"
-													? "Média"
-													: "Baixa"}
-										</div>
-									</div>
 								</div>
 							</Card>
 						</button>

@@ -1,6 +1,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { format } from "date-fns";
+import { Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Task, TaskColumn } from "@/types/tasks";
 
@@ -32,42 +39,45 @@ export const TaskCard = ({ task, onTaskClick }: TaskCardProps) => {
 	return (
 		<div ref={setNodeRef} style={style} {...attributes} {...listeners}>
 			<Card
-				className="p-4 hover:shadow-lg transition-all cursor-pointer bg-card group"
+				className="p-3 hover:shadow-lg transition-all cursor-pointer bg-card group"
 				onClick={() => {
 					if (!isDragging) {
 						onTaskClick(task);
 					}
 				}}
 			>
-				<div className="space-y-3">
-					<div className="flex items-start justify-between gap-2">
-						<div className="flex-1 min-w-0">
+				<div className="space-y-1">
+					<div className="flex items-start flex-col">
+						<div className="flex items-center justify-between w-full">
 							<p className="text-sm font-medium mb-1">{task.title}</p>
-							{task.description && (
-								<p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-									{task.description}
-								</p>
-							)}
+							<span
+								className={cn(
+									"rounded-full w-2 h-2",
+									task.priority === "high" && "bg-destructive",
+									task.priority === "medium" && "bg-warning",
+									task.priority === "low" && "bg-success",
+								)}
+							/>
 						</div>
+
+						{task.description && (
+							<p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+								{task.description}
+							</p>
+						)}
 					</div>
 
-					<div className="flex items-center justify-between gap-2">
-						<div
-							className={cn(
-								"px-2 py-1 rounded text-xs font-medium",
-								task.priority === "high" &&
-									"bg-destructive/20 text-destructive",
-								task.priority === "medium" && "bg-warning/20 text-warning",
-								task.priority === "low" && "bg-success/20 text-success",
-							)}
-						>
-							{task.priority === "high"
-								? "Alta"
-								: task.priority === "medium"
-									? "Média"
-									: "Baixa"}
+					{task.startDate && task.endDate && (
+						<div className="flex items-center justify-between gap-2">
+							<div className="flex items-center gap-2">
+								<Calendar className="h-3 w-3 text-muted-foreground" size={16} />
+								<p className="text-xs text-muted-foreground">
+									{format(new Date(task.startDate), "dd/MM HH:mm")} -{" "}
+									{format(new Date(task.endDate), "HH:mm")}
+								</p>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</Card>
 		</div>

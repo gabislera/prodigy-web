@@ -36,7 +36,7 @@ export const DroppableColumn = ({
 		<>
 			<div
 				ref={setNodeRef}
-				className="flex flex-col w-60 h-full max-h-[calc(100vh-200px)]"
+				className="flex flex-col w-80 h-full max-h-[calc(100vh-200px)]"
 			>
 				<div className="flex items-center justify-between flex-shrink-0 mb-3">
 					<div className="flex items-center gap-2">
@@ -86,7 +86,9 @@ export const DroppableColumn = ({
 				description={
 					<>
 						Tem certeza que deseja excluir a coluna "{column.title}"?{" "}
-						<strong>Todas as tarefas desta coluna também serão removidas.</strong>{" "}
+						<strong>
+							Todas as tarefas desta coluna também serão removidas.
+						</strong>{" "}
 						Esta ação não pode ser desfeita.
 					</>
 				}
