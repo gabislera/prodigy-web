@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarPlus, CalendarX, Trash2 } from "lucide-react";
+import { CalendarPlus, CalendarX, FolderPlus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -419,13 +419,22 @@ export const TaskDialog = ({
 								{taskHasNoGroup &&
 									showGroupSelector &&
 									visibleGroups.length > 0 && (
-										<Button
-											type="button"
-											variant="outline"
-											onClick={() => setIsMoveToGroupDialogOpen(true)}
-										>
-											Mover para Grupo
-										</Button>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													type="button"
+													variant="ghost"
+													size="icon"
+													className="hover:text-primary"
+													onClick={() => setIsMoveToGroupDialogOpen(true)}
+												>
+													<FolderPlus className="h-4 w-4" />
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>Adicionar a um grupo</p>
+											</TooltipContent>
+										</Tooltip>
 									)}
 							</div>
 							<div className="flex gap-2">
