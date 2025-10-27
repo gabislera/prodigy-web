@@ -28,8 +28,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
 import { cn } from "@/lib/utils";
+import { dateFnsLocale } from "@/utils/date-helpers";
 import {
 	AgendaDaysToShow,
 	AgendaView,

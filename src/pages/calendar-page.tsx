@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useTaskGroups } from "@/hooks/use-task-groups";
 import { useTasks } from "@/hooks/use-tasks";
 import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
+import { formatTimeSimple } from "@/utils/date-helpers";
 
 // Helper functions to convert between Task and CalendarEvent
 const taskToCalendarEvent = (task: Task): CalendarEvent => {
@@ -354,16 +355,8 @@ export function CalendarPage() {
 									})}
 								</p>
 								<p>
-									<strong>Horário:</strong>{" "}
-									{dragStartDate.toLocaleTimeString("pt-BR", {
-										hour: "2-digit",
-										minute: "2-digit",
-									})}{" "}
-									-{" "}
-									{dragEndDate.toLocaleTimeString("pt-BR", {
-										hour: "2-digit",
-										minute: "2-digit",
-									})}
+									<strong>Horário:</strong> {formatTimeSimple(dragStartDate)} -{" "}
+									{formatTimeSimple(dragEndDate)}
 								</p>
 							</div>
 						)}

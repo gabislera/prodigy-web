@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useTodayTasks } from "@/hooks/use-today-tasks";
 import type { Task } from "@/types/tasks";
+import { formatTaskTimeRange } from "@/utils/date-helpers";
 import { getPriorityColor } from "@/utils/taskUtils";
 
 interface TodayTasksListProps {
@@ -15,24 +16,6 @@ export function TodayTasksList({
 	maxItems = 5,
 }: TodayTasksListProps) {
 	const { data: todayTasks, isLoading } = useTodayTasks();
-
-	const getTaskTimeString = (task: Task) => {
-		if (!task.startDate || !task.endDate) return null;
-
-		const startDate = new Date(task.startDate);
-		const endDate = new Date(task.endDate);
-
-		const startTime = startDate.toLocaleTimeString("pt-BR", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-		const endTime = endDate.toLocaleTimeString("pt-BR", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-
-		return `${startTime} - ${endTime}`;
-	};
 
 	const incompleteTasks = todayTasks?.filter((task) => !task.completed) || [];
 
@@ -71,7 +54,10 @@ export function TodayTasksList({
 			{!isLoading &&
 				hasTasks &&
 				sortedTasks.map((task) => {
-					const timeString = getTaskTimeString(task);
+					const timeString =
+						task.startDate && task.endDate
+							? formatTaskTimeRange(task.startDate, task.endDate)
+							: null;
 
 					return (
 						<Card

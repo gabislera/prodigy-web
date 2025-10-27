@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useTimer } from "@/hooks/use-timer";
 import { useTodayTasks } from "@/hooks/use-today-tasks";
-import { formatTime } from "@/utils/format-time";
+import { formatTime } from "@/utils/date-helpers";
 
 // Predefinições de tempo
 const TIMER_PRESETS = {

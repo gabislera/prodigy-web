@@ -16,6 +16,8 @@ import {
 } from "date-fns";
 import type React from "react";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { dateFnsLocale } from "@/utils/date-helpers";
 import {
 	type CalendarEvent,
 	DraggableEvent,
@@ -26,8 +28,6 @@ import {
 	WeekCellsHeight,
 } from ".";
 import { EndHour, StartHour } from "./constants";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
-import { cn } from "@/lib/utils";
 
 interface WeekViewProps {
 	currentDate: Date;

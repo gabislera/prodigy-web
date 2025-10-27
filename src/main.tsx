@@ -5,9 +5,9 @@ import { createRoot } from "react-dom/client";
 import { Toaster } from "sonner";
 import "./index.css";
 
+import { TimerProvider } from "./contexts/timer-context";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
-import { TimerProvider } from "./contexts/timer-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });

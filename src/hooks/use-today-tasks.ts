@@ -1,73 +1,71 @@
-import { useQuery } from "@tanstack/react-query";
-import { tasksService } from "@/services/tasksService";
+import {
+	endOfDay,
+	isToday,
+	isWithinInterval,
+	parseISO,
+	startOfDay,
+} from "date-fns";
+import { useMemo } from "react";
 import type { Task } from "@/types/tasks";
+import { useTasks } from "./use-tasks";
 
-// Query Keys
-const TODAY_TASKS_QUERY_KEY = ["today-tasks"] as const;
-
+/**
+ * Hook para obter tarefas de hoje
+ * Reutiliza os dados do useTasks para evitar requisições duplicadas
+ */
 export function useTodayTasks() {
-	return useQuery({
-		queryKey: TODAY_TASKS_QUERY_KEY,
-		queryFn: async (): Promise<Task[]> => {
-			const allTasks = await tasksService.getAllTasks();
-			return filterTodayTasks(allTasks);
-		},
-		staleTime: 5 * 60 * 1000, // 5 minutes
-	});
+	const { tasks: allTasks = [], isLoading, error } = useTasks();
+
+	const todayTasks = useMemo(() => {
+		return filterTodayTasks(allTasks);
+	}, [allTasks]);
+
+	return {
+		data: todayTasks,
+		isLoading,
+		error,
+	};
 }
 
+/**
+ * Filtra tarefas que são relevantes para hoje
+ * Usa date-fns para lógica de datas mais robusta e legível
+ */
 function filterTodayTasks(tasks: Task[]): Task[] {
-	const today = new Date();
-	const startOfDay = new Date(
-		today.getFullYear(),
-		today.getMonth(),
-		today.getDate(),
-		0,
-		0,
-		0,
-		0,
-	);
-	const endOfDay = new Date(
-		today.getFullYear(),
-		today.getMonth(),
-		today.getDate(),
-		23,
-		59,
-		59,
-		999,
-	);
+	if (!tasks.length) return [];
 
 	return tasks.filter((task) => {
-		// Skip tasks without dates
+		// Skip tasks without any date information
 		if (!task.startDate && !task.endDate) {
 			return false;
 		}
 
-		const startDate = task.startDate ? new Date(task.startDate) : null;
-		const endDate = task.endDate ? new Date(task.endDate) : null;
+		// Parse dates safely
+		const startDate = task.startDate ? parseISO(task.startDate) : null;
+		const endDate = task.endDate ? parseISO(task.endDate) : null;
 
-		// Task starts today
-		if (startDate && startDate >= startOfDay && startDate <= endOfDay) {
+		// All-day task that is today
+		if (task.allDay && startDate && isToday(startDate)) {
 			return true;
 		}
 
-		// Task ends today
-		if (endDate && endDate >= startOfDay && endDate <= endOfDay) {
-			return true;
+		// Task with both start and end dates
+		if (startDate && endDate) {
+			// Task spans across today
+			return isWithinInterval(new Date(), {
+				start: startOfDay(startDate),
+				end: endOfDay(endDate),
+			});
 		}
 
-		// Task spans across today (starts before today and ends after today)
-		if (startDate && endDate && startDate < startOfDay && endDate > endOfDay) {
-			return true;
+		// Task with only start date - check if it's today
+		if (startDate && !endDate) {
+			return isToday(startDate);
 		}
 
-		// Task is all day and is today
-		if (
-			task.allDay &&
-			startDate &&
-			startDate.toDateString() === today.toDateString()
-		) {
-			return true;
+		// Task with only end date - check if it ends today
+		if (!startDate && endDate) {
+			return isToday(endDate);
 		}
 
 		return false;

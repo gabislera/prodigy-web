@@ -1,3 +1,8 @@
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export const dateFnsLocale = ptBR;
+
 /**
  * Format a date to a time string (HH:mm)
  */
@@ -28,3 +33,72 @@ export const getDefaultTimes = () => {
 		end: formatTimeFromDate(later),
 	};
 };
+
+/**
+ * Format the time range of a task for display
+ */
+export function formatTaskTimeRange(
+	startDate: string,
+	endDate: string,
+): string | null {
+	if (!startDate || !endDate) return null;
+
+	try {
+		const start = parseISO(startDate);
+		const end = parseISO(endDate);
+
+		const startTime = format(start, "HH:mm", { locale: ptBR });
+		const endTime = format(end, "HH:mm", { locale: ptBR });
+
+		return `${startTime} - ${endTime}`;
+	} catch (error) {
+		console.warn("Erro ao formatar horário da tarefa:", error);
+		return null;
+	}
+}
+
+/**
+ * Format a date for display in Brazilian Portuguese
+ */
+export function formatDate(
+	date: string | Date,
+	formatString: string = "dd/MM/yyyy",
+): string {
+	try {
+		const dateObj = typeof date === "string" ? parseISO(date) : date;
+		return format(dateObj, formatString, { locale: ptBR });
+	} catch (error) {
+		console.warn("Erro ao formatar data:", error);
+		return "Data inválida";
+	}
+}
+
+/**
+ * Format a date for display in simple time format (HH:mm)
+ */
+export function formatTimeSimple(date: string | Date): string {
+	try {
+		const dateObj = typeof date === "string" ? parseISO(date) : date;
+		return format(dateObj, "HH:mm", { locale: ptBR });
+	} catch (error) {
+		console.warn("Erro ao formatar horário:", error);
+		return "Horário inválido";
+	}
+}
+
+/**
+ * Unified function for formatting time
+ * Automatically detect the type of input and format accordingly
+ */
+export function formatTime(input: number | string | Date): string {
+	if (typeof input === "number") {
+		// Format for timer (milliseconds → MM:SS)
+		const totalSeconds = Math.ceil(input / 1000);
+		const minutes = Math.floor(totalSeconds / 60);
+		const seconds = totalSeconds % 60;
+		return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+	} else {
+		// Format for time (date → HH:mm)
+		return formatTimeSimple(input);
+	}
+}

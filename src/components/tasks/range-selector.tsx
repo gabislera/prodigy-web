@@ -2,6 +2,7 @@ import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatTimeFromDate, getDefaultTimes } from "@/utils/date-helpers";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
@@ -17,13 +18,6 @@ interface RangeSelectorProps {
 	selectedEndDate?: Date | null;
 }
 
-// Helper to format date to time string (HH:mm)
-const formatTimeFromDate = (date: Date): string => {
-	const hours = date.getHours().toString().padStart(2, "0");
-	const minutes = date.getMinutes().toString().padStart(2, "0");
-	return `${hours}:${minutes}`;
-};
-
 export const RangeSelector = ({
 	children,
 	onSelectRange,
@@ -35,26 +29,16 @@ export const RangeSelector = ({
 	const [open, setOpen] = useState(false);
 	const [range, setRange] = useState<DateRange | undefined>(initialRange);
 
-	// Calculate default times: current time and current time + 30min
-	const getDefaultTimes = () => {
-		const now = new Date();
-		const later = new Date(now.getTime() + 30 * 60000); // +30 minutes
-		return {
-			start: formatTimeFromDate(now),
-			end: formatTimeFromDate(later),
-		};
-	};
+	const defaultTimes = getDefaultTimes();
 
 	const [startTime, setStartTime] = useState(() =>
 		initialRange?.from
 			? formatTimeFromDate(initialRange.from)
-			: getDefaultTimes().start,
+			: defaultTimes.start,
 	);
 
 	const [endTime, setEndTime] = useState(() =>
-		initialRange?.to
-			? formatTimeFromDate(initialRange.to)
-			: getDefaultTimes().end,
+		initialRange?.to ? formatTimeFromDate(initialRange.to) : defaultTimes.end,
 	);
 
 	// Update times when initialRange changes

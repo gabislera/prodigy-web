@@ -3,7 +3,7 @@
 import { RiCalendarEventLine } from "@remixicon/react";
 import { addDays, format, isToday } from "date-fns";
 import { useMemo } from "react";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
+import { dateFnsLocale } from "@/utils/date-helpers";
 import {
 	AgendaDaysToShow,
 	type CalendarEvent,

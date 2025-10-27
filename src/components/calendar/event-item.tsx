@@ -4,8 +4,8 @@ import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { differenceInMinutes, format, getMinutes } from "date-fns";
 import { useMemo } from "react";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
 import { cn } from "@/lib/utils";
+import { dateFnsLocale } from "@/utils/date-helpers";
 import {
 	type CalendarEvent,
 	getBorderRadiusClasses,
@@ -54,7 +54,10 @@ function EventWrapper({
 	const isEventCompleted = event.completed || false;
 
 	// Map priority to color
-	const priorityColorMap: Record<CalendarEvent["priority"], "sky" | "amber" | "violet" | "rose" | "emerald" | "orange"> = {
+	const priorityColorMap: Record<
+		CalendarEvent["priority"],
+		"sky" | "amber" | "violet" | "rose" | "emerald" | "orange"
+	> = {
 		high: "rose",
 		medium: "amber",
 		low: "emerald",
@@ -116,7 +119,10 @@ export function EventItem({
 	onTouchStart,
 }: EventItemProps) {
 	// Map priority to color
-	const priorityColorMap: Record<CalendarEvent["priority"], "sky" | "amber" | "violet" | "rose" | "emerald" | "orange"> = {
+	const priorityColorMap: Record<
+		CalendarEvent["priority"],
+		"sky" | "amber" | "violet" | "rose" | "emerald" | "orange"
+	> = {
 		high: "rose",
 		medium: "amber",
 		low: "emerald",
@@ -132,7 +138,8 @@ export function EventItem({
 		if (currentTime && event.startDate && event.endDate) {
 			return new Date(
 				new Date(currentTime).getTime() +
-					(new Date(event.endDate).getTime() - new Date(event.startDate).getTime()),
+					(new Date(event.endDate).getTime() -
+						new Date(event.startDate).getTime()),
 			);
 		}
 		return new Date(event.endDate);

@@ -2,32 +2,18 @@ import { Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTodayTasks } from "@/hooks/use-today-tasks";
 import type { Task } from "@/types/tasks";
+import { formatTaskTimeRange } from "@/utils/date-helpers";
 
 interface TodayTasksCardProps {
 	onTaskClick: (task: Task) => void;
 	maxItems?: number;
 }
 
-export function TodayTasksCard({ onTaskClick, maxItems = 5 }: TodayTasksCardProps) {
+export function TodayTasksCard({
+	onTaskClick,
+	maxItems = 5,
+}: TodayTasksCardProps) {
 	const { data: todayTasks, isLoading } = useTodayTasks();
-
-	const getTaskTimeString = (task: Task) => {
-		if (!task.startDate || !task.endDate) return null;
-
-		const startDate = new Date(task.startDate);
-		const endDate = new Date(task.endDate);
-
-		const startTime = startDate.toLocaleTimeString("pt-BR", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-		const endTime = endDate.toLocaleTimeString("pt-BR", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-
-		return `${startTime} - ${endTime}`;
-	};
 
 	const incompleteTasks = todayTasks?.filter((task) => !task.completed) || [];
 
@@ -63,20 +49,27 @@ export function TodayTasksCard({ onTaskClick, maxItems = 5 }: TodayTasksCardProp
 			<CardContent className="space-y-3">
 				{isLoading && (
 					<div className="text-center py-4">
-						<p className="text-xs text-muted-foreground">Carregando tarefas...</p>
+						<p className="text-xs text-muted-foreground">
+							Carregando tarefas...
+						</p>
 					</div>
 				)}
 
 				{!isLoading && !hasTasks && (
 					<div className="text-center py-4">
-						<p className="text-xs text-muted-foreground">Nenhuma tarefa para hoje</p>
+						<p className="text-xs text-muted-foreground">
+							Nenhuma tarefa para hoje
+						</p>
 					</div>
 				)}
 
 				{!isLoading &&
 					hasTasks &&
 					sortedTasks.map((task) => {
-						const timeString = getTaskTimeString(task);
+						const timeString =
+							task.startDate && task.endDate
+								? formatTaskTimeRange(task.startDate, task.endDate)
+								: null;
 
 						return (
 							<button

@@ -34,7 +34,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTimer } from "@/hooks/use-timer";
 import { cn } from "@/lib/utils";
-import { formatTime } from "@/utils/format-time";
+import { formatTime } from "@/utils/date-helpers";
 
 export const Route = createFileRoute("/_protected")({
 	beforeLoad: async () => {

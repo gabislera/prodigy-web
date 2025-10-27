@@ -15,6 +15,12 @@ import {
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { dateFnsLocale } from "@/utils/date-helpers";
+import {
 	type CalendarEvent,
 	DraggableEvent,
 	DroppableCell,
@@ -28,12 +34,6 @@ import {
 	useEventVisibility,
 } from ".";
 import { DefaultStartHour } from "./constants";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { dateFnsLocale } from "@/lib/date-fns-locale";
 
 interface MonthViewProps {
 	currentDate: Date;
