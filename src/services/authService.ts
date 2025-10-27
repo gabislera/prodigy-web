@@ -77,16 +77,7 @@ export const authService = {
 		}
 	},
 
-	isAuthenticated(): boolean {
-		const token = localStorage.getItem("accessToken");
-		if (!token) return false;
-
-		try {
-			const payload = JSON.parse(atob(token.split(".")[1]));
-			const currentTime = Date.now() / 1000;
-			return payload.exp > currentTime;
-		} catch {
-			return false;
-		}
+	hasToken(): boolean {
+		return !!localStorage.getItem("accessToken");
 	},
 };

@@ -13,13 +13,7 @@ export const useAuth = () => {
 
 	const { data: user, isLoading: isLoadingUser } = useQuery({
 		queryKey: AUTH_QUERY_KEY,
-		queryFn: () => {
-			const currentUser = authService.getCurrentUser();
-			if (!currentUser || !authService.isAuthenticated()) {
-				return null;
-			}
-			return currentUser;
-		},
+		queryFn: () => authService.getCurrentUser(),
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
@@ -74,7 +68,7 @@ export const useAuth = () => {
 		},
 	});
 
-	const isAuthenticated = !!user && authService.isAuthenticated();
+	const isAuthenticated = !!user;
 
 	return {
 		user,
