@@ -6,11 +6,11 @@ import {
 	TodayTasksCard,
 	WeeklyStats,
 } from "@/components/dashboard";
-import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTaskGroups } from "@/hooks/use-task-groups";
 import type { Task } from "@/types/tasks";
 
 export function DashboardPage() {
-	const { taskGroupsWithDetails, isLoading } = useTaskGroupsWithDetails();
+	const { taskGroupsWithDetails, isLoading } = useTaskGroups();
 
 	const handleTaskClick = (task: Task) => {
 		console.log("Task clicked:", task);

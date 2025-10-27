@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTaskGroups } from "@/hooks/use-task-groups";
 import {
 	type CreateGroupFormData,
 	createGroupSchema,
@@ -31,7 +31,7 @@ export const CreateGroupDialog = ({
 	editingGroup,
 	// onCreateGroup,
 }: CreateGroupDialogProps) => {
-	const { createTaskGroup, updateTaskGroup } = useTaskGroupsWithDetails();
+	const { createTaskGroup, updateTaskGroup } = useTaskGroups();
 
 	const {
 		register,

@@ -28,7 +28,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTaskGroups } from "@/hooks/use-task-groups";
 import { useTasks } from "@/hooks/use-tasks";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
@@ -75,7 +75,7 @@ export const TaskDialog = ({
 	const [isMoveToGroupDialogOpen, setIsMoveToGroupDialogOpen] = useState(false);
 	const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 	const [dateValidationError, setDateValidationError] = useState<string>("");
-	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
+	const { taskGroupsWithDetails } = useTaskGroups();
 	const { deleteTask } = useTasks();
 
 	const taskHasNoGroup = useMemo(() => {

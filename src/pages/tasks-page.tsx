@@ -10,7 +10,8 @@ import { TaskDialog } from "@/components/tasks/task-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
-import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
+import { useTaskColumns } from "@/hooks/use-task-columns";
+import { useTaskGroups } from "@/hooks/use-task-groups";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 
@@ -27,14 +28,13 @@ export function TasksPage() {
 		TaskColumn[] | null
 	>(null);
 
+	const { taskGroupsWithDetails, deleteTaskGroup } = useTaskGroups();
 	const {
-		taskGroupsWithDetails,
-		deleteTaskGroup,
 		updateColumnOrder,
 		createTaskColumn,
 		updateTaskColumn,
 		deleteTaskColumn,
-	} = useTaskGroupsWithDetails();
+	} = useTaskColumns();
 	const { createTask, updateTask, deleteTask } = useTasks(selectedGroup);
 
 	// Get group data from cache

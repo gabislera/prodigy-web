@@ -8,8 +8,8 @@ import {
 } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
-import { useAllTasks, useTasks } from "@/hooks/use-tasks";
+import { useTaskGroups } from "@/hooks/use-task-groups";
+import { useTasks } from "@/hooks/use-tasks";
 import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
 
 // Helper functions to convert between Task and CalendarEvent
@@ -22,9 +22,8 @@ const taskToCalendarEvent = (task: Task): CalendarEvent => {
 };
 
 export function CalendarPage() {
-	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
-	const { updateTask, createTask } = useTasks();
-	const { allTasks: allTasksFromApi } = useAllTasks();
+	const { taskGroupsWithDetails } = useTaskGroups();
+	const { updateTask, createTask, tasks } = useTasks();
 
 	const getInitialCalendarSidebar = () => {
 		if (typeof window === "undefined") return false;
@@ -60,6 +59,7 @@ export function CalendarPage() {
 	const [dragStartDate, setDragStartDate] = useState<Date | null>(null);
 	const [dragEndDate, setDragEndDate] = useState<Date | null>(null);
 
+	// Combina tasks de grupos + tasks sem grupo (evita duplicatas)
 	const allTasks = useMemo(() => {
 		const tasksFromGroups =
 			taskGroupsWithDetails?.flatMap((group) =>
@@ -74,7 +74,7 @@ export function CalendarPage() {
 				),
 			) || [];
 
-		const tasksWithoutGroup = allTasksFromApi
+		const tasksWithoutGroup = tasks
 			.filter((task: ApiTask) => task != null && !task.columnId)
 			.map((task: ApiTask) => ({
 				...task,
@@ -93,7 +93,7 @@ export function CalendarPage() {
 		);
 
 		return [...tasksFromGroups, ...uniqueTasksWithoutGroup];
-	}, [taskGroupsWithDetails, allTasksFromApi]);
+	}, [taskGroupsWithDetails, tasks]);
 
 	const calendarTasks = useMemo(
 		() => allTasks.filter((task) => task.type === "event"),

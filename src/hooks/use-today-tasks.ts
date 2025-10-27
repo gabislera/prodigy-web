@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { tasksService } from "@/services/tasksService";
 import type { Task } from "@/types/tasks";
 
+// Query Keys
+const TODAY_TASKS_QUERY_KEY = ["today-tasks"] as const;
+
 export function useTodayTasks() {
 	return useQuery({
-		queryKey: ["today-tasks"],
+		queryKey: TODAY_TASKS_QUERY_KEY,
 		queryFn: async (): Promise<Task[]> => {
 			const allTasks = await tasksService.getAllTasks();
 			return filterTodayTasks(allTasks);
