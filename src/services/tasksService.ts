@@ -71,7 +71,7 @@ export const tasksService = {
 		groupId: string,
 		columnOrders: { columnId: string; order: number }[],
 	): Promise<void> {
-		await api.put(`/columns${groupId}/order`, {
+		await api.put(`/columns/${groupId}/order`, {
 			columnOrders,
 		});
 	},
