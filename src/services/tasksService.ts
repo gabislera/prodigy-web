@@ -16,11 +16,14 @@ export const tasksService = {
 		return response.data;
 	},
 
+	// Lista simples de grupos (para /tasks)
 	async getAllTaskGroups(): Promise<ApiTaskGroup[]> {
 		const response = await api.get("/groups");
 		return response.data;
 	},
 
+	// DEPRECATED: Manter temporariamente para Calendar
+	// TODO: Migrar Calendar para usar getAllTasks() + getAllTaskGroups()
 	async getAllTaskGroupsWithDetails(): Promise<ApiTaskGroup[]> {
 		const response = await api.get("/groups/with-details");
 		return response.data;
@@ -86,5 +89,25 @@ export const tasksService = {
 
 	async deleteTaskGroup(groupId: string): Promise<void> {
 		await api.delete(`/groups/${groupId}`);
+	},
+
+	// Novo: Estatísticas globais para Dashboard
+	async getTaskStats(): Promise<{
+		totalTasks: number;
+		completedTasks: number;
+		inProgressTasks: number;
+		todayTasks: number;
+		efficiency: number;
+	}> {
+		const response = await api.get("/groups/stats");
+		return response.data;
+	},
+
+	// Novo: Buscar colunas com tasks de um grupo específico
+	async getGroupColumnsWithTasks(
+		groupId: string,
+	): Promise<ApiTaskColumn[]> {
+		const response = await api.get(`/columns/${groupId}`);
+		return response.data;
 	},
 };

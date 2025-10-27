@@ -4,25 +4,21 @@ import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
 import type { ApiTaskGroup, UpdateTaskGroupData } from "@/types/tasks";
 
-const TASK_GROUPS_WITH_DETAILS_QUERY_KEY = [
-	"task-groups-with-details",
-] as const;
+const TASK_GROUPS_QUERY_KEY = ["task-groups"] as const;
 
 export function useTaskGroups() {
 	const queryClient = useQueryClient();
 
-	const { data: taskGroupsWithDetails = [], isLoading } = useQuery<
-		ApiTaskGroup[]
-	>({
-		queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
-		queryFn: tasksService.getAllTaskGroupsWithDetails,
+	const { data: taskGroups = [], isLoading } = useQuery<ApiTaskGroup[]>({
+		queryKey: TASK_GROUPS_QUERY_KEY,
+		queryFn: tasksService.getAllTaskGroups,
 	});
 
 	const createTaskGroupMutation = useMutation({
 		mutationFn: tasksService.createTaskGroup,
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+				queryKey: TASK_GROUPS_QUERY_KEY,
 			});
 		},
 		onError: (error: ApiError) => {
@@ -43,7 +39,7 @@ export function useTaskGroups() {
 		}) => tasksService.updateTaskGroup(groupId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+				queryKey: TASK_GROUPS_QUERY_KEY,
 			});
 		},
 		onError: (error: ApiError) => {
@@ -58,7 +54,7 @@ export function useTaskGroups() {
 		mutationFn: (groupId: string) => tasksService.deleteTaskGroup(groupId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_WITH_DETAILS_QUERY_KEY,
+				queryKey: TASK_GROUPS_QUERY_KEY,
 			});
 		},
 		onError: (error: ApiError) => {
@@ -70,7 +66,7 @@ export function useTaskGroups() {
 	});
 
 	return {
-		taskGroupsWithDetails,
+		taskGroups,
 		isLoading,
 		createTaskGroup: createTaskGroupMutation.mutateAsync,
 		updateTaskGroup: updateTaskGroupMutation.mutateAsync,

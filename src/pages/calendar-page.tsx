@@ -8,7 +8,7 @@ import {
 } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useTaskGroups } from "@/hooks/use-task-groups";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
 import { formatTimeSimple } from "@/utils/date-helpers";
@@ -23,7 +23,7 @@ const taskToCalendarEvent = (task: Task): CalendarEvent => {
 };
 
 export function CalendarPage() {
-	const { taskGroupsWithDetails } = useTaskGroups();
+	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
 	const { updateTask, createTask, tasks } = useTasks();
 
 	const getInitialCalendarSidebar = () => {

@@ -10,6 +10,7 @@ import { TaskDialog } from "@/components/tasks/task-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDragAndDrop } from "@/hooks/use-drag-and-drop";
+import { useGroupColumns } from "@/hooks/use-group-columns";
 import { useTaskColumns } from "@/hooks/use-task-columns";
 import { useTaskGroups } from "@/hooks/use-task-groups";
 import { useTasks } from "@/hooks/use-tasks";
@@ -28,7 +29,8 @@ export function TasksPage() {
 		TaskColumn[] | null
 	>(null);
 
-	const { taskGroupsWithDetails, deleteTaskGroup } = useTaskGroups();
+	const { taskGroups, deleteTaskGroup } = useTaskGroups();
+	const { columns: groupColumns, isLoading: isLoadingColumns } = useGroupColumns(selectedGroup);
 	const {
 		updateColumnOrder,
 		createTaskColumn,
@@ -38,13 +40,13 @@ export function TasksPage() {
 	const { createTask, updateTask, deleteTask } = useTasks(selectedGroup);
 
 	// Get group data from cache
-	const selectedGroupData = taskGroupsWithDetails.find(
+	const selectedGroupData = taskGroups.find(
 		(g) => g.id === selectedGroup,
 	);
 
 	// Convert ApiTaskColumn[] to TaskColumn[]
 	const baseTaskColumns: TaskColumn[] =
-		selectedGroupData?.columns.map((apiColumn) => ({
+		(groupColumns || []).map((apiColumn) => ({
 			id: apiColumn.id,
 			title: apiColumn.title,
 			groupId: apiColumn.groupId,
@@ -65,7 +67,7 @@ export function TasksPage() {
 				createdAt: apiTask.createdAt,
 				updatedAt: apiTask.updatedAt,
 			})),
-		})) || [];
+		}));
 
 	// Use optimistic state if available, otherwise use base state
 	const taskColumns = useMemo(() => {
@@ -295,7 +297,15 @@ export function TasksPage() {
 	};
 
 	if (selectedGroup) {
-		const group = taskGroupsWithDetails.find((g) => g.id === selectedGroup);
+		const group = taskGroups.find((g) => g.id === selectedGroup);
+
+		if (isLoadingColumns) {
+			return (
+				<div className="flex items-center justify-center h-full">
+					<p className="text-muted-foreground">Carregando tarefas...</p>
+				</div>
+			);
+		}
 
 		return (
 			<div className="flex flex-col h-full overflow-hidden">
@@ -392,7 +402,7 @@ export function TasksPage() {
 		);
 	}
 
-	const visibleGroups = taskGroupsWithDetails;
+	const visibleGroups = taskGroups;
 
 	return (
 		<div className="p-4 pb-24 space-y-6">
