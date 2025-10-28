@@ -26,7 +26,10 @@ export const BottomNavigation = () => {
 			<div className="flex justify-around items-center py-2 px-2">
 				{navigation.map((tab) => {
 					const Icon = tab.icon;
-					const isActive = location.pathname === tab.href;
+					const isActive =
+						tab.href === "/"
+							? location.pathname === "/"
+							: location.pathname.startsWith(tab.href);
 
 					return (
 						<Link

@@ -72,9 +72,12 @@ function RouteComponent() {
 	const { user, logout, isLogoutLoading } = useAuth();
 	const timer = useTimer();
 
-	const currentNavItem = navigation.find(
-		(item) => item.href === location.pathname,
-	);
+	const currentNavItem = navigation.find((item) => {
+		if (item.href === "/") {
+			return location.pathname === "/";
+		}
+		return location.pathname.startsWith(item.href);
+	});
 
 	const isMobile = useIsMobile();
 
@@ -123,7 +126,10 @@ function RouteComponent() {
 								<SidebarMenu>
 									{navigation.map((tab) => {
 										const Icon = tab.icon;
-										const isActive = tab.href === location.pathname;
+										const isActive =
+											tab.href === "/"
+												? location.pathname === "/"
+												: location.pathname.startsWith(tab.href);
 
 										return (
 											<SidebarMenuItem key={tab.name}>
