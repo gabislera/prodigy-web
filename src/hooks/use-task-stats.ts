@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { tasksService } from "@/services/tasksService";
 
 interface TaskStats {
@@ -11,7 +12,7 @@ interface TaskStats {
 
 export function useTaskStats() {
 	const { data, isLoading, error } = useQuery<TaskStats>({
-		queryKey: ["task-stats"],
+		queryKey: queryKeys.taskStats.all,
 		queryFn: tasksService.getTaskStats,
 	});
 

@@ -3,11 +3,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { format } from "date-fns";
 import { Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Task, TaskColumn } from "@/types/tasks";
 

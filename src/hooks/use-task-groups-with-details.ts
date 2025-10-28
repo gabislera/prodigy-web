@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { tasksService } from "@/services/tasksService";
 import type { ApiTaskGroup } from "@/types/tasks";
 
@@ -8,7 +9,7 @@ export function useTaskGroupsWithDetails() {
 	const { data: taskGroupsWithDetails = [], isLoading } = useQuery<
 		ApiTaskGroup[]
 	>({
-		queryKey: ["task-groups-with-details"],
+		queryKey: queryKeys.taskGroups.withDetails,
 		queryFn: tasksService.getAllTaskGroupsWithDetails,
 	});
 

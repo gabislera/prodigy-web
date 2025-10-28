@@ -1,16 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { queryKeys } from "@/lib/query-keys";
 import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
 import type { ApiTaskGroup, UpdateTaskGroupData } from "@/types/tasks";
-
-const TASK_GROUPS_QUERY_KEY = ["task-groups"] as const;
 
 export function useTaskGroups() {
 	const queryClient = useQueryClient();
 
 	const { data: taskGroups = [], isLoading } = useQuery<ApiTaskGroup[]>({
-		queryKey: TASK_GROUPS_QUERY_KEY,
+		queryKey: queryKeys.taskGroups.all,
 		queryFn: tasksService.getAllTaskGroups,
 	});
 
@@ -18,7 +17,7 @@ export function useTaskGroups() {
 		mutationFn: tasksService.createTaskGroup,
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_QUERY_KEY,
+				queryKey: queryKeys.taskGroups.all,
 			});
 		},
 		onError: (error: ApiError) => {
@@ -39,7 +38,7 @@ export function useTaskGroups() {
 		}) => tasksService.updateTaskGroup(groupId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_QUERY_KEY,
+				queryKey: queryKeys.taskGroups.all,
 			});
 		},
 		onError: (error: ApiError) => {
@@ -54,7 +53,7 @@ export function useTaskGroups() {
 		mutationFn: (groupId: string) => tasksService.deleteTaskGroup(groupId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: TASK_GROUPS_QUERY_KEY,
+				queryKey: queryKeys.taskGroups.all,
 			});
 		},
 		onError: (error: ApiError) => {
