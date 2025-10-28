@@ -1,4 +1,4 @@
-import { Target } from "lucide-react";
+import { Logs, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Task, TaskGroup } from "@/types/tasks";
 import { formatTaskTimeRange } from "@/utils/date-helpers";
@@ -47,7 +47,7 @@ export function TodayTasksCard({
 		<Card className="bg-card border-border">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<Target className="text-primary" size={20} />
+					<Logs className="text-secondary/80" size={24} />
 					Tarefas de Hoje
 				</CardTitle>
 				<p className="text-sm text-muted-foreground">

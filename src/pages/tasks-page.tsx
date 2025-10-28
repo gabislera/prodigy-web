@@ -22,7 +22,9 @@ export function TasksPage() {
 	const params = useParams({ strict: false });
 	const groupIdFromUrl = (params as { groupId?: string }).groupId;
 
-	const [selectedGroup, setSelectedGroup] = useState<string | null>(groupIdFromUrl || null);
+	const [selectedGroup, setSelectedGroup] = useState<string | null>(
+		groupIdFromUrl || null,
+	);
 
 	// Sync selectedGroup with URL param
 	useEffect(() => {
@@ -42,7 +44,8 @@ export function TasksPage() {
 	>(null);
 
 	const { taskGroups, deleteTaskGroup } = useTaskGroups();
-	const { columns: groupColumns, isLoading: isLoadingColumns } = useGroupColumns(selectedGroup);
+	const { columns: groupColumns, isLoading: isLoadingColumns } =
+		useGroupColumns(selectedGroup);
 	const {
 		updateColumnOrder,
 		createTaskColumn,
@@ -414,7 +417,7 @@ export function TasksPage() {
 						<Filter className="text-primary" size={20} />
 					</div> */}
 				<Button
-					className="bg-gradient-primary shadow-glow"
+					className="bg-primary "
 					onClick={() => setIsCreateGroupDialogOpen(true)}
 				>
 					<Plus size={16} />

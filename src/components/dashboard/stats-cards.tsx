@@ -18,8 +18,8 @@ export function StatsCards({
 		<div className="grid gap-4 md:grid-cols-4">
 			<Card className="border-border bg-card p-4">
 				<div className="flex items-center gap-3">
-					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
-						<CheckCircle2 className="h-5 w-5 text-primary" />
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+						<CheckCircle2 className="h-5 w-5 text-primary-solid" />
 					</div>
 					<div>
 						<p className="text-2xl font-bold text-foreground">{completed}</p>
@@ -43,8 +43,8 @@ export function StatsCards({
 
 			<Card className="border-border bg-card p-4">
 				<div className="flex items-center gap-3">
-					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
-						<Calendar className="h-5 w-5 text-primary" />
+					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+						<Calendar className="h-5 w-5 text-primary-solid" />
 					</div>
 					<div>
 						<p className="text-2xl font-bold text-foreground">{today}</p>

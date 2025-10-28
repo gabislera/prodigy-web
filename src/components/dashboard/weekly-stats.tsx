@@ -16,7 +16,7 @@ export function WeeklyStats({
 		<Card className="bg-card border-border">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<TrendingUp className="text-primary" size={20} />
+					<TrendingUp className="text-secondary/80" size={24} />
 					Esta Semana
 				</CardTitle>
 			</CardHeader>

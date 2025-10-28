@@ -48,7 +48,7 @@ export function ProfilePage() {
 			</div>
 
 			{/* User Profile Card */}
-			<Card className="p-6 bg-gradient-primary border-0 shadow-glow">
+			<Card className="p-6  border-0">
 				<div className="flex items-center gap-4">
 					<Avatar className="w-20 h-20 border-4 border-white/20">
 						<AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=studyapp" />
@@ -70,9 +70,16 @@ export function ProfilePage() {
 							</span>
 						</div> */}
 					</div>
-					<Button variant="secondary" size="sm" onClick={() => setIsOpen(true)}>
-						<Edit3 className="h-4 w-4" />
-						<span className="hidden md:block">Editar</span>
+					<Button
+						variant="secondary"
+						size="sm"
+						className="bg-secondary/50"
+						onClick={() => setIsOpen(true)}
+					>
+						<Edit3 className="h-4 w-4 text-primary-foreground" />
+						<span className="hidden md:block text-primary-foreground">
+							Editar
+						</span>
 					</Button>
 				</div>
 			</Card>

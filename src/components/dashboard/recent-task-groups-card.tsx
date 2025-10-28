@@ -1,4 +1,4 @@
-import { Folder, Target } from "lucide-react";
+import { Folder, Folders, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -23,7 +23,7 @@ export function RecentTaskGroupsCard({
 		<Card className="bg-card border-border">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<Target className="text-primary" size={20} />
+					<Folders className="text-secondary/80" size={24} />
 					Grupos Recentes
 				</CardTitle>
 				<p className="text-sm text-muted-foreground">
@@ -61,7 +61,7 @@ export function RecentTaskGroupsCard({
 								onClick={() => onGroupClick?.(group)}
 							>
 								<div className="flex items-center gap-2 mb-2">
-									<Folder className="h-4 w-4 text-accent" />
+									{/* <Folder className="h-4 w-4 text-primary" /> */}
 									<div className="flex-1">
 										<span className="text-sm font-medium block">
 											{group.name}
