@@ -16,8 +16,8 @@ import {
 	ChevronDownIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
+	ListTodoIcon,
 	PanelRightCloseIcon,
-	PanelRightOpenIcon,
 	PlusIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -211,13 +211,13 @@ export function EventCalendar({
 								variant="outline"
 								size="icon"
 								onClick={onSidebarToggle}
-								aria-label={isSidebarOpen ? "Fechar sidebar" : "Abrir sidebar"}
+								aria-label={isSidebarOpen ? "Fechar tarefas" : "Abrir tarefas"}
 								className="max-[479px]:h-8 max-[479px]:w-8"
 							>
 								{isSidebarOpen ? (
 									<PanelRightCloseIcon size={16} aria-hidden="true" />
 								) : (
-									<PanelRightOpenIcon size={16} aria-hidden="true" />
+									<ListTodoIcon size={16} aria-hidden="true" />
 								)}
 							</Button>
 						)}

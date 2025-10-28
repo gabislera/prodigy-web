@@ -1,4 +1,4 @@
-import { Folder, Folders, Target } from "lucide-react";
+import { Folders } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

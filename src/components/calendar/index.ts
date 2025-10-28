@@ -15,6 +15,7 @@ export { EventsPopup } from "./events-popup";
 export * from "./hooks/use-current-time-indicator";
 export * from "./hooks/use-event-visibility";
 export { MonthView } from "./month-view";
+export { TasksBottomSheet } from "./tasks-bottom-sheet";
 export { TasksSidebar } from "./tasks-sidebar";
 // Type exports
 export type { CalendarEvent, CalendarView } from "./types";

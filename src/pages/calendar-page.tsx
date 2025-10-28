@@ -4,14 +4,19 @@ import { toast } from "sonner";
 import {
 	type CalendarEvent,
 	EventCalendar,
+	TasksBottomSheet,
 	TasksSidebar,
 } from "@/components/calendar";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn } from "@/types/tasks";
-import { formatTimeSimple } from "@/utils/date-helpers";
+import {
+	formatTimeSimple,
+	getDefaultEventTimes,
+} from "@/utils/date-helpers";
 
 // Helper functions to convert between Task and CalendarEvent
 const taskToCalendarEvent = (task: Task): CalendarEvent => {
@@ -25,6 +30,7 @@ const taskToCalendarEvent = (task: Task): CalendarEvent => {
 export function CalendarPage() {
 	const { taskGroupsWithDetails } = useTaskGroupsWithDetails();
 	const { updateTask, createTask, tasks } = useTasks();
+	const isMobile = useIsMobile();
 
 	const getInitialCalendarSidebar = () => {
 		if (typeof window === "undefined") return false;
@@ -36,6 +42,9 @@ export function CalendarPage() {
 		getInitialCalendarSidebar,
 	);
 
+	const [isTaskBottomSheetOpen, setIsTaskBottomSheetOpen] =
+		useState<boolean>(false);
+
 	// Filter states
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 	const [completionFilter, setCompletionFilter] = useState<
@@ -43,11 +52,17 @@ export function CalendarPage() {
 	>("all");
 
 	const toggleCalendarSidebar = () => {
-		setIsTaskSidebarOpen((prev) => {
-			const next = !prev;
-			localStorage.setItem("calendar_sidebar_state", JSON.stringify(next));
-			return next;
-		});
+		// Mobile: abre bottom sheet
+		if (isMobile) {
+			setIsTaskBottomSheetOpen((prev) => !prev);
+		} else {
+			// Desktop: abre sidebar
+			setIsTaskSidebarOpen((prev) => {
+				const next = !prev;
+				localStorage.setItem("calendar_sidebar_state", JSON.stringify(next));
+				return next;
+			});
+		}
 	};
 
 	const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
@@ -194,8 +209,10 @@ export function CalendarPage() {
 		const fullTask = allTasks.find((t) => t.id === task.id);
 		if (fullTask) {
 			setSelectedTask(fullTask as Task);
-			setInitialStartDate(null);
-			setInitialEndDate(null);
+			// Set default date/time for calendar events
+			const { start, end } = getDefaultEventTimes();
+			setInitialStartDate(start);
+			setInitialEndDate(end);
 			setIsTaskDialogOpen(true);
 		}
 	};
@@ -294,7 +311,7 @@ export function CalendarPage() {
 
 	return (
 		<div
-			className={`flex h-[calc(100vh-80px)] pb-20 md:p-4 gap-0 ${isTaskSidebarOpen ? "gap-4" : ""}`}
+			className={`flex h-[calc(100vh-80px)] pb-20 md:pb-0 md:p-4 gap-0 ${isTaskSidebarOpen ? "gap-4" : ""}`}
 		>
 			<div className="flex flex-col flex-1 min-h-0 rounded-lg">
 				<EventCalendar
@@ -308,8 +325,9 @@ export function CalendarPage() {
 				/>
 			</div>
 
+			{/* Desktop Sidebar */}
 			<div
-				className={`transition-all duration-300 ease-in-out overflow-hidden h-full  ${
+				className={`hidden md:block transition-all duration-300 ease-in-out overflow-hidden h-full  ${
 					isTaskSidebarOpen ? "w-80 opacity-100" : "w-0 opacity-0"
 				}`}
 			>
@@ -323,6 +341,19 @@ export function CalendarPage() {
 					onTaskClick={handleTaskClick}
 				/>
 			</div>
+
+			{/* Mobile Bottom Sheet */}
+			<TasksBottomSheet
+				isOpen={isTaskBottomSheetOpen}
+				onOpenChange={setIsTaskBottomSheetOpen}
+				allTasks={unscheduledTasks}
+				taskGroupsWithDetails={taskGroupsWithDetails}
+				selectedGroupIds={selectedGroupIds}
+				setSelectedGroupIds={setSelectedGroupIds}
+				completionFilter={completionFilter}
+				setCompletionFilter={setCompletionFilter}
+				onTaskClick={handleTaskClick}
+			/>
 
 			{selectedTask && (
 				<TaskDialog

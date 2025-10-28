@@ -35,6 +35,31 @@ export const getDefaultTimes = () => {
 };
 
 /**
+ * Return default date/times for calendar events
+ * Rounds to next 15-minute interval and adds 1 hour duration
+ */
+export const getDefaultEventTimes = () => {
+	const now = new Date();
+	const startDate = new Date(now);
+
+	// Round up to next 15-minute interval
+	const minutes = now.getMinutes();
+	const roundedMinutes = Math.ceil(minutes / 15) * 15;
+	startDate.setMinutes(roundedMinutes);
+	startDate.setSeconds(0);
+	startDate.setMilliseconds(0);
+
+	// Add 1 hour for end time
+	const endDate = new Date(startDate);
+	endDate.setHours(startDate.getHours() + 1);
+
+	return {
+		start: startDate,
+		end: endDate,
+	};
+};
+
+/**
  * Format the time range of a task for display
  */
 export function formatTaskTimeRange(

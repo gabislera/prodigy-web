@@ -1,4 +1,4 @@
-import { Logs, Target } from "lucide-react";
+import { Logs } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Task, TaskGroup } from "@/types/tasks";
 import { formatTaskTimeRange } from "@/utils/date-helpers";

@@ -38,7 +38,7 @@ export const BottomNavigation = () => {
 							className={cn(
 								"group flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300",
 								"hover:bg-secondary/50 active:scale-95",
-								isActive && "bg-gradient-primary shadow-glow",
+								isActive && "bg-primary",
 							)}
 						>
 							<Icon
