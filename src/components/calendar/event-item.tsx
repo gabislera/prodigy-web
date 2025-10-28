@@ -53,22 +53,11 @@ function EventWrapper({
 	// Check if the event is completed
 	const isEventCompleted = event.completed || false;
 
-	// Map priority to color
-	const priorityColorMap: Record<
-		CalendarEvent["priority"],
-		"sky" | "amber" | "violet" | "rose" | "emerald" | "orange"
-	> = {
-		high: "rose",
-		medium: "amber",
-		low: "emerald",
-	};
-	const eventColor = priorityColorMap[event.priority];
-
 	return (
 		<button
 			className={cn(
 				"flex size-full overflow-hidden px-1 text-left font-medium backdrop-blur-md transition outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg data-past-event:line-through sm:px-2",
-				getEventColorClasses(eventColor),
+				getEventColorClasses(event.priority),
 				getBorderRadiusClasses(isFirstDay, isLastDay),
 				className,
 			)}
@@ -118,16 +107,6 @@ export function EventItem({
 	onMouseDown,
 	onTouchStart,
 }: EventItemProps) {
-	// Map priority to color
-	const priorityColorMap: Record<
-		CalendarEvent["priority"],
-		"sky" | "amber" | "violet" | "rose" | "emerald" | "orange"
-	> = {
-		high: "rose",
-		medium: "amber",
-		low: "emerald",
-	};
-	const eventColor = priorityColorMap[event.priority];
 
 	// Use the provided currentTime (for dragging) or the event's actual time
 	const displayStart = useMemo(() => {
@@ -240,7 +219,7 @@ export function EventItem({
 		<button
 			className={cn(
 				"flex w-full flex-col gap-1 rounded p-2 text-left transition outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-past-event:line-through data-past-event:opacity-90",
-				getEventColorClasses(eventColor),
+				getEventColorClasses(event.priority),
 				className,
 			)}
 			data-past-event={event.completed || undefined}

@@ -17,6 +17,6 @@ export * from "./hooks/use-event-visibility";
 export { MonthView } from "./month-view";
 export { TasksSidebar } from "./tasks-sidebar";
 // Type exports
-export type { CalendarEvent, CalendarView, EventColor } from "./types";
+export type { CalendarEvent, CalendarView } from "./types";
 export * from "./utils";
 export { WeekView } from "./week-view";

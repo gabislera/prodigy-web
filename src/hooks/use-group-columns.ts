@@ -10,9 +10,11 @@ export function useGroupColumns(groupId: string | null) {
 		isLoading,
 		error,
 	} = useQuery<TaskColumn[]>({
-		queryKey: groupId ? queryKeys.taskColumns.groupColumns(groupId) : ["group-columns", null],
+		queryKey: groupId
+			? queryKeys.taskColumns.groupColumns(groupId)
+			: ["group-columns", null],
 		queryFn: () => tasksService.getGroupColumnsWithTasks(groupId!),
-		enabled: !!groupId, // Só busca quando groupId existe
+		enabled: !!groupId,
 	});
 
 	return {

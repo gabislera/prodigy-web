@@ -1,16 +1,2 @@
-import type { Task } from "@/types/tasks"
-
-export type CalendarView = "month" | "week" | "day" | "agenda"
-
-export type CalendarEvent = Task & {
-  startDate: string
-  endDate: string
-}
-
-export type EventColor =
-  | "sky"
-  | "amber"
-  | "violet"
-  | "rose"
-  | "emerald"
-  | "orange"
+// Re-export calendar types from centralized location
+export type { CalendarEvent, CalendarView } from "@/types/calendar";

@@ -79,10 +79,6 @@ export interface CreateTaskColumnData {
 	order: number;
 }
 
-export interface TasksState {
-	todo: Task[];
-	inProgress: Task[];
-	done: Task[];
+export interface UpdateTaskColumnData {
+	title: string;
 }
-
-export type TasksByColumn = Record<string, Task[]>;
