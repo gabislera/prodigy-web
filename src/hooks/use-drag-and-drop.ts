@@ -10,19 +10,17 @@ import { useTasks } from "./use-tasks";
 
 interface UseDragAndDropProps {
 	taskColumns: TaskColumn[];
-	selectedGroup: string | null;
 	onOptimisticUpdate: (newColumns: TaskColumn[]) => void;
 	onResetOptimistic: () => void;
 }
 
 export function useDragAndDrop({
 	taskColumns,
-	selectedGroup,
 	onOptimisticUpdate,
 	onResetOptimistic,
 }: UseDragAndDropProps) {
 	const [activeId, setActiveId] = useState<string | null>(null);
-	const { updateTask } = useTasks(selectedGroup);
+	const { updateTask } = useTasks();
 
 	// Helper function to calculate new positions when reordering within the same column
 	const calculateNewPositions = (
@@ -263,7 +261,7 @@ export function useDragAndDrop({
 					});
 				}
 
-				// Reset optimistic state after successful API call
+				// Reset optimistic state after successful API call and invalidation
 				onResetOptimistic();
 			} catch (error) {
 				console.error("Erro ao mover task:", error);

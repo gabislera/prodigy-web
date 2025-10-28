@@ -1,4 +1,3 @@
-import React from "react";
 import {
 	QuickActions,
 	RecentTaskGroupsCard,
@@ -12,7 +11,7 @@ import type { Task } from "@/types/tasks";
 
 export function DashboardPage() {
 	const { taskGroups, isLoading: isLoadingGroups } = useTaskGroups();
-	const { stats, isLoading: isLoadingStats } = useTaskStats();
+	const { stats } = useTaskStats();
 
 	const handleTaskClick = (task: Task) => {
 		console.log("Task clicked:", task);

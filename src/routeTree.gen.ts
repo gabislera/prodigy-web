@@ -18,6 +18,7 @@ import { Route as ProtectedTasksRouteImport } from './routes/_protected/tasks'
 import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
 import { Route as ProtectedNotesRouteImport } from './routes/_protected/notes'
 import { Route as ProtectedCalendarRouteImport } from './routes/_protected/calendar'
+import { Route as ProtectedTasksGroupIdRouteImport } from './routes/_protected/tasks/$groupId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -63,6 +64,11 @@ const ProtectedCalendarRoute = ProtectedCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedTasksGroupIdRoute = ProtectedTasksGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => ProtectedTasksRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
@@ -70,9 +76,10 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof ProtectedCalendarRoute
   '/notes': typeof ProtectedNotesRoute
   '/profile': typeof ProtectedProfileRoute
-  '/tasks': typeof ProtectedTasksRoute
+  '/tasks': typeof ProtectedTasksRouteWithChildren
   '/timer': typeof ProtectedTimerRoute
   '/': typeof ProtectedIndexRoute
+  '/tasks/$groupId': typeof ProtectedTasksGroupIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -80,9 +87,10 @@ export interface FileRoutesByTo {
   '/calendar': typeof ProtectedCalendarRoute
   '/notes': typeof ProtectedNotesRoute
   '/profile': typeof ProtectedProfileRoute
-  '/tasks': typeof ProtectedTasksRoute
+  '/tasks': typeof ProtectedTasksRouteWithChildren
   '/timer': typeof ProtectedTimerRoute
   '/': typeof ProtectedIndexRoute
+  '/tasks/$groupId': typeof ProtectedTasksGroupIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,9 +100,10 @@ export interface FileRoutesById {
   '/_protected/calendar': typeof ProtectedCalendarRoute
   '/_protected/notes': typeof ProtectedNotesRoute
   '/_protected/profile': typeof ProtectedProfileRoute
-  '/_protected/tasks': typeof ProtectedTasksRoute
+  '/_protected/tasks': typeof ProtectedTasksRouteWithChildren
   '/_protected/timer': typeof ProtectedTimerRoute
   '/_protected/': typeof ProtectedIndexRoute
+  '/_protected/tasks/$groupId': typeof ProtectedTasksGroupIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/timer'
     | '/'
+    | '/tasks/$groupId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/timer'
     | '/'
+    | '/tasks/$groupId'
   id:
     | '__root__'
     | '/_protected'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_protected/tasks'
     | '/_protected/timer'
     | '/_protected/'
+    | '/_protected/tasks/$groupId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,14 +213,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCalendarRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/tasks/$groupId': {
+      id: '/_protected/tasks/$groupId'
+      path: '/$groupId'
+      fullPath: '/tasks/$groupId'
+      preLoaderRoute: typeof ProtectedTasksGroupIdRouteImport
+      parentRoute: typeof ProtectedTasksRoute
+    }
   }
 }
+
+interface ProtectedTasksRouteChildren {
+  ProtectedTasksGroupIdRoute: typeof ProtectedTasksGroupIdRoute
+}
+
+const ProtectedTasksRouteChildren: ProtectedTasksRouteChildren = {
+  ProtectedTasksGroupIdRoute: ProtectedTasksGroupIdRoute,
+}
+
+const ProtectedTasksRouteWithChildren = ProtectedTasksRoute._addFileChildren(
+  ProtectedTasksRouteChildren,
+)
 
 interface ProtectedRouteChildren {
   ProtectedCalendarRoute: typeof ProtectedCalendarRoute
   ProtectedNotesRoute: typeof ProtectedNotesRoute
   ProtectedProfileRoute: typeof ProtectedProfileRoute
-  ProtectedTasksRoute: typeof ProtectedTasksRoute
+  ProtectedTasksRoute: typeof ProtectedTasksRouteWithChildren
   ProtectedTimerRoute: typeof ProtectedTimerRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
 }
@@ -217,7 +248,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedCalendarRoute: ProtectedCalendarRoute,
   ProtectedNotesRoute: ProtectedNotesRoute,
   ProtectedProfileRoute: ProtectedProfileRoute,
-  ProtectedTasksRoute: ProtectedTasksRoute,
+  ProtectedTasksRoute: ProtectedTasksRouteWithChildren,
   ProtectedTimerRoute: ProtectedTimerRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,
 }

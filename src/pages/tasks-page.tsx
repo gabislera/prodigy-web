@@ -1,5 +1,6 @@
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Plus, Search, Settings } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ColumnDialog } from "@/components/tasks/column-dialog";
 import { CreateGroupDialog } from "@/components/tasks/create-group-dialog";
@@ -17,7 +18,18 @@ import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn, TaskGroup } from "@/types/tasks";
 
 export function TasksPage() {
-	const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+	const navigate = useNavigate();
+	const params = useParams({ strict: false });
+	const groupIdFromUrl = (params as { groupId?: string }).groupId;
+
+	const [selectedGroup, setSelectedGroup] = useState<string | null>(groupIdFromUrl || null);
+
+	// Sync selectedGroup with URL param
+	useEffect(() => {
+		if (groupIdFromUrl) {
+			setSelectedGroup(groupIdFromUrl);
+		}
+	}, [groupIdFromUrl]);
 	const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
@@ -37,12 +49,7 @@ export function TasksPage() {
 		updateTaskColumn,
 		deleteTaskColumn,
 	} = useTaskColumns();
-	const { createTask, updateTask, deleteTask } = useTasks(selectedGroup);
-
-	// Get group data from cache
-	const selectedGroupData = taskGroups.find(
-		(g) => g.id === selectedGroup,
-	);
+	const { createTask, updateTask, deleteTask } = useTasks();
 
 	// Convert ApiTaskColumn[] to TaskColumn[]
 	const baseTaskColumns: TaskColumn[] =
@@ -88,7 +95,6 @@ export function TasksPage() {
 	const { activeId, handleDragStart, handleDragOver, handleDragEnd } =
 		useDragAndDrop({
 			taskColumns,
-			selectedGroup,
 			onOptimisticUpdate: updateOptimisticState,
 			onResetOptimistic: resetOptimisticState,
 		});
@@ -221,10 +227,21 @@ export function TasksPage() {
 
 			if (selectedGroup === groupId) {
 				setSelectedGroup(null);
+				navigate({ to: "/tasks" });
 			}
 		} catch (error) {
 			console.error("Erro ao deletar grupo:", error);
 		}
+	};
+
+	const handleGroupClick = (groupId: string) => {
+		setSelectedGroup(groupId);
+		navigate({ to: `/tasks/${groupId}` });
+	};
+
+	const handleBackToGroups = () => {
+		setSelectedGroup(null);
+		navigate({ to: "/tasks" });
 	};
 
 	const handleSaveColumnOrder = async (newColumns: TaskColumn[]) => {
@@ -316,7 +333,7 @@ export function TasksPage() {
 						<Button
 							variant="ghost"
 							size="icon"
-							onClick={() => setSelectedGroup(null)}
+							onClick={handleBackToGroups}
 							className="h-8 w-8"
 						>
 							<ArrowLeft className="h-4 w-4" />
@@ -436,7 +453,7 @@ export function TasksPage() {
 					<GroupCard
 						key={group.id}
 						group={group}
-						onGroupClick={setSelectedGroup}
+						onGroupClick={handleGroupClick}
 						onEditGroup={handleEditGroup}
 						onDeleteGroup={handleDeleteGroup}
 					/>

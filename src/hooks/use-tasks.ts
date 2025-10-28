@@ -22,7 +22,9 @@ export function useTasks() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.all });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.withDetails });
+			queryClient.invalidateQueries({
+				queryKey: queryKeys.taskGroups.withDetails,
+			});
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskColumns.all });
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskStats.all });
 		},
@@ -37,12 +39,17 @@ export function useTasks() {
 	const updateTaskMutation = useMutation({
 		mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskData }) =>
 			tasksService.updateTask(taskId, data),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.all });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.withDetails });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskColumns.all });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskStats.all });
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
+				queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.all }),
+				queryClient.invalidateQueries({
+					queryKey: queryKeys.taskGroups.withDetails,
+				}),
+				queryClient.invalidateQueries({ queryKey: queryKeys.taskColumns.all }),
+				queryClient.invalidateQueries({ queryKey: queryKeys.taskStats.all }),
+				queryClient.invalidateQueries({ queryKey: ["group-columns"] }),
+			]);
 		},
 		onError: (error: ApiError) => {
 			toast.error(
@@ -57,7 +64,9 @@ export function useTasks() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.all });
-			queryClient.invalidateQueries({ queryKey: queryKeys.taskGroups.withDetails });
+			queryClient.invalidateQueries({
+				queryKey: queryKeys.taskGroups.withDetails,
+			});
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskColumns.all });
 			queryClient.invalidateQueries({ queryKey: queryKeys.taskStats.all });
 		},
