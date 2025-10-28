@@ -70,7 +70,7 @@ function RouteComponent() {
 	if (isMobile) {
 		return (
 			<div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-				<main className="flex-1 overflow-hidden pb-20">
+				<main className="flex-1 overflow-auto pb-20">
 					<Outlet />
 				</main>
 				<BottomNavigation />

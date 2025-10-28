@@ -13,10 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task, TaskColumn } from "@/types/tasks";
-import {
-	formatTimeSimple,
-	getDefaultEventTimes,
-} from "@/utils/date-helpers";
+import { formatTimeSimple, getDefaultEventTimes } from "@/utils/date-helpers";
 
 // Helper functions to convert between Task and CalendarEvent
 const taskToCalendarEvent = (task: Task): CalendarEvent => {
@@ -311,7 +308,7 @@ export function CalendarPage() {
 
 	return (
 		<div
-			className={`flex h-[calc(100vh-80px)] pb-20 md:pb-0 md:p-4 gap-0 ${isTaskSidebarOpen ? "gap-4" : ""}`}
+			className={`flex h-[calc(100vh-80px)] pb-20 p-4 md:pb-0 md:p-4 gap-0 ${isTaskSidebarOpen ? "gap-4" : ""}`}
 		>
 			<div className="flex flex-col flex-1 min-h-0 rounded-lg">
 				<EventCalendar
