@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { queryKeys } from "@/lib/query-keys";
 import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
-import type { ApiTask, UpdateTaskData } from "@/types/tasks";
+import type { Task, UpdateTaskData } from "@/types/tasks";
 
 export function useTasks() {
 	const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export function useTasks() {
 		data: tasks = [],
 		isLoading,
 		error,
-	} = useQuery<ApiTask[]>({
+	} = useQuery<Task[]>({
 		queryKey: queryKeys.tasks.all,
 		queryFn: tasksService.getAllTasks,
 	});

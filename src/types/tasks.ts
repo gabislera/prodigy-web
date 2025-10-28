@@ -34,42 +34,6 @@ export interface TaskGroup {
 	updatedAt: string;
 }
 
-export interface ApiTask {
-	id: string;
-	title: string;
-	description: string;
-	priority: "high" | "medium" | "low";
-	columnId: string | null;
-	position: number;
-	completed: boolean;
-	startDate?: string | null;
-	endDate?: string | null;
-	allDay?: boolean;
-	status?: string;
-	type?: "task" | "event";
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface ApiTaskColumn {
-	id: string;
-	title: string;
-	groupId: string;
-	order: number;
-	tasks: ApiTask[];
-}
-
-export interface ApiTaskGroup {
-	id: string;
-	name: string;
-	description?: string;
-	createdAt: string;
-	updatedAt: string;
-	columns: ApiTaskColumn[];
-	taskCount: number;
-	completedCount: number;
-}
-
 export interface CreateTaskData {
 	title: string;
 	description?: string;

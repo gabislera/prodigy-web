@@ -5,12 +5,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { ApiTaskGroup } from "@/types/tasks";
+import type { TaskGroup } from "@/types/tasks";
 
 interface MoveToGroupDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	groups: ApiTaskGroup[];
+	groups: TaskGroup[];
 	onMove: (groupId: string, columnId: string) => void;
 }
 
@@ -20,7 +20,7 @@ export const MoveToGroupDialog = ({
 	groups,
 	onMove,
 }: MoveToGroupDialogProps) => {
-	const handleSelectGroup = (group: ApiTaskGroup) => {
+	const handleSelectGroup = (group: TaskGroup) => {
 		if (group.columns.length > 0) {
 			onMove(group.id, group.columns[0].id);
 			onOpenChange(false);

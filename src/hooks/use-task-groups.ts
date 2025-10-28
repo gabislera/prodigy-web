@@ -3,12 +3,12 @@ import { toast } from "sonner";
 import { queryKeys } from "@/lib/query-keys";
 import { tasksService } from "@/services/tasksService";
 import type { ApiError } from "@/types/api";
-import type { ApiTaskGroup, UpdateTaskGroupData } from "@/types/tasks";
+import type { TaskGroup, UpdateTaskGroupData } from "@/types/tasks";
 
 export function useTaskGroups() {
 	const queryClient = useQueryClient();
 
-	const { data: taskGroups = [], isLoading } = useQuery<ApiTaskGroup[]>({
+	const { data: taskGroups = [], isLoading } = useQuery<TaskGroup[]>({
 		queryKey: queryKeys.taskGroups.all,
 		queryFn: tasksService.getAllTaskGroups,
 	});

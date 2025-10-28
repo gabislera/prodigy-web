@@ -2,10 +2,10 @@ import { Folder, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import type { ApiTaskGroup } from "@/types/tasks";
+import type { TaskGroup } from "@/types/tasks";
 
 interface RecentTaskGroupsCardProps {
-	taskGroups: ApiTaskGroup[];
+	taskGroups: TaskGroup[];
 	isLoading: boolean;
 	maxGroups?: number;
 }

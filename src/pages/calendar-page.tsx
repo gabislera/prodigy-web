@@ -10,7 +10,7 @@ import { TaskDialog } from "@/components/tasks/task-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTasks } from "@/hooks/use-tasks";
-import type { ApiTask, Task, TaskColumn } from "@/types/tasks";
+import type { Task, TaskColumn } from "@/types/tasks";
 import { formatTimeSimple } from "@/utils/date-helpers";
 
 // Helper functions to convert between Task and CalendarEvent
@@ -76,8 +76,8 @@ export function CalendarPage() {
 			) || [];
 
 		const tasksWithoutGroup = tasks
-			.filter((task: ApiTask) => task != null && !task.columnId)
-			.map((task: ApiTask) => ({
+			.filter((task: Task) => task != null && !task.columnId)
+			.map((task: Task) => ({
 				...task,
 				groupId: null,
 				groupName: "Sem grupo",
@@ -89,7 +89,7 @@ export function CalendarPage() {
 			),
 		);
 		const uniqueTasksWithoutGroup = tasksWithoutGroup.filter(
-			(task: ApiTask & { groupId: null; groupName: string }) =>
+			(task: Task & { groupId: null; groupName: string }) =>
 				!taskIds.has(task.id),
 		);
 

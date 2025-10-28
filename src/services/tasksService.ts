@@ -1,8 +1,8 @@
 import { api } from "@/lib/apiClient";
 import type {
-	ApiTask,
-	ApiTaskColumn,
-	ApiTaskGroup,
+	Task,
+	TaskColumn,
+	TaskGroup,
 	CreateTaskColumnData,
 	CreateTaskData,
 	CreateTaskGroupData,
@@ -11,35 +11,35 @@ import type {
 } from "@/types/tasks";
 
 export const tasksService = {
-	async getAllTasks(): Promise<ApiTask[]> {
+	async getAllTasks(): Promise<Task[]> {
 		const response = await api.get("/tasks");
 		return response.data;
 	},
 
 	// Lista simples de grupos (para /tasks)
-	async getAllTaskGroups(): Promise<ApiTaskGroup[]> {
+	async getAllTaskGroups(): Promise<TaskGroup[]> {
 		const response = await api.get("/groups");
 		return response.data;
 	},
 
 	// DEPRECATED: Manter temporariamente para Calendar
 	// TODO: Migrar Calendar para usar getAllTasks() + getAllTaskGroups()
-	async getAllTaskGroupsWithDetails(): Promise<ApiTaskGroup[]> {
+	async getAllTaskGroupsWithDetails(): Promise<TaskGroup[]> {
 		const response = await api.get("/groups/with-details");
 		return response.data;
 	},
 
-	async createTaskGroup(data: CreateTaskGroupData): Promise<ApiTaskGroup> {
+	async createTaskGroup(data: CreateTaskGroupData): Promise<TaskGroup> {
 		const response = await api.post("/groups", data);
 		return response.data;
 	},
 
-	async getGroupColumns(groupId: string): Promise<ApiTaskColumn[]> {
+	async getGroupColumns(groupId: string): Promise<TaskColumn[]> {
 		const response = await api.get(`/columns/${groupId}`);
 		return response.data;
 	},
 
-	async createTaskColumn(data: CreateTaskColumnData): Promise<ApiTaskColumn> {
+	async createTaskColumn(data: CreateTaskColumnData): Promise<TaskColumn> {
 		const response = await api.post("/columns", data);
 		return response.data;
 	},
@@ -47,7 +47,7 @@ export const tasksService = {
 	async updateTaskColumn(
 		columnId: string,
 		data: { title: string },
-	): Promise<ApiTaskColumn> {
+	): Promise<TaskColumn> {
 		const response = await api.put(`/columns/${columnId}`, data);
 		return response.data;
 	},
@@ -56,12 +56,12 @@ export const tasksService = {
 		await api.delete(`/columns/${columnId}`);
 	},
 
-	async createTask(data: CreateTaskData): Promise<ApiTask> {
+	async createTask(data: CreateTaskData): Promise<Task> {
 		const response = await api.post("/tasks", data);
 		return response.data;
 	},
 
-	async updateTask(taskId: string, data: UpdateTaskData): Promise<ApiTask> {
+	async updateTask(taskId: string, data: UpdateTaskData): Promise<Task> {
 		const response = await api.put(`/tasks/${taskId}`, data);
 		return response.data;
 	},
@@ -82,7 +82,7 @@ export const tasksService = {
 	async updateTaskGroup(
 		groupId: string,
 		data: UpdateTaskGroupData,
-	): Promise<ApiTaskGroup> {
+	): Promise<TaskGroup> {
 		const response = await api.put(`/groups/${groupId}`, data);
 		return response.data;
 	},
@@ -106,7 +106,7 @@ export const tasksService = {
 	// Novo: Buscar colunas com tasks de um grupo específico
 	async getGroupColumnsWithTasks(
 		groupId: string,
-	): Promise<ApiTaskColumn[]> {
+	): Promise<TaskColumn[]> {
 		const response = await api.get(`/columns/${groupId}`);
 		return response.data;
 	},

@@ -51,35 +51,10 @@ export function TasksPage() {
 	} = useTaskColumns();
 	const { createTask, updateTask, deleteTask } = useTasks();
 
-	// Convert ApiTaskColumn[] to TaskColumn[]
-	const baseTaskColumns: TaskColumn[] =
-		(groupColumns || []).map((apiColumn) => ({
-			id: apiColumn.id,
-			title: apiColumn.title,
-			groupId: apiColumn.groupId,
-			order: apiColumn.order,
-			tasks: apiColumn.tasks.map((apiTask) => ({
-				id: apiTask.id,
-				title: apiTask.title,
-				description: apiTask.description,
-				priority: apiTask.priority,
-				columnId: apiTask.columnId,
-				position: apiTask.position,
-				completed: apiTask.completed,
-				startDate: apiTask.startDate,
-				endDate: apiTask.endDate,
-				allDay: apiTask.allDay,
-				status: apiTask.status,
-				type: apiTask.type,
-				createdAt: apiTask.createdAt,
-				updatedAt: apiTask.updatedAt,
-			})),
-		}));
-
 	// Use optimistic state if available, otherwise use base state
 	const taskColumns = useMemo(() => {
-		return optimisticTaskColumns || baseTaskColumns;
-	}, [optimisticTaskColumns, baseTaskColumns]);
+		return optimisticTaskColumns || groupColumns;
+	}, [optimisticTaskColumns, groupColumns]);
 
 	// Function to update optimistic state
 	const updateOptimisticState = (newColumns: TaskColumn[]) => {

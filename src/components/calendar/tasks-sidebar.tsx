@@ -9,7 +9,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import type { ApiTaskGroup } from "@/types/tasks";
+import type { TaskGroup } from "@/types/tasks";
 
 interface TaskWithGroup {
 	id: string;
@@ -25,7 +25,7 @@ interface TaskWithGroup {
 
 interface TasksSidebarProps {
 	allTasks: TaskWithGroup[];
-	taskGroupsWithDetails: ApiTaskGroup[];
+	taskGroupsWithDetails: TaskGroup[];
 	selectedGroupIds: string[];
 	setSelectedGroupIds: (ids: string[]) => void;
 	completionFilter: "all" | "completed" | "incomplete";
