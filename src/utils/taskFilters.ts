@@ -5,33 +5,13 @@ import {
 	parseISO,
 	startOfDay,
 } from "date-fns";
-import { useMemo } from "react";
 import type { Task } from "@/types/tasks";
-import { useTasks } from "./use-tasks";
-
-/**
- * Hook para obter tarefas de hoje
- * Reutiliza os dados do useTasks para evitar requisições duplicadas
- */
-export function useTodayTasks() {
-	const { tasks: allTasks = [], isLoading, error } = useTasks();
-
-	const todayTasks = useMemo(() => {
-		return filterTodayTasks(allTasks);
-	}, [allTasks]);
-
-	return {
-		data: todayTasks,
-		isLoading,
-		error,
-	};
-}
 
 /**
  * Filtra tarefas que são relevantes para hoje
  * Usa date-fns para lógica de datas mais robusta e legível
  */
-function filterTodayTasks(tasks: Task[]): Task[] {
+export function filterTodayTasks(tasks: Task[]): Task[] {
 	if (!tasks.length) return [];
 
 	return tasks.filter((task) => {

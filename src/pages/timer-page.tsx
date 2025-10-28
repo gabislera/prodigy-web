@@ -1,5 +1,5 @@
 import { Clock, Pause, Play, RotateCcw, Settings } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -13,8 +13,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useTimer } from "@/hooks/use-timer";
-import { useTodayTasks } from "@/hooks/use-today-tasks";
+import { useTasks } from "@/hooks/use-tasks";
 import { formatTime } from "@/utils/date-helpers";
+import { filterTodayTasks } from "@/utils/taskFilters";
 
 // Predefinições de tempo
 const TIMER_PRESETS = {
@@ -26,7 +27,9 @@ const TIMER_PRESETS = {
 export function TimerPage() {
 	const timer = useTimer();
 	const [settingsOpen, setSettingsOpen] = useState(false);
-	const { data: todayTasks = [] } = useTodayTasks();
+	const { tasks = [] } = useTasks();
+
+	const todayTasks = useMemo(() => filterTodayTasks(tasks), [tasks]);
 
 	const [localFocusMinutes, setLocalFocusMinutes] = useState(
 		timer.focusDuration / 60000,

@@ -1,21 +1,29 @@
 import { Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTodayTasks } from "@/hooks/use-today-tasks";
-import type { Task } from "@/types/tasks";
+import type { Task, TaskGroup } from "@/types/tasks";
 import { formatTaskTimeRange } from "@/utils/date-helpers";
+import { filterTodayTasks } from "@/utils/taskFilters";
 
 interface TodayTasksCardProps {
+	taskGroups: TaskGroup[];
+	isLoading: boolean;
 	onTaskClick: (task: Task) => void;
 	maxItems?: number;
 }
 
 export function TodayTasksCard({
+	taskGroups,
+	isLoading,
 	onTaskClick,
 	maxItems = 5,
 }: TodayTasksCardProps) {
-	const { data: todayTasks, isLoading } = useTodayTasks();
+	const allTasks: Task[] = taskGroups.flatMap((group) =>
+		group.columns.flatMap((column) => column.tasks),
+	);
 
-	const incompleteTasks = todayTasks?.filter((task) => !task.completed) || [];
+	const todayTasks = filterTodayTasks(allTasks);
+
+	const incompleteTasks = todayTasks.filter((task) => !task.completed);
 
 	const priorityOrder = { high: 3, medium: 2, low: 1 };
 

@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
 	QuickActions,
 	RecentTaskGroupsCard,
@@ -5,16 +6,37 @@ import {
 	TodayTasksCard,
 	WeeklyStats,
 } from "@/components/dashboard";
-import { useTaskGroups } from "@/hooks/use-task-groups";
+import { useTaskGroupsWithDetails } from "@/hooks/use-task-groups-with-details";
 import { useTaskStats } from "@/hooks/use-task-stats";
 import type { Task } from "@/types/tasks";
 
 export function DashboardPage() {
-	const { taskGroups, isLoading: isLoadingGroups } = useTaskGroups();
+	const { taskGroupsWithDetails, isLoading: isLoadingGroups } =
+		useTaskGroupsWithDetails();
 	const { stats } = useTaskStats();
+	const navigate = useNavigate();
+
+	const findGroupIdByColumnId = (columnId: string): string | undefined => {
+		for (const group of taskGroupsWithDetails) {
+			const hasColumn = group.columns.some((column) => column.id === columnId);
+			if (hasColumn) {
+				return group.id;
+			}
+		}
+		return undefined;
+	};
 
 	const handleTaskClick = (task: Task) => {
-		console.log("Task clicked:", task);
+		if (task.columnId) {
+			const groupId = findGroupIdByColumnId(task.columnId);
+			if (groupId) {
+				navigate({ to: `/tasks/${groupId}` });
+			}
+		}
+	};
+
+	const handleGroupClick = (group: { id: string }) => {
+		navigate({ to: `/tasks/${group.id}` });
 	};
 
 	return (
@@ -42,11 +64,17 @@ export function DashboardPage() {
 
 			{/* Tarefas de Hoje + Grupos Recentes */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				<TodayTasksCard onTaskClick={handleTaskClick} />
-				<RecentTaskGroupsCard
-					taskGroups={taskGroups}
+				<TodayTasksCard
+					taskGroups={taskGroupsWithDetails}
 					isLoading={isLoadingGroups}
-					maxGroups={3}
+					onTaskClick={handleTaskClick}
+					maxItems={3}
+				/>
+				<RecentTaskGroupsCard
+					taskGroups={taskGroupsWithDetails}
+					isLoading={isLoadingGroups}
+					maxGroups={2}
+					onGroupClick={handleGroupClick}
 				/>
 				{/* Conquistas - Temporariamente comentado */}
 				{/* <AchievementsCard

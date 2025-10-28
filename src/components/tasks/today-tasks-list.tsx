@@ -1,9 +1,11 @@
 import { Clock } from "lucide-react";
+import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useTodayTasks } from "@/hooks/use-today-tasks";
+import { useTasks } from "@/hooks/use-tasks";
 import type { Task } from "@/types/tasks";
 import { formatTaskTimeRange } from "@/utils/date-helpers";
+import { filterTodayTasks } from "@/utils/taskFilters";
 import { getPriorityColor } from "@/utils/taskUtils";
 
 interface TodayTasksListProps {
@@ -15,7 +17,9 @@ export function TodayTasksList({
 	onTaskClick,
 	maxItems = 5,
 }: TodayTasksListProps) {
-	const { data: todayTasks, isLoading } = useTodayTasks();
+	const { tasks = [], isLoading } = useTasks();
+
+	const todayTasks = useMemo(() => filterTodayTasks(tasks), [tasks]);
 
 	const incompleteTasks = todayTasks?.filter((task) => !task.completed) || [];
 

@@ -8,12 +8,14 @@ interface RecentTaskGroupsCardProps {
 	taskGroups: TaskGroup[];
 	isLoading: boolean;
 	maxGroups?: number;
+	onGroupClick?: (group: TaskGroup) => void;
 }
 
 export function RecentTaskGroupsCard({
 	taskGroups,
 	isLoading,
 	maxGroups = 3,
+	onGroupClick,
 }: RecentTaskGroupsCardProps) {
 	const recentGroups = [...taskGroups].reverse().slice(0, maxGroups);
 
@@ -52,9 +54,11 @@ export function RecentTaskGroupsCard({
 								: 0;
 
 						return (
-							<div
+							<button
 								key={group.id}
-								className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+								type="button"
+								className="w-full p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left cursor-pointer"
+								onClick={() => onGroupClick?.(group)}
 							>
 								<div className="flex items-center gap-2 mb-2">
 									<Folder className="h-4 w-4 text-accent" />
@@ -82,7 +86,7 @@ export function RecentTaskGroupsCard({
 									{group.completedCount} de {group.taskCount} concluídas (
 									{progress}%)
 								</p>
-							</div>
+							</button>
 						);
 					})}
 			</CardContent>
