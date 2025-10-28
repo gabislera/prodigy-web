@@ -1,12 +1,14 @@
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import {
-	createFileRoute,
-	Link,
-	Outlet,
-	redirect,
-	useLocation,
-} from "@tanstack/react-router";
-import { Calendar, FileText, Flame, Home, Kanban, Timer } from "lucide-react";
+	Calendar,
+	FileText,
+	Home,
+	Kanban,
+	type LucideIcon,
+	Timer,
+} from "lucide-react";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
+import { Header } from "@/components/layout/header";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser } from "@/components/layout/nav-user";
 import {
@@ -16,11 +18,13 @@ import {
 	SidebarHeader,
 	SidebarInset,
 	SidebarProvider,
-	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTimer } from "@/hooks/use-timer";
-import { formatTime } from "@/utils/date-helpers";
+
+export interface NavigationProps {
+	title: string;
+	url: string;
+	icon: LucideIcon;
+}
 
 export const Route = createFileRoute("/_protected")({
 	beforeLoad: async () => {
@@ -53,31 +57,6 @@ const navigation = [
 ];
 
 function RouteComponent() {
-	const location = useLocation();
-	const timer = useTimer();
-
-	const currentNavItem = navigation.find((item) => {
-		if (item.url === "/") {
-			return location.pathname === "/";
-		}
-		return location.pathname.startsWith(item.url);
-	});
-
-	const isMobile = useIsMobile();
-
-	const showMiniTimer = timer.isRunning && location.pathname !== "/timer";
-
-	if (isMobile) {
-		return (
-			<div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-				<main className="flex-1 overflow-auto pb-20">
-					<Outlet />
-				</main>
-				<BottomNavigation />
-			</div>
-		);
-	}
-
 	return (
 		<SidebarProvider>
 			<Sidebar collapsible="icon">
@@ -102,36 +81,12 @@ function RouteComponent() {
 					<NavUser />
 				</SidebarFooter>
 			</Sidebar>
-			<SidebarInset className="flex flex-col overflow-hidden">
-				<header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6 bg-sidebar">
-					<SidebarTrigger className="-ml-1" />
-					<div className="flex items-center justify-between w-full">
-						<h1 className="text-xl font-bold text-white">
-							{currentNavItem?.title}
-						</h1>
-						<div className="flex items-center gap-3">
-							{showMiniTimer && (
-								<Link
-									to="/timer"
-									className="flex items-center gap-2 rounded-full px-3 py-1 transition-all duration-200 hover:scale-105 cursor-pointer bg-gradient-primary/20 hover:bg-gradient-primary/30"
-								>
-									<Timer className="size-4 text-primary" />
-									<span className="text-sm font-bold tabular-nums text-primary">
-										{formatTime(timer.timeRemaining)}
-									</span>
-								</Link>
-							)}
-
-							<div className="flex items-center gap-2 bg-secondary/70 rounded-full px-3 py-1">
-								<Flame className="size-4 text-secondary-solid" />
-								<span className="text-sm font-bold text-white">7</span>
-							</div>
-						</div>
-					</div>
-				</header>
-				<main className="flex-1 overflow-hidden">
+			<SidebarInset className="flex flex-col ">
+				<Header navigation={navigation} />
+				<main className="flex-1 ">
 					<Outlet />
 				</main>
+				<BottomNavigation navigation={navigation} />
 			</SidebarInset>
 		</SidebarProvider>
 	);
