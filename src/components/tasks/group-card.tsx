@@ -1,4 +1,5 @@
 import { Folder, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { memo } from "react";
 import { Card } from "@/components/ui/card";
 import {
 	DropdownMenu,
@@ -16,7 +17,7 @@ interface GroupCardProps {
 	onDeleteGroup: (groupId: string) => void;
 }
 
-export const GroupCard = ({
+export const GroupCard = memo(({
 	group,
 	onGroupClick,
 	onEditGroup,
@@ -105,4 +106,6 @@ export const GroupCard = ({
 			</div>
 		</Card>
 	);
-};
+});
+
+GroupCard.displayName = "GroupCard";

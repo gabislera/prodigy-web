@@ -2,6 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { format } from "date-fns";
 import { Calendar } from "lucide-react";
+import { memo } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Task, TaskColumn } from "@/types/tasks";
@@ -15,7 +16,7 @@ interface TaskCardProps {
 	onToggleComplete: (taskId: string, completed: boolean) => void;
 }
 
-export const TaskCard = ({ task, onTaskClick }: TaskCardProps) => {
+export const TaskCard = memo(({ task, onTaskClick }: TaskCardProps) => {
 	const {
 		attributes,
 		listeners,
@@ -77,4 +78,6 @@ export const TaskCard = ({ task, onTaskClick }: TaskCardProps) => {
 			</Card>
 		</div>
 	);
-};
+});
+
+TaskCard.displayName = "TaskCard";
