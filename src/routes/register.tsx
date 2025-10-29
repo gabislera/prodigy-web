@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@radix-ui/react-label";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,30 +17,26 @@ import { useAuth } from "@/hooks/use-auth";
 import { type RegisterFormData, registerSchema } from "@/schemas/authSchema";
 
 export const Route = createFileRoute("/register")({
-	beforeLoad: async () => {
-		// Check if user is already authenticated
-		const token = localStorage.getItem("accessToken");
-		if (token) {
-			try {
-				const payload = JSON.parse(atob(token.split(".")[1]));
-				const currentTime = Date.now() / 1000;
-				if (payload.exp > currentTime) {
-					throw redirect({ to: "/" });
-				}
-			} catch {
-				// Token is invalid, continue to register page
-			}
-		}
-	},
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const navigate = useNavigate();
 	const {
+		user,
 		register: registerUser,
 		isRegisterLoading,
 		registerError,
-	} = useAuth();
+	} = useAuth({
+		enabled: false,
+	});
+
+	// Redirect to home if already authenticated
+	useEffect(() => {
+		if (user) {
+			navigate({ to: "/" });
+		}
+	}, [user, navigate]);
 
 	const {
 		register,

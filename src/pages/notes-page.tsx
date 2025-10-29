@@ -2,13 +2,13 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useNotes } from "@/hooks/use-notes";
-import type { Note } from "@/types/notes";
 import { AINotesDialog } from "@/components/notes/ai-notes-dialog";
 import { NotesEditor } from "@/components/notes/notes-editor";
 import { NotesHeader } from "@/components/notes/notes-header";
 import { NotesList } from "@/components/notes/notes-list";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNotes } from "@/hooks/use-notes";
+import type { Note } from "@/types/notes";
 
 export function NotesPage() {
 	const { notes, createNote, debouncedUpdateNote, deleteNote } = useNotes();
@@ -26,9 +26,8 @@ export function NotesPage() {
 	const { messages, sendMessage, status } = useChat({
 		transport: new DefaultChatTransport({
 			api: "http://localhost:3333/notes/ai",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-			},
+			// Cookies are sent automatically with credentials: 'include'
+			credentials: "include",
 		}),
 	});
 

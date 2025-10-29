@@ -2,55 +2,84 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3333";
 
-// Create a separate axios instance for refresh token to avoid interceptor loops
-const apiPublic = axios.create({
-	baseURL: API_BASE_URL,
-	withCredentials: true,
-});
-
-// Create axios instance with auth interceptor
+/**
+ * API client configured to work with httpOnly cookies
+ * Tokens are automatically sent by the browser - no manual handling needed
+ */
 export const api = axios.create({
 	baseURL: API_BASE_URL,
-	withCredentials: true, // Enable cookies
+	withCredentials: true, // Enables cookies for all requests
+	headers: {
+		"Content-Type": "application/json",
+	},
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-	(config) => {
-		const token = localStorage.getItem("accessToken");
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-		return config;
-	},
-	(error) => Promise.reject(error),
-);
+// Simple flag to prevent multiple refresh attempts
+let isRefreshing = false;
+let refreshPromise: Promise<void> | null = null;
 
-// Response interceptor to handle token refresh
+/**
+ * Interceptor to automatically refresh expired access tokens
+ * Simple and straightforward - no complex queueing system needed
+ */
 api.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
+		const status = error.response?.status;
 
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			originalRequest._retry = true;
+		// Only handle 401 errors
+		if (status !== 401) {
+			return Promise.reject(error);
+		}
 
+		// Don't retry auth endpoints or already retried requests
+		const isAuthEndpoint = originalRequest.url?.includes("/auth/");
+		if (isAuthEndpoint || originalRequest._isRetry) {
+			// If auth endpoint fails, redirect to login
+			if (isAuthEndpoint && !window.location.pathname.includes("/login")) {
+				window.location.href = "/login";
+			}
+			return Promise.reject(error);
+		}
+
+		// If already refreshing, wait for it
+		if (isRefreshing && refreshPromise) {
 			try {
-				// Use a separate axios instance to avoid interceptor loops
-				const refreshResponse = await apiPublic.post("/auth/refresh");
-
-				const { accessToken } = refreshResponse.data;
-				localStorage.setItem("accessToken", accessToken);
-
-				// Retry original request
-				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+				await refreshPromise;
+				originalRequest._isRetry = true;
 				return api(originalRequest);
 			} catch {
-				localStorage.removeItem("accessToken");
-				window.location.href = "/login";
+				return Promise.reject(error);
 			}
 		}
 
-		return Promise.reject(error);
+		// Start refresh process
+		isRefreshing = true;
+		originalRequest._isRetry = true;
+
+		refreshPromise = api
+			.post("/auth/refresh")
+			.then(() => {
+				// Success - token refreshed
+			})
+			.catch(() => {
+				// Refresh failed - redirect to login
+				if (!window.location.pathname.includes("/login")) {
+					window.location.href = "/login";
+				}
+				throw error;
+			})
+			.finally(() => {
+				isRefreshing = false;
+				refreshPromise = null;
+			});
+
+		try {
+			await refreshPromise;
+			return api(originalRequest);
+		} catch {
+			return Promise.reject(error);
+		}
 	},
 );

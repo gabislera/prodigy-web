@@ -1,4 +1,10 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	useLocation,
+	useNavigate,
+} from "@tanstack/react-router";
 import {
 	Calendar,
 	FileText,
@@ -7,6 +13,7 @@ import {
 	type LucideIcon,
 	Timer,
 } from "lucide-react";
+import { useEffect } from "react";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import { Header } from "@/components/layout/header";
 import { NavMain } from "@/components/layout/nav-main";
@@ -19,6 +26,8 @@ import {
 	SidebarInset,
 	SidebarProvider,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface NavigationProps {
 	title: string;
@@ -27,24 +36,6 @@ export interface NavigationProps {
 }
 
 export const Route = createFileRoute("/_protected")({
-	beforeLoad: async () => {
-		// Check if user is authenticated
-		const token = localStorage.getItem("accessToken");
-		if (!token) {
-			throw redirect({ to: "/login" });
-		}
-
-		// Check if token is valid
-		try {
-			const payload = JSON.parse(atob(token.split(".")[1]));
-			const currentTime = Date.now() / 1000;
-			if (payload.exp <= currentTime) {
-				throw redirect({ to: "/login" });
-			}
-		} catch {
-			throw redirect({ to: "/login" });
-		}
-	},
 	component: RouteComponent,
 });
 
@@ -57,6 +48,54 @@ const navigation = [
 ];
 
 function RouteComponent() {
+	const location = useLocation();
+	const navigate = useNavigate();
+	const { user, logout, isLogoutLoading, isLoadingUser } = useAuth();
+	const isMobile = useIsMobile();
+
+	// Redirect to login if not authenticated
+	useEffect(() => {
+		if (!isLoadingUser && !user) {
+			navigate({ to: "/login" });
+		}
+	}, [user, isLoadingUser, navigate]);
+
+	// const currentNavItem = navigation.find(
+	// 	(item) => item.url === location.pathname,
+	// );
+
+	// const handleLogout = () => {
+	// 	logout();
+	// };
+
+	// Show loading state while checking auth
+	if (isLoadingUser) {
+		return (
+			<div className="min-h-screen bg-background flex items-center justify-center">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+					<p className="mt-4 text-muted-foreground">Carregando...</p>
+				</div>
+			</div>
+		);
+	}
+
+	// Don't render protected content if not authenticated
+	if (!user) {
+		return null;
+	}
+
+	// if (isMobile) {
+	// 	return (
+	// 		<div className="min-h-screen bg-background text-foreground">
+	// 			<main className="relative pb-20">
+	// 				<Outlet /> {/* Mobile pages */}
+	// 			</main>
+	// 			<BottomNavigation navigation={navigation} />
+	// 		</div>
+	// 	);
+	// }
+
 	return (
 		<SidebarProvider>
 			<Sidebar collapsible="icon">
