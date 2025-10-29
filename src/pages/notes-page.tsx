@@ -25,7 +25,7 @@ export function NotesPage() {
 
 	const { messages, sendMessage, status } = useChat({
 		transport: new DefaultChatTransport({
-			api: "http://localhost:3333/notes/ai",
+			api: "http://localhost:3333/notes/generate-ai",
 			// Cookies are sent automatically with credentials: 'include'
 			credentials: "include",
 		}),
