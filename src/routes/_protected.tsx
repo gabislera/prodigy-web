@@ -120,7 +120,7 @@ function RouteComponent() {
 					<NavUser />
 				</SidebarFooter>
 			</Sidebar>
-			<SidebarInset className="flex flex-col ">
+			<SidebarInset className="flex flex-col overflow-hidden">
 				<Header navigation={navigation} />
 				<main className="flex-1 ">
 					<Outlet />
