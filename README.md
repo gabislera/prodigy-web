@@ -1,17 +1,18 @@
 # Prodigy
 
-<img width="1511" height="827" alt="Captura de Tela 2025-10-06 às 11 49 23" src="https://github.com/user-attachments/assets/55b50780-aa39-4b4d-af14-ec72f66f5998" />
+<img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 32 46" src="https://github.com/user-attachments/assets/32084ac9-72c1-4673-812c-3c6a9e8bdfae" />
 
-Prodigy é uma aplicação web moderna de produtividade desenvolvida com React, TypeScript e Tailwind CSS, que combina funcionalidades de calendário, gerenciamento de tarefas estilo Kanban, sistema de notas com IA e timer Pomodoro. O sistema oferece uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
+Prodigy é uma aplicação web de produtividade e aprendizado inteligente que usa IA para gerar planos de estudo, tarefas e notas personalizadas. Integra calendário, Kanban, anotações com IA e timer Pomodoro, oferecendo uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
 
 ## Funcionalidades
 
-- **Calendário**: Visualização em mês, semana e dia com criação de eventos
-- **Sistema Kanban**: Gerenciamento de tarefas com drag & drop entre colunas
-- **Notas com IA**: Criação automática de notas usando inteligência artificial
-- **Timer Pomodoro**: Técnica de produtividade com ciclos de foco e pausa
-- **Interface Responsiva**: Design adaptável para desktop e mobile
-- **Autenticação Segura**: Sistema de login com refresh token automático
+- **Planos Inteligentes com IA: Gere automaticamente planos de estudo, tarefas e atividades personalizadas
+- **Calendário Integrado: Visualização por mês, semana e dia, com criação e organização de eventos
+- **Sistema Kanban: Gerencie tarefas com drag & drop entre colunas de forma intuitiva
+- **Notas com IA: Gere e organize anotações automaticamente a partir do conteúdo estudado
+- **Timer Pomodoro: Aplique ciclos de foco e pausa para melhorar a produtividade
+- **Interface Responsiva: Design adaptável e fluido para desktop e mobile
+- **Autenticação Segura: Login com tokens JWT e renovação automática de sessão
   
 
 ## Tecnologias utilizadas
