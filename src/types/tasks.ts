@@ -82,3 +82,19 @@ export interface CreateTaskColumnData {
 export interface UpdateTaskColumnData {
 	title: string;
 }
+
+export interface AITaskPlan {
+	group: {
+		name: string;
+		description?: string;
+	};
+	tasks: {
+		title: string;
+		description: string;
+		priority: "high" | "medium" | "low";
+		position: number;
+		startDate: string;
+		endDate: string;
+		selected?: boolean;
+	}[];
+}

@@ -102,9 +102,9 @@ function RouteComponent() {
 				<SidebarHeader>
 					<div className="flex items-center justify-center gap-2 group-data-[collapsible=icon]:hidden">
 						<div className="flex items-center justify-center size-7 rounded-md bg-secondary/70 text-primary-foreground font-bold text-lg">
-							D
+							P
 						</div>
-						<h2 className="font-bold text-white">Daily Focus</h2>
+						<h2 className="font-bold text-white">Prodigy</h2>
 					</div>
 
 					<div className="hidden group-data-[collapsible=icon]:flex items-center justify-center">

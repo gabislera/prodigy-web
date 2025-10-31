@@ -1,4 +1,4 @@
-import { ArrowLeft, Bot, Mic, Plus, Search, Sparkles } from "lucide-react";
+import { ArrowLeft, Bot, Loader2, Mic, Plus, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,7 +23,7 @@ export function NotesHeader({
 	onBackToList,
 }: NotesHeaderProps) {
 	const isMobile = useIsMobile();
-	const buttonVariant = isMobile ? "ghost" : "outline";
+	const buttonVariant = isMobile ? "ghost" : "default";
 	return (
 		<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 p-4 border-b border-border/30 w-full bg-background">
 			{/* Botões */}
@@ -48,31 +48,22 @@ export function NotesHeader({
 
 				{/* Botões principais */}
 				<div className="flex items-center gap-2">
-					{isAIGenerating && (
-						<Bot className="size-6 text-zinc-400 animate-pulse mr-2" />
+					{isAIGenerating ? (
+						<Loader2 className="size-4 animate-spin text-white" />
+					) : (
+						<Button
+							onClick={onOpenAIDialog}
+							size="sm"
+							variant="outline"
+						>
+							<Sparkles className="w-4 h-4" />
+						</Button>
 					)}
-					<Button
-						onClick={onCreateNote}
-						size="sm"
-						variant={buttonVariant}
-						disabled
-					>
-						<Mic className="w-4 h-4" />
-						<span className="sr-only">Gravar nota</span>
-					</Button>
-					<Button onClick={onCreateNote} size="sm" variant={buttonVariant}>
-						<Plus className="w-4 h-4" />
+					<Button onClick={onCreateNote} size="sm" variant={buttonVariant} className="bg-primary">
+						<Plus />
 						<span className="sr-only md:not-sr-only md:ml-2">Nova Nota</span>
 					</Button>
-					<Button
-						onClick={onOpenAIDialog}
-						size="sm"
-						className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20 md:flex-1"
-						variant={buttonVariant}
-					>
-						<Sparkles className="w-4 h-4" />
-						<span className="sr-only md:not-sr-only md:ml-2">Gerar com IA</span>
-					</Button>
+
 				</div>
 			</div>
 
