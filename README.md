@@ -2,6 +2,7 @@
 
 <img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 32 46" src="https://github.com/user-attachments/assets/32084ac9-72c1-4673-812c-3c6a9e8bdfae" />
 
+
 Prodigy é uma aplicação web de produtividade e aprendizado inteligente que usa IA para gerar planos de estudo, tarefas e notas personalizadas. Integra calendário, Kanban, anotações com IA e timer Pomodoro, oferecendo uma experiência completa de organização pessoal com interface responsiva e autenticação segura.
 
 ## Funcionalidades
@@ -66,15 +67,22 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 ## Preview das Funcionalidades do Sistema
 
 ### Calendário
-<img width="1512" height="826" alt="Captura de Tela 2025-10-06 às 11 49 37" src="https://github.com/user-attachments/assets/5dff6a6f-5c92-4e0f-b593-02ea79d051af" />
+<img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 38 19" src="https://github.com/user-attachments/assets/999a38ff-0475-4839-bc75-bcd172a2f520" />
 
 - Visualização em múltiplas visualizações (mês, semana, dia)
 - Criação rápida de eventos com diálogos intuitivos
   
 
+### Grupos de tarefas
+<img width="1512" height="823" alt="Captura de Tela 2025-10-31 às 13 39 11" src="https://github.com/user-attachments/assets/c8a867b9-3953-4d9c-8194-d7e2a335f775" />
+
+- Criação de tarefas com IA
+- Agrupamento de tarefas por grupo
+- Estatísticas das tarefas do grupo
+  
 
 ### Sistema Kanban
-<img width="1512" height="826" alt="Captura de Tela 2025-10-06 às 11 50 31" src="https://github.com/user-attachments/assets/21b107fc-dc30-4fe0-80f5-28f78f042d35" />
+<img width="1512" height="820" alt="Captura de Tela 2025-10-31 às 13 39 37" src="https://github.com/user-attachments/assets/50139597-e7ed-484c-b749-8355ab38afa7" />
 
 - Drag & drop entre colunas
 - Reordenação de tarefas
@@ -83,14 +91,14 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
   
 
 - ### Timer Pomodoro
-<img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 43" src="https://github.com/user-attachments/assets/07766c18-abbc-43ca-ab7e-7a720742fedd" />
+<img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 40 40" src="https://github.com/user-attachments/assets/73476a55-66bb-4550-a471-4bb5080a7783" />
 
 - Ciclos de foco e pausa configuráveis
 - Estatísticas de produtividade
   
 
 ### Notas Inteligentes
-<img width="1512" height="825" alt="Captura de Tela 2025-10-06 às 11 50 59" src="https://github.com/user-attachments/assets/8af9467c-8932-421e-8f0b-59bca053b9f6" />
+<img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 43 30" src="https://github.com/user-attachments/assets/62d87b7e-06be-4f56-9685-7917bbf54b81" />
 
 - Editor Markdown com preview
 - Geração automática com IA
