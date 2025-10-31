@@ -69,7 +69,8 @@ Acesse [http://localhost:5173](http://localhost:5173) no navegador.
 ### Calendário
 <img width="1512" height="825" alt="Captura de Tela 2025-10-31 às 13 38 19" src="https://github.com/user-attachments/assets/999a38ff-0475-4839-bc75-bcd172a2f520" />
 
-- Visualização em múltiplas visualizações (mês, semana, dia)
+- Calend[ario com múltiplas visualizações (mês, semana, dia)
+- Lista de tarefas não agendadas no calendário
 - Criação rápida de eventos com diálogos intuitivos
   
 
