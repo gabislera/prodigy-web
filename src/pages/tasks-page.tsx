@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Plus, Search, Settings } from "lucide-react";
+import { ArrowLeft, Plus, Search, Settings, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { AITaskSuggestionDialog } from "@/components/tasks/ai-task-suggestion-dialog";
 import { ColumnDialog } from "@/components/tasks/column-dialog";
 import { CreateGroupDialog } from "@/components/tasks/create-group-dialog";
 import { GroupCard } from "@/components/tasks/group-card";
@@ -36,6 +37,7 @@ export function TasksPage() {
 	const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 	const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
+	const [aiDialogOpen, setAiDialogOpen] = useState(false);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [editingGroup, setEditingGroup] = useState<TaskGroup | null>(null);
 	const [editingColumn, setEditingColumn] = useState<TaskColumn | null>(null);
@@ -416,13 +418,22 @@ export function TasksPage() {
 				{/* <div className="flex items-center gap-2">
 						<Filter className="text-primary" size={20} />
 					</div> */}
-				<Button
-					className="bg-primary "
-					onClick={() => setIsCreateGroupDialogOpen(true)}
-				>
-					<Plus size={16} />
-					Novo Grupo
-				</Button>
+				<div className="flex gap-2">
+					<Button
+						variant="outline"
+						className="border-primary/50 hover:bg-primary/10"
+						onClick={() => setAiDialogOpen(true)}
+					>
+						<Sparkles  className="size-4 text-white" />
+					</Button>
+					<Button
+						className="bg-primary"
+						onClick={() => setIsCreateGroupDialogOpen(true)}
+					>
+						<Plus />
+						Novo Grupo
+					</Button>
+				</div>
 			</div>
 
 			{/* Groups Grid */}
@@ -437,6 +448,12 @@ export function TasksPage() {
 					/>
 				))}
 			</div>
+
+			<AITaskSuggestionDialog
+				open={aiDialogOpen}
+				onOpenChange={setAiDialogOpen}
+				groupId={selectedGroup}
+			/>
 
 			<CreateGroupDialog
 				isOpen={isCreateGroupDialogOpen}
