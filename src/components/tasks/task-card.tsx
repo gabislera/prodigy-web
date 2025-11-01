@@ -6,6 +6,7 @@ import { memo } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Task, TaskColumn } from "@/types/tasks";
+import { removeHtmlTags } from "@/utils/taskUtils";
 
 interface TaskCardProps {
 	task: Task;
@@ -49,16 +50,16 @@ export const TaskCard = memo(({ task, onTaskClick }: TaskCardProps) => {
 							<span
 								className={cn(
 									"rounded-full w-2 h-2",
-									task.priority === "high" && "bg-destructive",
-									task.priority === "medium" && "bg-warning",
-									task.priority === "low" && "bg-success",
+									task.priority === "high" && "bg-red-500",
+									task.priority === "medium" && "bg-yellow-500",
+									task.priority === "low" && "bg-green-500",
 								)}
 							/>
 						</div>
 
 						{task.description && (
 							<p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-								{task.description}
+								{removeHtmlTags(task.description)}
 							</p>
 						)}
 					</div>

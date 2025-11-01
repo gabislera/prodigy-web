@@ -33,6 +33,7 @@ import { useTasks } from "@/hooks/use-tasks";
 import { taskFormSchema } from "@/schemas/taskSchema";
 import type { Task, TaskColumn } from "@/types/tasks";
 import { combineDateAndTime, formatTimeFromDate } from "@/utils/date-helpers";
+import { RichTextEditor } from "../RickTaskEditor";
 import { DateSelector } from "./date-selector";
 import { MoveToGroupDialog } from "./move-to-group-dialog";
 
@@ -233,11 +234,16 @@ export const TaskDialog = ({
 						<div className="flex items-start flex-col gap-4 w-full px-6">
 							<div className="space-y-2 w-full">
 								{/* <Label htmlFor="task-description ">Descrição</Label> */}
-								<Textarea
+								{/* <Textarea
 									id="task-description"
 									placeholder="Descreva os detalhes da tarefa"
 									{...register("description")}
 									className="resize-none min-h-[200px] max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-zinc-600 scrollbar-track-transparent"
+								/> */}
+								<RichTextEditor
+									content={watch("description") || ""}
+									onChange={(value) => setValue("description", value)}
+									placeholder="Adicione uma descrição para a tarefa..."
 								/>
 								{errors.description && (
 									<p className="text-sm text-red-500">

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import type { TaskGroup } from "@/types/tasks";
+import { removeHtmlTags } from "@/utils/taskUtils";
 
 interface TaskWithGroup {
 	id: string;
@@ -166,16 +167,16 @@ export const TasksBottomSheet = ({
 											<span
 												className={cn(
 													"rounded-full w-2 h-2 shrink-0 mt-1",
-													task.priority === "high" && "bg-destructive",
-													task.priority === "medium" && "bg-warning",
-													task.priority === "low" && "bg-success",
+													task.priority === "high" && "bg-red-500",
+													task.priority === "medium" && "bg-yellow-500",
+													task.priority === "low" && "bg-green-500",
 												)}
 											/>
 										</div>
 
 										{task.description && (
 											<p className="text-xs text-muted-foreground line-clamp-2">
-												{task.description}
+												{removeHtmlTags(task.description)}
 											</p>
 										)}
 

@@ -16,6 +16,7 @@ import { useTimer } from "@/hooks/use-timer";
 import { useTasks } from "@/hooks/use-tasks";
 import { formatTime } from "@/utils/date-helpers";
 import { filterTodayTasks } from "@/utils/taskFilters";
+import { removeHtmlTags } from "@/utils/taskUtils";
 
 // Predefinições de tempo
 const TIMER_PRESETS = {
@@ -220,7 +221,7 @@ export function TimerPage() {
 													{task.title}
 												</p>
 												<p className="mt-1 text-xs text-muted-foreground">
-													{task.description}
+													{removeHtmlTags(task.description)}
 												</p>
 												{(task.startDate || task.endDate) && (
 													<div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">

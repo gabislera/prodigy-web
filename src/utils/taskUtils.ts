@@ -28,3 +28,16 @@ export const getPriorityColor = (
 			};
 	}
 };
+
+export const removeHtmlTags = (html: string): string => {
+	if (!html) return "";
+
+	return html
+		.replace(/<[^>]*>/g, "") // Remove tags HTML
+		.replace(/&nbsp;/g, " ") // Substitui &nbsp; por espaço
+		.replace(/&amp;/g, "&") // Substitui &amp; por &
+		.replace(/&lt;/g, "<") // Substitui &lt; por <
+		.replace(/&gt;/g, ">") // Substitui &gt; por >
+		.replace(/&quot;/g, '"') // Substitui &quot; por "
+		.trim(); // Remove espaços extras
+};
